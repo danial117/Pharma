@@ -3,6 +3,7 @@ import NavBar from "./NavBar";
 import Footer from "./Footer";
 
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 
 
@@ -11,10 +12,7 @@ import { useNavigate } from "react-router-dom";
 
 
 const About=()=>{
-    const storedData = localStorage.getItem('domContent');
-    const parsedData = JSON.parse(storedData);
-   const DOM= parsedData[0]
-
+      const Content=useSelector((state)=>state.content)
 
 
 
@@ -26,8 +24,8 @@ const About=()=>{
         <div className="w-full xs:max-sm:mb-16">
             <div className="h-[500px] xs:max-sm:grid-cols-1 xs:max-sm:h-auto grid grid-cols-2 w-full ">
                <div className="py-[4rem] xs:max-sm:pt-12 xs:max-sm:pb-2 w-[70%] mx-auto">
-                <p  className="font-Lexend xs:max-sm:text-[1rem] sm:max-md:text-[1.3rem] text-[1.7rem]">{DOM.AboutPageImageText1.text1}</p>
-                <p className="font-Abel xs:max-sm:text-[10px] sm:max-md:text-[14px] my-4 text-[1rem]">{DOM.AboutPageImageText1.text2}</p>
+                <p  className="font-Lexend xs:max-sm:text-[1rem] sm:max-md:text-[1.3rem] text-[1.7rem]">{Content.AboutPageImageText1 ? Content.AboutPageImageText1.text1: 'We offer a better health to everyone.' }</p>
+                <p className="font-Abel xs:max-sm:text-[10px] sm:max-md:text-[14px] my-4 text-[1rem]">{Content.AboutPageImageText1 ? Content.AboutPageImageText1.text2 : 'We are a group of comapanies involved to help you in your medication plans. We offer a better solution for your healthcare medications. We offer great plans to help you manage your medications regularly.A better medical solution to everyone to help live a better life. We want to help you in your medical diagnostics.we love our customers'}</p>
                 </div>
 
 
@@ -72,8 +70,8 @@ const About=()=>{
             <div style={{backgroundImage: `linear-gradient(to right,rgba(0,0,0,0.7), rgba(0,0,0,0.8)), url(${require('../assets/2.jpeg')})`}}  className="w-full bg-cover bg-center xs:max-sm:h-[400px] h-[500px] my-auto">
 
              <div className="w-[60%] sm:max-md:w-[80%] xs:max-sm:w-[90%]   mx-auto py-24">
-                <p className="text-center xs:max-sm:text-[3rem] sm:max-md:text-[5rem] text-[4rem] font-Abel text-white">{DOM.AboutPageImageText2.text1}</p>
-                <p className="text-white xs:max-sm:text-xs font-Livvic">{DOM.AboutPageImageText2.text2}
+                <p className="text-center xs:max-sm:text-[3rem] sm:max-md:text-[5rem] text-[4rem] font-Abel text-white">{Content.AboutPageImageText2 ? Content.AboutPageImageText2.text1: 'Our Mission'}</p>
+                <p className="text-white xs:max-sm:text-xs font-Livvic">{Content.AboutPageImageText2 ? Content.AboutPageImageText2.text2 : 'Our mission is to improve patient outcomes by providing innovative, reliable, and cost-effective medical supplies. We believe that every patient deserves the best care possible, and we are committed to supporting healthcare professionals in achieving that goal. We aim to enhance patient care and outcomes through our commitment to quality, innovation, and exceptional service. Our equipment is sourced from leading manufacturers and is designed to support healthcare professionals in delivering efficient and effective care.'}
                 </p>
 
 
@@ -126,8 +124,8 @@ const About=()=>{
 
 
                <div className="py-[4rem] xs:max-sm:py-8 xs:max-sm:w-[80%]  w-[70%] mx-auto">
-                <p  className="font-Lexend sm:max-md:text-[1.3rem] text-[1.7rem]">{DOM.AboutPageImageText3.text1}</p>
-                <p className="font-Abel sm:max-md:text-[14px] my-4 xs:max-sm:text-[10px] text-[1rem]">{DOM.AboutPageImageText3.text2}</p>
+                <p  className="font-Lexend sm:max-md:text-[1.3rem] text-[1.7rem]">{Content.AboutPageImageText3 ? Content.AboutPageImageText3.text1:'Our Commitment'}</p>
+                <p className="font-Abel sm:max-md:text-[14px] my-4 xs:max-sm:text-[10px] text-[1rem]">{Content.AboutPageImageText3 ? Content.AboutPageImageText3.text2 : 'We are dedicated to making a meaningful impact on the healthcare industry by continuously striving to improve our products and services. Our commitment to excellence is reflected in everything we do, from the products we supply to the relationships we build with our customers.'}</p>
                 </div>
 
 

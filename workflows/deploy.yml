@@ -1,0 +1,37 @@
+name: Deploy to Hostinger
+
+on:
+  push:
+    branches:
+      - main  # Adjust this to your main branch name
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'  # Adjust Node.js version as needed
+
+      - name: Install dependencies
+        run: |
+          npm install  # Or use 'yarn install' if using yarn
+
+      - name: Build React app
+        run: |
+          npm run build  # Or 'yarn build' if using yarn
+
+      - name: Deploy to Hostinger
+        uses: SamKirkland/FTP-Deploy-Action@4.0.0
+        with:
+          ftp-server: ftp.yourdomain.com  # Replace with your FTP server address
+          ftp-username: ${{ secrets.FTP_USERNAME }}  # Set this secret in your repository settings
+          ftp-password: ${{ secrets.FTP_PASSWORD }}  # Set this secret in your repository settings
+          local-dir: ./build
+          remote-dir: /public_html  # Adjust remote directory path as needed
+          git-ftp-args: --insecure  # Add this if you encounter SSL issues

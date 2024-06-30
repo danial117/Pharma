@@ -18,9 +18,6 @@ import {LocalPhoneRounded,EmailRounded} from '@mui/icons-material'
 
 
 
-
-
-
 const Footer=()=>{
 
 

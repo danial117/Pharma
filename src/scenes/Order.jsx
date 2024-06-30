@@ -35,6 +35,15 @@ const Order=()=>{
 
 
 
+
+
+
+
+
+
+
+
+
       const validateForm = () => {
         const newErrors = {};
         // Name validation
@@ -72,6 +81,18 @@ const Order=()=>{
        
         return newErrors;
       };
+
+
+
+
+
+
+
+
+
+
+
+
 
 
       useEffect(()=>{
@@ -142,6 +163,21 @@ const Order=()=>{
 
 
 
+
+      const handlePaymentSuccess = () => {
+        setOrderProcess(3);
+      };
+
+
+
+
+
+
+
+
+
+
+
       const handleSubmit = async(e) => {
 
         e.preventDefault();
@@ -184,6 +220,14 @@ const Order=()=>{
       };
 
 
+
+
+
+
+
+
+
+
       const RemoveAddress=async()=>{
       const response=  await api.delete('/address',{},{headers:{'Content-Type':'application/json'}}).then((response)=>{
         if(response.status=200){
@@ -193,6 +237,12 @@ const Order=()=>{
       
 
       }
+
+
+
+
+
+
 
 
       const Checkout=async()=>{
@@ -241,7 +291,43 @@ const Order=()=>{
 
     <div className=" w-[100%] p-8">
 
-        <div className="flex flex-row xs:max-md:grid xs:max-md:grid-cols-1 gap-y-6 gap-x-6 w-[100%]">
+
+
+    {   
+       orderProcess===3 &&
+       <div className="w-[100%]    h-[100vh] bg-white">
+
+          <div className="w-full pt-16 flex my-auto flex-col gap-y-2">
+            <div className="bg-green-500 flex mx-auto  rounded-full h-[150px] w-[150px]">
+              <CheckRounded style={{margin:'auto',fontSize:120,color:'white'}}/>
+            </div>
+
+
+
+
+         
+         <div className="py-8">
+            <p className=" flex flex-col gap-y-12 font-Lexend text-center text-[2rem]">Order Placed Successfully!</p>
+            <p className="font-Livvic text-center text-md">We've sent you an email the order details.</p>
+
+         </div>
+
+
+          </div>
+
+       </div>
+
+}
+
+
+
+
+
+
+{
+  orderProcess !==3 &&
+
+     <div className="flex flex-row xs:max-md:grid xs:max-md:grid-cols-1 gap-y-6 gap-x-6 w-[100%]">
 
             <div className="basis-[60%] flex flex-col gap-y-4  ">
 
@@ -348,11 +434,11 @@ const Order=()=>{
 
 
               </div>
-            <div className="p-4">
-              <p className="font-bold text-xl font-Lexend">{address.firstName} {address.lastName}</p>
-              <p className="font-bold text-lg font-Lexend">{address.streetAddress}</p>
-              <p className="font-bold text-lg font-Lexend">{address.state}</p>
-              <p className="font-bold text-lg font-Lexend">{address.city}</p>
+            <div className="p-4 flex flex-col gap-y-2">
+              <p className=" text-xl font-Lexend">{address.firstName} {address.lastName}</p>
+              <p className=" text-lg font-Lexend">{address.streetAddress}</p>
+              <p className=" text-lg font-Lexend">{address.state}</p>
+              <p className=" text-lg font-Lexend">{address.city} , 20459</p>
 
 
               </div>
@@ -364,6 +450,7 @@ const Order=()=>{
 
                 <button onClick={()=>{setAddress({})}} className=" py-2 px-4 rounded-md font-Lexend bg-white">Edit</button>
                 <button onClick={RemoveAddress} className=" py-2 px-6 rounded-md font-Lexend bg-white">Remove</button>
+                <button onClick={()=>{setOrderProcess(2)}} className=" py-2 px-6 rounded-md font-Lexend bg-white">Confirm</button>
 
 
                 </div>
@@ -388,7 +475,9 @@ const Order=()=>{
         orderProcess === 2 &&
           <div className="w-full py-4 border-2 border-gray-300 bg-white">
             <div className="w-[80%] mx-auto">
-            <PayPalButtonComponent />
+            <PayPalButtonComponent 
+               onPaymentSuccess={handlePaymentSuccess}
+             />
             </div> 
         </div>
         }
@@ -398,9 +487,7 @@ const Order=()=>{
 
 
 
-        <div className="w-full bg-black p-4">
-          <p className="text-white font-Lexend text-xl">3. Order Confirmation</p>
-        </div>
+       
 
               
 
@@ -624,6 +711,16 @@ const Order=()=>{
 
 
         </div>
+
+
+}
+
+
+
+
+
+
+
 
 
     </div>

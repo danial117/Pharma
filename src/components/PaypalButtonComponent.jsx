@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 
 
 
-const PayPalButtonComponent = () => {
+const PayPalButtonComponent = ({onPaymentSuccess}) => {
 
 const accessToken=useSelector((state)=>state.accessToken)
 
@@ -87,7 +87,8 @@ const accessToken=useSelector((state)=>state.accessToken)
                 } else if (!orderData.purchase_units) {
                   throw new Error(JSON.stringify(orderData));
                 } else {
-                  
+                  console.log('sucess')
+                  onPaymentSuccess()
                   const transaction =
                     orderData?.purchase_units?.[0]?.payments?.captures?.[0] ||
                     orderData?.purchase_units?.[0]?.payments?.authorizations?.[0];
@@ -99,7 +100,7 @@ const accessToken=useSelector((state)=>state.accessToken)
                     orderData,
                     JSON.stringify(orderData, null, 2),
                   );
-                  window.location.href='/'
+                 
                 }
               } catch (error) {
                 console.error(error);

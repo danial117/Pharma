@@ -18,7 +18,7 @@ const MainPageProducts=()=>{
     const { cart, toggleCart } = useContext(CartContext);
     const cartItems=useSelector((state)=>state.cartItems);
     const cartItemIds = cartItems.map(item => item._id);
-
+     const [brands,setBrands]=useState([])
 
 
     useEffect(()=>{
@@ -34,7 +34,7 @@ const MainPageProducts=()=>{
    else if(select ===2){
     fetch(`http://localhost:3002/brands?page=${page}&limit=6`,{
         method:'GET'
-         }).then((response)=>response.json()).then((result)=>{setProducts(result);setPage(page+1); console.log(products)})
+         }).then((response)=>response.json()).then((result)=>{setBrands(result);setPage(page+1); console.log(products)})
    }
 
 
@@ -94,8 +94,8 @@ const MainPageProducts=()=>{
                 <div className="flex gap-y-2 flex-col">
                     <div onClick={()=>{setSelect(1); setPage(1)}} className={`pl-6 cursor-pointer sm:max-md:pl-2 md:max-lg:text-sm sm:max-md:text-[10px]  rounded-md ${select===1 ? 'bg-emerald-500 text-white' :'bg-white text-cyan-900'} text-[16px] font-Livvic  w-full py-4`}>All pharmacutical medicines</div>
                     <div onClick={()=>{ setSelect(2); setPage(1); }} className={`pl-6  cursor-pointer sm:max-md:pl-2 md:max-lg:text-sm sm:max-md:text-[10px]  rounded-md  text-[16px] ${select===2 ? 'bg-emerald-500 text-white' :'bg-white text-cyan-900'} font-Livvic  w-full py-4`}>Brands</div>
-                    <div onClick={()=>{setSelect(3); setPage(1);}} className={`pl-6  cursor-pointer sm:max-md:pl-2 md:max-lg:text-sm sm:max-md:text-[10px]  rounded-md text-[16px] ${select===3 ? 'bg-emerald-500 text-white' :'bg-white text-cyan-900'} font-Livvic  w-full py-4`}>All pharmacutical medicines</div>
-                    <div  onClick={()=>{setSelect(4); setPage(1);}} className={`pl-6 cursor-pointer  sm:max-md:pl-2 md:max-lg:text-sm sm:max-md:text-[10px]  rounded-md  text-[16px] ${select===4 ? 'bg-emerald-500 text-white' :'bg-white text-cyan-900'} font-Livvic  w-full py-4`}>All pharmacutical medicines</div>
+                    <div onClick={()=>{setSelect(3); setPage(1);}} className={`pl-6  cursor-pointer sm:max-md:pl-2 md:max-lg:text-sm sm:max-md:text-[10px]  rounded-md text-[16px] ${select===3 ? 'bg-emerald-500 text-white' :'bg-white text-cyan-900'} font-Livvic  w-full py-4`}>Skin care medications</div>
+                    <div  onClick={()=>{setSelect(4); setPage(1);}} className={`pl-6 cursor-pointer  sm:max-md:pl-2 md:max-lg:text-sm sm:max-md:text-[10px]  rounded-md  text-[16px] ${select===4 ? 'bg-emerald-500 text-white' :'bg-white text-cyan-900'} font-Livvic  w-full py-4`}>Oral health medications</div>
 
                 </div>
 
@@ -112,10 +112,10 @@ const MainPageProducts=()=>{
                     
            {  
            select===2 && 
-           products.map((data,index)=>{
+           brands.map((data,index)=>{
 
             return(
-                <div key={index} className="w-[100%] cursor-pointer mx-auto">
+                <div onClick={()=>{window.location.href=`/brand/${data._id}`}} key={index} className="w-[100%] cursor-pointer mx-auto">
 
                 <img className="h-[150px]" src={data.logoUrl}  />
 
