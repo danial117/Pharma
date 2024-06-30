@@ -41,7 +41,7 @@ const App=()=>{
 
   return(
     <div className="app">
-    <BrowserRouter basename="/" >
+    <BrowserRouter basename="/app" >
 
     
     <Routes>
