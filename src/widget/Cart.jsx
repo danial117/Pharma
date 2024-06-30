@@ -6,7 +6,7 @@ import { CloseRounded,Add,Remove,KeyboardArrowLeftRounded } from '@mui/icons-mat
 import { useEffect, useState,useContext } from 'react';
 import { useMediaQuery } from '@mui/material';
 import { useSelector } from 'react-redux';
-import { incrementItemQuantity,decrementItemQuantity,removeItemFromCartAsync } from '../state';
+import { incrementItemQuantityAsync,decrementItemQuantityAsync,removeItemFromCartAsync,removeItemFromCart } from '../state';
 import { useDispatch } from 'react-redux';
 import { CartContext } from '../cartContext/cartContext';
 import api from '../utils/api';
@@ -31,22 +31,29 @@ const Cart=()=>{
 
     const CartCheckout=async()=>{
 
-     
-     
-
+              
+          if(accessToken)
+{
           await api.get(`/order/createOrder`,{ 
                headers:{'Authorization': `Bearer ${accessToken}`}
              }).then((response)=>{
 
              if(response.status === 201){
+                console.log(cartItemIds)
              cartItemIds.map((data)=>{
-                 dispatch(removeItemFromCartAsync({itemId:data.product}))
+                 dispatch(removeItemFromCart({itemId:data.product}))
                 })
-                
+                 
                 window.location.href='/order'
+                
              }
              })
-            
+            }
+
+            else{
+                 window.location.href='/createAccount'
+                
+            }
         
        
 
@@ -152,9 +159,9 @@ const Cart=()=>{
 
                         <div className=''>
                         <div className="grid grid-cols-3 gap-x-2  my-4  border-[1px] rounded-md w-[40%] md:max-lg:w-[60%] ml-auto ">
-                    <div onClick={()=>{dispatch(decrementItemQuantity({itemId:data._id}))}} className="px-auto  cursor-pointer  bg-gray-300"><Remove style={{fontSize:20}}/></div>
+                    <div onClick={()=>{dispatch(decrementItemQuantityAsync({itemId:data._id}))}} className="px-auto  cursor-pointer  bg-gray-300"><Remove style={{fontSize:20}}/></div>
                     <p className=" mx-auto">{data.quantity}</p>
-                    <div onClick={()=>{dispatch(incrementItemQuantity({itemId:data._id}))}} className=" px-auto my-auto  cursor-pointer "><Add style={{fontSize:20}}/></div>
+                    <div onClick={()=>{dispatch(incrementItemQuantityAsync({itemId:data._id}))}} className=" px-auto my-auto  cursor-pointer "><Add style={{fontSize:20}}/></div>
 
                 </div>
                         </div>

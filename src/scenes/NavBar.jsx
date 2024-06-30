@@ -53,13 +53,12 @@ const NavBar=()=>{
                 <p onClick={()=>{window.location.href='/'}} className='font-Lexend cursor-pointer md:max-lg:text-[14px] text-lg'>Home <span><KeyboardArrowDownRounded/></span></p>
                 <p onClick={()=>{window.location.href='/about'}} className='font-Lexend cursor-pointer md:max-lg:text-[14px] text-lg'>About <span><KeyboardArrowDownRounded/></span></p>
                 <p className='font-Lexend cursor-pointer md:max-lg:text-[14px] text-lg'>News <span><KeyboardArrowDownRounded/></span></p>
-                <p className='font-Lexend cursor-pointer md:max-lg:text-[14px] text-lg'>Info <span><KeyboardArrowDownRounded/></span></p>
                 <p className='font-Lexend cursor-pointer md:max-lg:text-[14px] text-lg'>Contact Us <span><KeyboardArrowDownRounded/></span></p>
             </div>}
 
-          {isMobile &&  <div className="basis-[20%] md:max-lg:basis-[20%] md:max-lg:justify-end md:max-lg:gap-x-4  w-full gap-x-6 flex flex-row py-2 ml-auto mr-[4px]">
-                <ShoppingCartRounded onClick={toggleCart} style={{cursor:'pointer',fontSize:30,margin:'auto'}}/>
-                <button onClick={()=>{window.location.href='/createAccount'}}  className="px-4  md:max-lg:text-[12px] md:max-lg:px-2  text-emerald-600 border-2 border-emerald-300  rounded-md text-sm  font-Poppins">
+          {isMobile &&  <div className="basis-[20%] md:max-lg:basis-[30%] md:max-lg:justify-end md:max-lg:gap-x-6  w-full gap-x-8 flex flex-row py-2 ml-auto mr-[4px]">
+                <ShoppingCartRounded onClick={toggleCart} style={{cursor:'pointer',fontSize:30,margin:'auto 0'}}/>
+                <button onClick={()=>{window.location.href='/createAccount'}}  className="px-4  md:max-lg:text-[12px] md:max-lg:px-2   text-emerald-600 border-2 border-emerald-300  rounded-md text-sm  font-Poppins">
                     Sign Up
                 </button>
                 <div className="flex flex-col justify-center">
@@ -78,6 +77,8 @@ const NavBar=()=>{
         onClose={handleClose}
       >
         <MenuItem onClick={handleClose}>Account Settings</MenuItem>
+        <MenuItem onClick={()=>{window.location.href='/userOrders'; handleClose()}}>Orders</MenuItem>
+        <MenuItem onClick={handleClose}>Cart</MenuItem>
         <MenuItem onClick={()=>{ dispatch(setLogoutAsync({}));   handleClose()}}>Logout</MenuItem>
       </Menu>
                 </div>
@@ -87,9 +88,35 @@ const NavBar=()=>{
 
             { !isMobile &&
             <div className="my-auto">
-              <div className="flex flex-row gap-x-4">
+              <div className="flex mr-2 flex-row gap-x-4">
+           
                  <ShoppingCartRounded onClick={toggleCart} style={{cursor:'pointer'}}/>
                  <MenuRounded onClick={()=>{setToggleMenu(!toggleMenu)}}  style={{cursor:'pointer'}}/>
+                 <div className="flex flex-col justify-center">
+            <div className="flex flex-row gap-y-2">
+             {user && user.profilePicture ?     
+                      
+              <img onClick={handleClick} src={user.profilePicture} className="w-[30px] cursor-pointer rounded-full mx-auto h-auto"  />
+
+             
+
+             :
+                <AccountCircle onClick={handleClick} style={{fontSize:30,cursor:'pointer',margin:'auto'}}/>}
+              {user &&  <p className="font-Lexend my-auto text-xs">{ user.name}</p>}
+              </div>
+                <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleClose}
+      >
+        <MenuItem onClick={handleClose}>Account Settings</MenuItem>
+        <MenuItem onClick={handleClose}>Orders</MenuItem>
+        <MenuItem onClick={handleClose}>Cart</MenuItem>
+        <MenuItem onClick={()=>{ dispatch(setLogoutAsync({}));   handleClose()}}>Logout</MenuItem>
+      </Menu>
+                </div>
+
+
               </div>
                 </div>
 
@@ -98,13 +125,12 @@ const NavBar=()=>{
            
               { toggleMenu &&
               
-              <div className="w-[30%] h-[100vh] right-0 z-[999] fixed bg-white"> 
+              <div className="w-[30%] h-[100vh] right-0 z-[999] fixed bg-gray-200"> 
                 <div className="absolute text-emerald-500 right-[3%] top-[3%]">
                   <CloseRounded onClick={()=>{setToggleMenu(!toggleMenu)}} style={{fontSize:'40px',cursor:'pointer'}}/>
                 </div>
                    <div className="flex w-[80%] text-white mx-auto gap-y-6 mt-24 text-black flex-col ">
                     <p onClick={()=>{window.location.href='/'}} className="font-Abel border-2 bg-emerald-500 cursor-pointer  text-center p-2 border-emerald-500">Home</p>
-                    <p onClick={()=>{window.location.href='/info'}} className="font-Abel border-2 bg-emerald-500 cursor-pointer text-center p-2 border-emerald-500">Info</p>
                     <p onClick={()=>{window.location.href='/about'}}  className="font-Abel border-2 bg-emerald-500 cursor-pointer text-center p-2 border-emerald-500">About</p>
                     <p onClick={()=>{window.location.href='/createAccount'}} className="font-Abel border-2 bg-emerald-500 cursor-pointer  text-center p-2 border-emerald-500">Sign Up</p>
                     <p  className="font-Abel border-2 bg-emerald-500 cursor-pointer text-center p-2 border-emerald-500">News</p>

@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useMediaQuery } from "@mui/material";
 import NavBar from "./NavBar"
 import {useNavigate} from 'react-router-dom'
-import { addItemToCart, removeItemFromCartAsync } from "../state";
+import { addItemToCart, removeItemFromCart, setAccessToken } from "../state";
 import { CartContext } from "../cartContext/cartContext";
 import SearchComponent from "../components/SearchComponent";
 import Slider from "react-slick";
@@ -17,6 +17,13 @@ import { setUser } from "../state";
 import Cart from "../widget/Cart";
 import MainPageProducts from "../components/MainPageProducts";
 import MainProductCarousal from "../components/MainProductCarousal";
+import api from "../utils/api";
+
+
+
+
+
+
 
 const HomePage=()=>{
 
@@ -24,18 +31,15 @@ const HomePage=()=>{
     const xs = useMediaQuery('(min-width:576px)');
     const { cart, toggleCart } = useContext(CartContext);
     const [DomContent,setDomContent]=useState([])
-   
+   const accessToken=useSelector((state)=>state.accessToken)
     const cartItems=useSelector((state)=>state.cartItems);
    const user=useSelector((state)=>state.user)
     const navigate=useNavigate()
     const dispatch=useDispatch()
     const cartItemIds = cartItems.map(item => item._id);
-   
+    const Content=useSelector((state)=>state.content)
 
-    const storedData = localStorage.getItem('domContent');
-       const parsedData = JSON.parse(storedData);
-       console.log(parsedData)
-      const DOM= parsedData[0]
+    
 
   
  
@@ -53,43 +57,84 @@ const HomePage=()=>{
 
 
 
+
+
      
 
       
 
  useEffect(()=>{
     
-
-
- 
- 
-  
-
-
-
-
-    window.onload = () => {
+    window.onload = async() => {
         
-        fetch('http://localhost:3002/get-user-info', {
+    const response=   await fetch('http://localhost:3002/user/', {
           method: 'GET',
           credentials: 'include' // Include cookies in request
         })
         .then(response => response.json())
         .then(data => {
-           dispatch(setUser({user:data}));
-           if(user.id.toString() !== data.id.toString()){
+          const {accessToken,...rest}=data
+          
+          dispatch(setUser({user:rest}));
+          dispatch(setAccessToken({accessToken:accessToken}));
+        
+          
+           console.log(data)
+           if(user.email.toString() !== data.email.toString()){         /////
             cartItemIds.forEach((id)=>{
                
-                dispatch(removeItemFromCartAsync({itemId:id}))
+                dispatch(removeItemFromCart({itemId:id}))
             })
-          
-           
            }
+           return accessToken
+          
           
         
-        })
-        .catch(error => console.error('Error:', error)); 
-      };
+        }).catch(error => console.error('Error:', error)); 
+
+
+        console.log(response)
+
+        const accessToken=response
+
+        if(accessToken){
+            api.get('http://localhost:3002/cart/').then((response)=>
+              { if(response.status===200) {
+        
+                response.data.items.map((item)=>{
+                    console.log(item)
+                   dispatch( addItemToCart({product:item.product,quantity:item.quantity}))
+                })
+        
+        
+                }
+            }
+            )
+        }
+
+
+
+
+
+
+
+    };
+
+
+
+      
+
+
+
+
+
+
+
+
+
+
+
+      
 
 
 
@@ -134,10 +179,10 @@ const HomePage=()=>{
         
 
         <div className="w-[50%] xs:max-sm:w-[100%] xs:max-sm:py-24 xs:max-sm:px-2 sm:max-md:w-[100%] md:max-lg:w-[80%] py-32 px-12">
-            <p className="font-Lexend xs:max-sm:text-[1.6rem] text-white text-[2rem]">{DOM.HomePageMainBannerText.text1}</p>
+            <p className="font-Lexend xs:max-sm:text-[1.6rem] text-white text-[2rem]">{Content.HomePageMainBannerText?Content.HomePageMainBannerText.text1:'Pharma Products'}</p>
 
             <div className="border-l-4 mt-4 mb-6 xs:max-sm:w-[80%] w-[60%] pl-4 border-emerald-600 ">
-                <p className="text-white xs:max-sm:text-xs text-md font-Livvic">{DOM.HomePageMainBannerText.text2}</p>
+                <p className="text-white xs:max-sm:text-xs text-md font-Livvic">{Content.HomePageMainBannerText?Content.HomePageMainBannerText.text2:'We have plenty of medical products here available for everyone. We care for customers'}</p>
                 
 
             </div>

@@ -6,6 +6,7 @@ const initialState = {
     cartItems:[],
     ItemsQuantity:0,
     accessToken: null, 
+    content:{}
 }; 
 
  export const addItemToCartAsync = createAsyncThunk(
@@ -15,16 +16,72 @@ const initialState = {
     const state = getState();
 
     if (state.accessToken) {
-       api.get(`/cart/create/${product._id}`)
+       api.get(`/cart/create/${product._id}/${quantity?quantity:1}`)
       .then((response)=>{
         if (response.status === 201) {
           console.log(response)
-          dispatch(addItemToCart({product:product,quantity:1}))
+          dispatch(addItemToCart({product:product,quantity:quantity?quantity:1}))
         }
       })
      
     } else {
-         dispatch(addItemToCart({product:product,quantity:1}))
+         dispatch(addItemToCart({product:product,quantity:quantity?quantity:1}))
+    }
+  }
+);
+
+
+export const incrementItemQuantityAsync = createAsyncThunk(
+  'auth/incrementItemQuantityAsync',
+  async ( item , { getState,dispatch }) => {
+    const {itemId}= item;
+    const state = getState();
+
+    if (state.accessToken) {
+       api.patch(`/cart/item/${itemId}`,JSON.stringify({action:'increment'}),{
+        headers:{
+          'Content-Type':'application/json'
+        }
+
+       })
+      .then((response)=>{
+        if (response.status === 200) {
+          console.log(response)
+          dispatch(incrementItemQuantity({itemId:itemId}))
+        }
+      })
+     
+    } else {
+      dispatch(incrementItemQuantity({itemId:itemId}))
+    }
+  }
+);
+
+
+
+export const decrementItemQuantityAsync = createAsyncThunk(
+  'auth/decrementItemQuantityAsync',
+  async (item, { getState,dispatch }) => {
+    const {itemId}=item
+    console.log(itemId)
+    const state = getState();
+
+    if (state.accessToken) {
+       api.patch(`/cart/item/${itemId}`,JSON.stringify({action:'decrement'}),{
+        headers:{
+          'Content-Type':'application/json'
+        }
+
+       })
+      .then((response)=>{
+        if (response.status === 200) {
+          console.log(response)
+          dispatch(decrementItemQuantity({itemId:itemId}))
+        }
+      })
+     
+    } else {
+      dispatch(decrementItemQuantity({itemId:itemId}))
     }
   }
 );
@@ -153,7 +210,26 @@ export const authSlice = createSlice({
         state.cartItems.push({ ...product, quantity });
       }
       state.ItemsQuantity += quantity;
+    },
+    setContent:(state,action)=>{
+      state.content=action.payload.data
+
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   }
 
 
@@ -166,7 +242,7 @@ export const authSlice = createSlice({
   });
 
     
-  export const {incrementItemQuantity,decrementItemQuantity,removeItemFromCart,setUser,setLogout,setAccessToken,clearAccessToken,addItemToCart} =
+  export const {setContent,incrementItemQuantity,decrementItemQuantity,removeItemFromCart,setUser,setLogout,setAccessToken,clearAccessToken,addItemToCart} =
   authSlice.actions;
 
 export default authSlice.reducer;

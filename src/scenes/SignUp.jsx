@@ -53,7 +53,7 @@ import { useDispatch } from "react-redux"
       headers:{"Content-Type":'application/json'},
       credentials:'include',
       body:JSON.stringify(formData)
-     }).then((response)=>response.json()).then((data)=>{ dispatch(setUser({user:data.userData}));  dispatch(setAccessToken({accessToken:data.accessToken}));})
+     }).then((response)=>response.json()).then((data)=>{ dispatch(setUser({user:data.userData})); window.location.href = '/';  dispatch(setAccessToken({accessToken:data.accessToken}));})
    
   };
 
@@ -68,7 +68,15 @@ import { useDispatch } from "react-redux"
       headers:{"Content-Type":'application/json'},
       credentials:'include',
       body:JSON.stringify(formData)
-     }).then((response)=>response.json()).then((data)=>{dispatch(setUser({user:data.modifiedUser})); dispatch(setAccessToken({accessToken:data.accessToken})); window.location.href='/' })
+     }).then((response)=>response.json()).then((data)=>{
+
+      
+      
+      
+    
+      window.location.href = '/';
+   
+     })
    
   };
 

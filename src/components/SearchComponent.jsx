@@ -34,6 +34,7 @@ const SearchComponent = ({ isMobile }) => {
           })
             .then((response) => response.json())
             .then((data) => {
+              console.log(data)
               setSuggestion(data.products);
               if(suggestions.length>0){
                 setBar(true);
@@ -45,9 +46,6 @@ const SearchComponent = ({ isMobile }) => {
       }, 3000);
 
       return () => clearTimeout(timeoutId);
-    
-
-   
   },[search.product,search.brand])
 
 
