@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "build": "react-scripts build",
-    "homepage": "https://infovit.us/",
+    "homepage": "https://react-react.ra783s.easypanel.host/",
     "start": "react-scripts start",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
