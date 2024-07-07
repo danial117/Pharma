@@ -1,7 +1,7 @@
 
 
 import express from 'express';
-import { CreateUserOrder,getUserOrder,CreatePaypalOrder,CapturePaypalOrder,AdminGetUserOrders } from '../controllers/order.js';
+import { CreateUserOrder,getUserOrder,CreatePaypalOrder,CapturePaypalOrder,AdminGetUserOrders,getUserOrders } from '../controllers/order.js';
 import { verifyAccessToken } from '../middlewares/auth.js';
 
 const router = express.Router();
@@ -14,6 +14,7 @@ router.post('/api',verifyAccessToken,CreatePaypalOrder);
 router.get('/show',AdminGetUserOrders)
   // Route for capturing a PayPal order
 router.post('/api/:orderId/capture',verifyAccessToken,CapturePaypalOrder);
+router.get('/userOrders',verifyAccessToken,getUserOrders)
 
 export default router;
 

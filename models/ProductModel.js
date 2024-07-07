@@ -2,18 +2,26 @@
 
 
 import mongoose from "mongoose";
-
+import { Schema } from "mongoose";
 const ProductSchema= mongoose.Schema({
     name:{
         type:String,
         required:true
     },
-   brand:{
-        type:String,
+   brandId:{
+        type:Schema.Types.ObjectId,
+        ref:'Brand'
        
+    },
+    brand:{
+        type:String,
     },
     productImage:{
          type:String
+    },
+    option:{
+        type:String
+
     },
     price:{
         type:Number,

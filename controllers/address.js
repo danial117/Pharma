@@ -87,7 +87,7 @@ export const deleteAddress = async (req, res) => {
   
       // Find all addresses for the user
       const addresses = await Address.findOne({ user: userId });
-  
+       console.log(userId, addresses)
       if (!addresses || addresses.length === 0) {
         return res.status(404).json({ error: 'No addresses found for user' });
       }

@@ -28,7 +28,7 @@ router.get('/',async (req, res) => {
   
       // Respond with the new access token
     
-      res.json({ name: user.name,profilePicture:user.picturePath,email:user.email,accessToken:accessToken });
+      res.status(200).json({ name: user.name,profilePicture:user.picturePath,email:user.email,accessToken:accessToken });
        
         if (!decoded) {
           return res.status(403).json({ error: 'Invalid or expired refresh token' });
