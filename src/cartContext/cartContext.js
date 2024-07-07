@@ -6,7 +6,7 @@ export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState(false);
   const isMobile = useMediaQuery('(min-width:768px)');
   const toggleCart = () => {
-    console.log(cart)
+   
     setCart((prevCart) => !prevCart);
     if (!isMobile) {
       const root = document.getElementById('root');

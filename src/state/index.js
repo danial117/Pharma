@@ -19,7 +19,7 @@ const initialState = {
        api.get(`/cart/create/${product._id}/${quantity?quantity:1}`)
       .then((response)=>{
         if (response.status === 201) {
-          console.log(response)
+       
           dispatch(addItemToCart({product:product,quantity:quantity?quantity:1}))
         }
       })
@@ -46,7 +46,7 @@ export const incrementItemQuantityAsync = createAsyncThunk(
        })
       .then((response)=>{
         if (response.status === 200) {
-          console.log(response)
+        
           dispatch(incrementItemQuantity({itemId:itemId}))
         }
       })
@@ -63,7 +63,7 @@ export const decrementItemQuantityAsync = createAsyncThunk(
   'auth/decrementItemQuantityAsync',
   async (item, { getState,dispatch }) => {
     const {itemId}=item
-    console.log(itemId)
+   
     const state = getState();
 
     if (state.accessToken) {
@@ -75,7 +75,7 @@ export const decrementItemQuantityAsync = createAsyncThunk(
        })
       .then((response)=>{
         if (response.status === 200) {
-          console.log(response)
+       
           dispatch(decrementItemQuantity({itemId:itemId}))
         }
       })
@@ -100,7 +100,7 @@ export const removeItemFromCartAsync = createAsyncThunk(
        api.delete(`/cart/item/${itemId}`)
       .then((response)=>{
         if (response.status === 200) {
-          console.log(response)
+         
           dispatch(removeItemFromCart({itemId:itemId}))
         }
       })
@@ -125,14 +125,14 @@ export const setLogoutAsync = createAsyncThunk(
   async ({}, { getState,dispatch }) => {
    
     const state = getState();
-    console.log(state.accessToken)
+   
     if (state.accessToken) {
        api.get(`/user/logout`,{
         withCredentials:true
        })
       .then((response)=>{
         if (response.status === 200) {
-          console.log(response)
+         
           dispatch(setLogout())
          
           
@@ -165,7 +165,7 @@ export const authSlice = createSlice({
           },
       decrementItemQuantity: (state, action) => {
         const { itemId } = action.payload;
-        console.log(itemId)
+      
         const itemToDecrement = state.cartItems.find((item) => item._id === itemId);
   
         if (itemToDecrement && itemToDecrement.quantity > 1) {

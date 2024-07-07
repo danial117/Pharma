@@ -67,7 +67,7 @@ const HomePage=()=>{
     
     window.onload = async() => {
         
-    const response=   await fetch('http://localhost:3002/user/', {
+    const response=   await fetch('/api/user/', {
           method: 'GET',
           credentials: 'include' // Include cookies in request
         })
@@ -79,7 +79,7 @@ const HomePage=()=>{
           dispatch(setAccessToken({accessToken:accessToken}));
         
           
-           console.log(data)
+         
            if(user.email.toString() !== data.email.toString()){         /////
             cartItemIds.forEach((id)=>{
                
@@ -90,19 +90,19 @@ const HomePage=()=>{
           
           
         
-        }).catch(error => console.error('Error:', error)); 
+        }); 
 
 
-        console.log(response)
+      
 
         const accessToken=response
 
         if(accessToken){
-            api.get('http://localhost:3002/cart/').then((response)=>
+            api.get('/cart/').then((response)=>
               { if(response.status===200) {
         
                 response.data.items.map((item)=>{
-                    console.log(item)
+                  
                    dispatch( addItemToCart({product:item.product,quantity:item.quantity}))
                 })
         
@@ -179,10 +179,10 @@ const HomePage=()=>{
         
 
         <div className="w-[50%] xs:max-sm:w-[100%] xs:max-sm:py-24 xs:max-sm:px-2 sm:max-md:w-[100%] md:max-lg:w-[80%] py-32 px-12">
-            <p className="font-Lexend xs:max-sm:text-[1.6rem] text-white text-[2rem]">{Content.HomePageMainBannerText?Content.HomePageMainBannerText.text1:'Pharma Products'}</p>
+            <p className="font-Lexend xs:max-sm:text-[1.6rem] text-white text-[2rem]">Pharma Products</p>
 
             <div className="border-l-4 mt-4 mb-6 xs:max-sm:w-[80%] w-[60%] pl-4 border-emerald-600 ">
-                <p className="text-white xs:max-sm:text-xs text-md font-Livvic">{Content.HomePageMainBannerText?Content.HomePageMainBannerText.text2:'We have plenty of medical products here available for everyone. We care for customers'}</p>
+                <p className="text-white xs:max-sm:text-xs text-md font-Livvic">We have plenty of medical products here available for everyone. We care for customers</p>
                 
 
             </div>

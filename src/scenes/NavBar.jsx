@@ -9,6 +9,7 @@ import { CartContext } from "../cartContext/cartContext";
 import { Menu, MenuItem, IconButton, Avatar } from '@mui/material';
 import { useDispatch } from "react-redux";
 import { setLogoutAsync } from "../state";
+import { TruncateText } from "../utility functions/TranctuateText";
 
 const NavBar=()=>{
 
@@ -18,12 +19,16 @@ const NavBar=()=>{
  
   const [toggleMenu,setToggleMenu] = useState(false)
   const user=useSelector((state)=>state.user)
+  const accessToken=useSelector((state)=>state.accessToken)
   const [profilePicture,setProfilePicture]=useState(false)
 
   const [anchorEl, setAnchorEl] = useState(null);
 
   const handleClick = (event) => {
+    
+    if(accessToken){
     setAnchorEl(event.currentTarget);
+  }
   };
 
   const handleClose = () => {
@@ -52,8 +57,8 @@ const NavBar=()=>{
            {isMobile && <div className="flex text-center my-auto justify-center   className='font-Abel text-lg' mx-auto gap-x-16 md:max-lg:gap-x-4 basis-[70%] md:max-lg:basis-[80%] mx-auto flex-row">
                 <p onClick={()=>{window.location.href='/'}} className='font-Lexend cursor-pointer md:max-lg:text-[14px] text-lg'>Home <span><KeyboardArrowDownRounded/></span></p>
                 <p onClick={()=>{window.location.href='/about'}} className='font-Lexend cursor-pointer md:max-lg:text-[14px] text-lg'>About <span><KeyboardArrowDownRounded/></span></p>
-                <p className='font-Lexend cursor-pointer md:max-lg:text-[14px] text-lg'>News <span><KeyboardArrowDownRounded/></span></p>
-                <p className='font-Lexend cursor-pointer md:max-lg:text-[14px] text-lg'>Contact Us <span><KeyboardArrowDownRounded/></span></p>
+                <p onClick={()=>{window.location.href='/news'}} className='font-Lexend cursor-pointer md:max-lg:text-[14px] text-lg'>News <span><KeyboardArrowDownRounded/></span></p>
+                <p  onClick={()=>{window.location.href='/contact'}} className='font-Lexend cursor-pointer md:max-lg:text-[14px] text-lg'>Contact Us <span><KeyboardArrowDownRounded/></span></p>
             </div>}
 
           {isMobile &&  <div className="basis-[20%] md:max-lg:basis-[30%] md:max-lg:justify-end md:max-lg:gap-x-6  w-full gap-x-8 flex flex-row py-2 ml-auto mr-[4px]">
@@ -70,17 +75,23 @@ const NavBar=()=>{
 
              :
                 <AccountCircle onClick={handleClick} style={{fontSize:30,cursor:'pointer',margin:'auto'}}/>}
-              {user &&  <p className="font-Lexend text-xs">{ user.name}</p>}
-                <Menu
+              {user &&  
+              <TruncateText
+              text={user.name}
+              maxLength={8}
+              className={'font-Lexend my-auto text-xs'}
+              
+             />}
+               <Menu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
         onClose={handleClose}
       >
         <MenuItem onClick={handleClose}>Account Settings</MenuItem>
         <MenuItem onClick={()=>{window.location.href='/userOrders'; handleClose()}}>Orders</MenuItem>
-        <MenuItem onClick={handleClose}>Cart</MenuItem>
+        <MenuItem onClick={toggleCart}>Cart</MenuItem>
         <MenuItem onClick={()=>{ dispatch(setLogoutAsync({}));   handleClose()}}>Logout</MenuItem>
-      </Menu>
+      </Menu> 
                 </div>
 
 
@@ -102,16 +113,24 @@ const NavBar=()=>{
 
              :
                 <AccountCircle onClick={handleClick} style={{fontSize:30,cursor:'pointer',margin:'auto'}}/>}
-              {user &&  <p className="font-Lexend my-auto text-xs">{ user.name}</p>}
+              {user && 
+              <TruncateText
+              text={user.name}
+              maxLength={10}
+              className={'font-Lexend my-auto text-xs'}
+              
+             />
+              
+              }
               </div>
-                <Menu
+              <Menu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
         onClose={handleClose}
       >
         <MenuItem onClick={handleClose}>Account Settings</MenuItem>
-        <MenuItem onClick={handleClose}>Orders</MenuItem>
-        <MenuItem onClick={handleClose}>Cart</MenuItem>
+        <MenuItem  onClick={()=>{window.location.href='/userOrders'; handleClose()}}>Orders</MenuItem>
+        <MenuItem onClick={toggleCart}>Cart</MenuItem>
         <MenuItem onClick={()=>{ dispatch(setLogoutAsync({}));   handleClose()}}>Logout</MenuItem>
       </Menu>
                 </div>
@@ -133,7 +152,8 @@ const NavBar=()=>{
                     <p onClick={()=>{window.location.href='/'}} className="font-Abel border-2 bg-emerald-500 cursor-pointer  text-center p-2 border-emerald-500">Home</p>
                     <p onClick={()=>{window.location.href='/about'}}  className="font-Abel border-2 bg-emerald-500 cursor-pointer text-center p-2 border-emerald-500">About</p>
                     <p onClick={()=>{window.location.href='/createAccount'}} className="font-Abel border-2 bg-emerald-500 cursor-pointer  text-center p-2 border-emerald-500">Sign Up</p>
-                    <p  className="font-Abel border-2 bg-emerald-500 cursor-pointer text-center p-2 border-emerald-500">News</p>
+                    <p onClick={()=>{window.location.href='/news'}}  className="font-Abel border-2 bg-emerald-500 cursor-pointer text-center p-2 border-emerald-500">News</p>
+                    <p onClick={()=>{window.location.href='/contact'}}  className="font-Abel border-2 bg-emerald-500 cursor-pointer text-center p-2 border-emerald-500">Contact</p>
 
                    </div>
 

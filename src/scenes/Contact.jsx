@@ -23,6 +23,7 @@ const Contact=()=>{
                         <input type="text" placeholder="Your Email Address" className="focus:outline-none w-[70%] xs:max-md:w-full font-Poppins border-2 border-gray-300 p-2 rounded-md text-[20px]" />
                         
                         <textarea placeholder="Message" className="focus:outline-none w-[70%] xs:max-md:w-full font-Poppins border-2 border-gray-300 p-2 rounded-md text-[20px]" rows={4} />
+                        <button className="bg-emerald-500 font-Poppins text-xl text-white py-2 rounded-md w-[30%]">Send</button>
 
                     
                     </div>
@@ -34,6 +35,7 @@ const Contact=()=>{
                             <p className="font-Abel xs:max-md:text-[1.4rem] text-[1.8rem]">Connect with us:</p>
                             <p className="font-Abel xs:max-md:text-sm text-lg">For any support or any questions:</p>
                             <p className="font-Abel xs:max-md:text-sm text-lg">Email us at <span className="text-blue-700">infovit@gmail.com</span></p>
+                            
 
 
                         </div>

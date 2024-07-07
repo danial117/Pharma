@@ -3,7 +3,7 @@ import axios from 'axios';
 
 import { setAccessToken } from '../state/index.js';
 const api = axios.create({
-  baseURL: 'http://localhost:3002',
+  baseURL: '/api/',
   
 });
 
@@ -30,7 +30,7 @@ api.interceptors.request.use(
     
     
     const accessToken =getStore().getState().accessToken
-    console.log(accessToken)
+   
     if (accessToken) {
       config.headers['Authorization'] = `Bearer ${accessToken}`;
     }
@@ -54,7 +54,7 @@ api.interceptors.response.use(
     
       
       try {
-        const { data } = await axios.get('http://localhost:3002/refresh-token',  {
+        const { data } = await axios.get('/api/refresh-token',  {
             withCredentials: true, 
           });
 
@@ -64,7 +64,7 @@ api.interceptors.response.use(
 
         return api(originalRequest);
       } catch (err) {
-        console.error('Refresh token failed', err);
+      
         // Handle logout or token refresh failure
       }
     }

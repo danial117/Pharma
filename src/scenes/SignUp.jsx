@@ -48,35 +48,35 @@ import { useDispatch } from "react-redux"
   const SignUpSubmit = (e) => {
     e.preventDefault();
     // Process the form data (e.g., send it to the server)
-     fetch('http://localhost:3002/user/signup',{
+     fetch('/api/user/signup',{
       method:'POST',
       headers:{"Content-Type":'application/json'},
       credentials:'include',
       body:JSON.stringify(formData)
-     }).then((response)=>response.json()).then((data)=>{ dispatch(setUser({user:data.userData})); window.location.href = '/';  dispatch(setAccessToken({accessToken:data.accessToken}));})
+     }).then((response)=>response.json()).then((data)=>{ dispatch(setUser({user:data.userData})); dispatch(setAccessToken({accessToken:data.accessToken})); window.location.href = '/'; })
    
   };
 
 
 
   const LoginSubmit = (e) => {
-    console.log('login')
+  
     e.preventDefault();
     // Process the form data (e.g., send it to the server)
-     fetch('http://localhost:3002/user/login',{
+     fetch('/api/user/login',{
       method:'POST',
       headers:{"Content-Type":'application/json'},
       credentials:'include',
       body:JSON.stringify(formData)
-     }).then((response)=>response.json()).then((data)=>{
+     }).then((response)=>response.json()).then((data)=>{ dispatch(setUser({user:data.modifiedUser}));  dispatch(setAccessToken({accessToken:data.accessToken})); window.location.href = '/'; })
+
+
 
       
       
       
     
-      window.location.href = '/';
-   
-     })
+    
    
   };
 
@@ -107,7 +107,7 @@ import { useDispatch } from "react-redux"
 
 
             <div class="container w-full my-4">
-      <a  href="http://localhost:3002/oauth2/redirect/google">
+      <a  href="/api/oauth2/redirect/google">
         <div class="g-sign-in-button">
           <div class="content-wrapper">
             <div class="logo-wrapper">

@@ -23,7 +23,7 @@ const accessToken=useSelector((state)=>state.accessToken)
     loadScript(
       'https://www.paypal.com/sdk/js?client-id=Af5N6smP8WXpweplc5KqOvUGyRl0eyRcT4TaC3TzC9BB0YI_s--VYb_D0T6gvREISBmf-qJzYpXIK0qa&components=buttons&enable-funding=venmo,paylater',
       () => {
-        console.log('PayPal SDK script loaded');
+       
 
         // Initialize PayPal Buttons
         window.paypal
@@ -34,7 +34,7 @@ const accessToken=useSelector((state)=>state.accessToken)
             },
             async createOrder() {
               try {
-                const response = await fetch(`http://localhost:3002/order/api/`, {
+                const response = await fetch(`/api/order/api/`, {
                   method: "POST",
                   headers: {
                     "Content-Type": "application/json",
@@ -63,13 +63,13 @@ const accessToken=useSelector((state)=>state.accessToken)
                   throw new Error(errorMessage);
                 }
               } catch (error) {
-                console.error(error);
+               
                 resultMessage(`Could not initiate PayPal Checkout...<br><br>${error}`);
               }
             },
             async onApprove(data, actions) {
               try {
-                const response = await fetch(`http://localhost:3002/order/api/${data.orderID}/capture`, {
+                const response = await fetch(`/api/order/api/${data.orderID}/capture`, {
                   method: "POST",
                   headers: {
                     "Content-Type": "application/json",
@@ -87,7 +87,7 @@ const accessToken=useSelector((state)=>state.accessToken)
                 } else if (!orderData.purchase_units) {
                   throw new Error(JSON.stringify(orderData));
                 } else {
-                  console.log('sucess')
+                 
                   onPaymentSuccess()
                   const transaction =
                     orderData?.purchase_units?.[0]?.payments?.captures?.[0] ||
@@ -95,15 +95,11 @@ const accessToken=useSelector((state)=>state.accessToken)
                   resultMessage(
                     `Transaction ${transaction.status}: ${transaction.id}<br><br>See console for all available details`,
                   );
-                  console.log(
-                    "Capture result",
-                    orderData,
-                    JSON.stringify(orderData, null, 2),
-                  );
+                
                  
                 }
               } catch (error) {
-                console.error(error);
+               
                 resultMessage(
                   `Sorry, your transaction could not be processed...<br><br>${error}`,
                 );
