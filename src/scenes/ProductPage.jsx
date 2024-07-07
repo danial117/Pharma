@@ -11,7 +11,7 @@ import { CartContext } from "../cartContext/cartContext";
 import Cart from "../widget/Cart";
 import Skeleton from "../skeleton/skeleton";
 import {useQuery} from '@tanstack/react-query'
-
+import {TruncateText} from '../utility functions/TranctuateText'
 
 
 
@@ -34,7 +34,7 @@ const ProductPage=()=>{
 
 
      const fetchProduct=async ()=>{
-       await fetch(`http://localhost:3002/products/id/${productId}`,{
+       await fetch(`/api/products/id/${productId}`,{
             method:'GET'
         }).then((response)=>response.json()).then((data)=>{setProduct(data); })
     }
@@ -45,7 +45,7 @@ const ProductPage=()=>{
         queryFn: fetchProduct,
       })
 
-      console.log(isLoading)
+   
     
 
 
@@ -69,7 +69,7 @@ const ProductPage=()=>{
     useEffect(()=>{ 
         
         const foundItem = cartItems.find(item => item._id == productId);
-        console.log("Found Item:", foundItem);
+     
 if (foundItem) {
   
    setCarted(true)
@@ -106,7 +106,7 @@ if (foundItem) {
         : 
           <img
             className="w-[60%]  h-[350px] mx-auto my-auto"
-            src={`http://localhost:3002/assets/images/${product.productImage}`}
+            src={`/api/assets/images/${product.productImage}`}
             alt={product.name}
           />
         }
@@ -127,8 +127,19 @@ if (foundItem) {
                 
                 :
                 <>
-                <p className="font-Abel text-[2rem] xs:max-md:text-[1.4rem] font-bold">{product.name}</p>
-                <p className="font-Lexend underline text-emerald-700">{product.brand}</p>
+               
+                <TruncateText 
+                         text={product.name}
+                         maxLength={50}
+                         className="font-Abel text-[2rem] xs:max-md:text-[1.4rem] font-bold"
+                   />
+
+               
+                <TruncateText 
+                         text={product.brand}
+                         maxLength={30}
+                         className="font-Lexend underline text-emerald-700"
+                   />
                 </>
 }
                
@@ -167,7 +178,7 @@ if (foundItem) {
                 
                 :
                 <div className="px-4 py-2 border-2 border-black md:max-lg:w-[40%] sm:max-md:w-[30%] xs:max-sm:w-[40%] w-[30%] rounded-full bg-gray-100">
-                <p className="font-Abel  ">3 ounce</p>
+                <p className="font-Abel  ">{product.options}</p>
                 </div>
                 
                  }
@@ -235,7 +246,7 @@ if (foundItem) {
 
                         :
                         <div className="flex gap-y-2 w-full h-[auto] flex-col">
-                        <div onClick={()=>{setProductDescription('Description'); if(productDescription==='Description'){setProductDescription(false)}}} className="cursor-pointer border-b-2 py-2 border-gray-300 ">
+                      {product.details.Description !== 'undefined' &&  <div onClick={()=>{setProductDescription('Description'); if(productDescription==='Description'){setProductDescription(false)}}} className="cursor-pointer border-b-2 py-2 border-gray-300 ">
                         <div className="flex justify-between">
                         <button className="text-gray-800 text-[13px] font-Lexend">Description</button>
                         <div className="text-gray-400">
@@ -251,6 +262,7 @@ if (foundItem) {
                             }
                         </p> }
                     </div>
+                    }
 
 
 
@@ -260,7 +272,7 @@ if (foundItem) {
 
 
 
-              
+              {product.details.Warnings !== 'undefined' &&
                     <div onClick={()=>{setProductDescription('Warnings'); if(productDescription==='Warnings'){setProductDescription(false)}}} className="cursor-pointer border-b-2 py-2 border-gray-300 ">
                         <div className="flex justify-between">
                         <button className="text-gray-800 text-[13px] font-Lexend">Warnings</button>
@@ -278,7 +290,7 @@ if (foundItem) {
                         </p> }
                     </div>
 
-
+}
                   
 
 
@@ -288,7 +300,7 @@ if (foundItem) {
 
 
 
-
+{    product.details.Certifications[0] !== 'undefined' &&
                     <div onClick={()=>{setProductDescription('Certificate'); if(productDescription==='Certificate'){setProductDescription(false)}}} className="cursor-pointer border-b-2 py-2 border-gray-300 ">
                         <div className="flex justify-between">
                         <button className="text-gray-800 text-[13px] font-Lexend">Certificate</button>
@@ -314,7 +326,7 @@ if (foundItem) {
                             }
                              </ul>
                         </div> }
-                    </div>
+                    </div>}
 
 
 
@@ -326,7 +338,7 @@ if (foundItem) {
 
 
 
-
+{product.details.DietaryRestrictions[0] !== 'undefined' &&
                     <div onClick={()=>{setProductDescription('DietaryRestrictions'); if(productDescription==='DietaryRestrictions'){setProductDescription(false)}}} className="cursor-pointer border-b-2 py-2 border-gray-300 ">
                         <div className="flex justify-between">
                         <button className="text-gray-800 text-[13px] font-Lexend">Dietary Restrictions</button>
@@ -355,7 +367,7 @@ if (foundItem) {
                     </div>
 
 
-
+}
 
 
 
@@ -368,7 +380,7 @@ if (foundItem) {
 
 
 
-                    <div onClick={()=>{setProductDescription('More'); if(productDescription==='More'){setProductDescription(false)}}} className="cursor-pointer border-b-2 py-2 border-gray-300 ">
+                  { product.details.More !== 'undefined' && <div onClick={()=>{setProductDescription('More'); if(productDescription==='More'){setProductDescription(false)}}} className="cursor-pointer border-b-2 py-2 border-gray-300 ">
                         <div className="flex justify-between">
                         <button className="text-gray-800 text-[13px] font-Lexend">More</button>
                         <div className="text-gray-400">
@@ -383,7 +395,15 @@ if (foundItem) {
                                 product.details.More
                             }
                         </p> }
-                    </div>
+                    </div>}
+
+
+
+
+
+
+
+
                     
                     
                     </div>

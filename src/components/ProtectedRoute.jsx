@@ -6,7 +6,7 @@ import { useSelector } from "react-redux";
 
 const ProtectedRoute = ({ children }) => {
     const accessToken=useSelector((state)=>state.accessToken)
-    console.log(accessToken)
+  
     return accessToken ? children : <Navigate to="/createAccount" />;
   };
 

@@ -10,7 +10,7 @@ import { incrementItemQuantityAsync,decrementItemQuantityAsync,removeItemFromCar
 import { useDispatch } from 'react-redux';
 import { CartContext } from '../cartContext/cartContext';
 import api from '../utils/api';
-
+import { TruncateText } from '../utility functions/TranctuateText';
 
 const Cart=()=>{
     const [hide,setHide]=useState(false)
@@ -39,7 +39,7 @@ const Cart=()=>{
              }).then((response)=>{
 
              if(response.status === 201){
-                console.log(cartItemIds)
+              
              cartItemIds.map((data)=>{
                  dispatch(removeItemFromCart({itemId:data.product}))
                 })
@@ -138,15 +138,27 @@ const Cart=()=>{
                     <div className="flex flex-row">
                         <div className=''>
                             <div className='w-[100%] flex  h-[100px]'>
-                            <img className='w-[80%]  h-[70px] mx-auto  ' src={`http://localhost:3002/assets/images/${data.productImage}`} />
+                            <img className='w-[80%]  h-[70px] mx-auto  ' src={`/api/assets/images/${data.productImage}`} />
                             </div>
 
                         </div>
 
-                        <div className='w-[60%]'>
-                            <p className='font-Lexend text-[14px]'>{data.name}</p>
-                            <p className='font-Poppins text-xs underline text-emerald-500'>{data.brand}</p>
-                            <p className='text-Livvic text-[14px] text-gray-700'>1 ounce</p>
+                        <div className='w-[100%]'>
+                           
+                            <TruncateText 
+                   text={data.name}
+                   maxLength={20}
+                    className="font-Lexend xs:max-sm:text-[16px]  sm:max-md:text-[14px] text-[14px]"
+              />
+
+                          
+                            <TruncateText 
+                   text={data.brand}
+                   maxLength={20}
+                    className="font-Poppins text-xs underline text-emerald-500"
+              />
+
+                            <p className='text-Livvic text-[14px] text-gray-700'>{data.options}</p>
                         </div>
 
                     </div>

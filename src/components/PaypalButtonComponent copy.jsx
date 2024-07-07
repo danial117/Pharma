@@ -15,11 +15,11 @@ const PayPalButtonComponent = () => {
     loadScript(
       'https://www.paypal.com/sdk/js?client-id=AYdJ54cARnHAFCmuk0opLZBTQs8CcAah-ia1dNHZSqqlGYlmq-PDG8iLtCSXYAuHFvqgD3OUeFvAJuaj&components=buttons&enable-funding=venmo',
       () => {
-        console.log('PayPal SDK script loaded');
+       
 
         // Load the app.js script after PayPal SDK script is loaded
-        loadScript('http://localhost:3002/assets/images/app.js', () => {
-          console.log('app.js script loaded');
+        loadScript('/api/assets/images/app.js', () => {
+         
         });
       }
     );
@@ -33,9 +33,9 @@ const PayPalButtonComponent = () => {
         document.body.removeChild(paypalScript);
       }
 
-      const appScript = document.querySelector('script[src="http://localhost:3002/assets/images/app.js"]');
+      const appScript = document.querySelector('script[src="/api/assets/images/app.js"]');
       if (appScript) {
-        console.log('removed')
+      
         document.body.removeChild(appScript);
       }
     };

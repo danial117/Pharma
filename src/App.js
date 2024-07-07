@@ -27,7 +27,7 @@ const App=()=>{
 
 
   useEffect(()=>{
-    fetch('http://localhost:3002/content/',{
+    fetch('/api/content/',{
      method:'GET'
     }).then((response)=>response.json()).then((data)=>{
     
@@ -50,6 +50,7 @@ const App=()=>{
       <Route path='/productPage/:productId' element={<ProductPage/>}> </Route>
       <Route path='/createAccount' element={<SignUp />}></Route>
       <Route path="/about" element={<About/>} />
+      <Route path="/contact" element={<Contact/>} />
       <Route path="/news" element={<NewsBlog/>} />
       <Route path="/news/:newsId" element={<NewsPage/>} />
       <Route path="/brand/:brandId" element={<BrandPage/>} />

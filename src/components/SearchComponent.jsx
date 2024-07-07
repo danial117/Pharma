@@ -1,6 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Inventory2Rounded, SearchRounded } from "@mui/icons-material";
 import { useNavigate } from 'react-router-dom';
+import { TruncateText } from '../utility functions/TranctuateText';
+
+
+
+
+
+
+
 const SearchComponent = ({ isMobile }) => {
   const [search, setSearch] = useState({ product: '', brand: '' });
   const [suggestions,setSuggestion]=useState([])
@@ -8,9 +16,10 @@ const SearchComponent = ({ isMobile }) => {
   const [bar,setBar]=useState(false)
   const [changeCount, setChangeCount] = useState(0);
   const navigate=useNavigate()
+  
  
   const handleInputChange = async(e) => {
-    console.log(e.target.value)
+   
     const { name, value } = e.target;
     setSearch((prevSearch) => ({
       ...prevSearch,
@@ -26,20 +35,20 @@ const SearchComponent = ({ isMobile }) => {
    
       const timeoutId = setTimeout(() => {
         if (search.product.length > 1 || search.brand.length > 1) {
-          console.log(search);
+         
           
 
-          fetch(`http://localhost:3002/products/search?product=${search.product}&brand=${search.brand}`, {
+          fetch(`/api/products/search?product=${search.product}&brand=${search.brand}`, {
             method: 'GET',
           })
             .then((response) => response.json())
             .then((data) => {
-              console.log(data)
+            
               setSuggestion(data.products);
               if(suggestions.length>0){
                 setBar(true);
               }
-              console.log(suggestions, data);
+             
               setChangeCount(0); // Reset the counter after fetching data
             });
         }
@@ -58,7 +67,7 @@ const SearchComponent = ({ isMobile }) => {
       <div className="flex w-full flex-row">
         <div className="w-[70%] xs:max-sm:w-[100%] flex flex-row xs:max-sm:py-2 py-4 bg-white">
           <div className="w-[50%] xs:max-sm:w-[70%] mx-2 border-gray-300 border-r-2 flex flex-row">
-            <div className="mx-2 xs:max-sm:mx-[2px] text-emerald-600">
+            <div className="mx-2 xs:max-sm:mx-[4px] my-auto text-emerald-600">
               <Inventory2Rounded />
             </div>
             <input
@@ -71,7 +80,7 @@ const SearchComponent = ({ isMobile }) => {
               onBlur={()=>{!barHovered && setBar(false)}}
             />
           </div>
-          <div>
+          <div className='my-auto'>
             <input
               
               placeholder="Search your brands"
@@ -106,8 +115,13 @@ const SearchComponent = ({ isMobile }) => {
         <div onClick={()=>{navigate(`/productPage/${data._id}`)}} key={index} className="w-full cursor-pointer border-b-2 border-gray-400">
           <div className="flex py-2 justify-between flex-row w-[90%] gap-x-2 mx-auto">
             <div className='flex flex-row gap-y-2'>
-            <img className="w-[40px] h-auto" src={`http://localhost:3002/assets/images/${data.productImage}`} alt="Product" />
-            <p className="my-auto font-Abel">{data.name}</p>
+            <img className="w-[40px] h-auto" src={`/api/assets/images/${data.productImage}`} alt="Product" />
+           
+            <TruncateText 
+                   text={data.name}
+                   maxLength={40}
+                    className="my-auto font-Abel cursor-pointer"
+              />
             </div>
             <p className="my-auto font-bold font-Abel">${data.price}</p>
            

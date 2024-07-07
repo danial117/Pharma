@@ -23,7 +23,7 @@ const BrandPage = () => {
 
     useEffect(()=>{
 
-        fetch(`http://localhost:3002/brands/${brandId}`,{method:'GET'}).then((response)=>response.json()).then((data)=>{
+        fetch(`/api/brands/${brandId}`,{method:'GET'}).then((response)=>response.json()).then((data)=>{
           setProducts(data)
         })
 
@@ -42,7 +42,7 @@ const BrandPage = () => {
               return (
                 <div key={index} className="flex gap-y-2 border-2 bg-white rounded-md border-emerald-500 flex-col">
                   <div className="w-[90%] sm:max-md:w-[100%] xs:max-sm:w-[100%] mt-6 border-b-2 pb-2 border-gray-200 mx-auto">
-                    <img className="w-[50%] h-[100%] mx-auto my-auto" src={`http://localhost:3002/assets/images/${data.productImage}`} alt={data.name} />
+                    <img className="w-[50%] h-[100%] mx-auto my-auto" src={`/api/assets/images/${data.productImage}`} alt={data.name} />
                   </div>
                   <div className="m-2 relative h-[180px] flex flex-col">
                     <p className="font-Abel text-[12px] xs:max-sm:text-[10px] font-bold text-emerald-400 my-[2px]">{data.brand}</p>

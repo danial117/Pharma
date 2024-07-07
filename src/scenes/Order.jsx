@@ -7,6 +7,7 @@ import { useSelector } from "react-redux";
 import { EditRounded } from "@mui/icons-material";
 import PayPalButtonComponent from "../components/PaypalButtonComponent";
 import api from "../utils/api";
+import { TruncateText } from "../utility functions/TranctuateText";
 const Order=()=>{
 
     const user=useSelector((state)=>state.user)
@@ -98,7 +99,7 @@ const Order=()=>{
       useEffect(()=>{
 
          api.get('/order').then((response)=>response.data).then((data)=>{
-        console.log(data)
+       
        const items=  data.items.map((item)=>{
             return item.product
          })
@@ -201,7 +202,7 @@ const Order=()=>{
           },
         }).then((response)=>response.data).then((data)=>{
 
-          console.log(data);
+       
           setAddress(data)
           setOrderProcess(2)
 
@@ -247,7 +248,7 @@ const Order=()=>{
 
       const Checkout=async()=>{
 
-        await fetch(`http://localhost:3002/user/address`,{
+        await fetch(`/api/user/address/`,{
             method:'GET',
             
         }).then((response)=>response.json()).then(()=>{
@@ -610,15 +611,26 @@ const Order=()=>{
                       <div className="flex flex-row">
                         <div className=''>
                             <div className='w-[100%] flex  h-[100px]'>
-                            <img className='w-[80%]  h-[70px] mx-auto  ' src={`http://localhost:3002/assets/images/${data.productImage}`} />
+                            <img className='w-[80%]  h-[70px] mx-auto  ' src={`/api/assets/images/${data.productImage}`} />
                             </div>
 
                         </div>
 
                         <div className='w-[60%]'>
-                            <p className='font-Lexend text-[14px]'>{data.name}</p>
-                            <p className='font-Poppins text-xs underline text-emerald-500'>{data.brand}</p>
-                            <p className='text-Livvic text-[14px] text-gray-700'>1 ounce</p>
+                                     
+                            <TruncateText 
+                   text={data.name}
+                   maxLength={20}
+                    className="font-Lexend text-[14px]"
+              />
+
+                            
+                            <TruncateText 
+                   text={data.brand}
+                   maxLength={15}
+                    className="font-Poppins text-xs underline text-emerald-500"
+              />
+                            <p className='text-Livvic text-[14px] text-gray-700'>{data.options}</p>
                         </div>
 
                     </div>
