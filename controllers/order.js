@@ -15,13 +15,15 @@ export const CreateUserOrder = async (req, res) => {
   try {
     // Retrieve user's cart
     const { userId } = req.user; // Assuming req.user is populated with user data
+    console.log(userId)
     const cart = await Cart.findOne({ user: userId });
-
-    if (!cart) {
+    console.log(cart)
+    if (cart.items.length === 0) {
       return res.status(404).json({ error: 'Cart not found for user' });
     }
 
     // Fetch product prices and calculate total amount
+    if(cart.items.length !== 0){
     const itemsWithPrices = await Promise.all(cart.items.map(async (item) => {
       const product = await Product.findById(item.product);
       return {
@@ -34,7 +36,9 @@ export const CreateUserOrder = async (req, res) => {
     const totalAmount = calculateTotalAmount(itemsWithPrices);
 
     // Check for an existing pending order
-    const existingOrder = await Order.findOne({ user: userId, orderStatus: 'Pending' });
+    const existingOrder = await Order.findOne({ user: userId, orderStatus: 'Pending',  orderStatus: {
+      $ne: 'Completed' // Not equal to 'completed'
+  },paymentMethod: 'Unknown'  });
 
     if (existingOrder) {
       // If an existing pending order is found, replace it with the new order data
@@ -58,7 +62,7 @@ export const CreateUserOrder = async (req, res) => {
       paymentMethod: 'Unknown',
       paymentStatus: 'Pending',
       orderStatus: 'Pending',
-      totalAmount: totalAmount,
+      totalAmount: totalAmount.toFixed(2),
     };
 
     // Create new order
@@ -68,8 +72,9 @@ export const CreateUserOrder = async (req, res) => {
     // Clear the user's cart after creating the order
     cart.items = [];
     await cart.save();
-
     res.status(201).json(savedOrder);
+}
+   
   } catch (error) {
     console.error('Error creating order:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -101,7 +106,9 @@ function generateOrderNumber() {
       const { userId } = req.user;
   
       // Find the user's order
-      const order = await Order.findOne({ user: userId }).populate('items.product');
+      const order = await Order.findOne({ user: userId, orderStatus: 'Pending',  orderStatus: {
+        $ne: 'Completed' // Not equal to 'completed'
+    },paymentMethod: 'Unknown'  }).populate('items.product');
       console.log(order)
       if (!order) {
         return res.status(404).json({ error: 'Order not found for user' });
@@ -121,7 +128,9 @@ function generateOrderNumber() {
   export const CreatePaypalOrder = async (req, res) => {
     try {
       const { userId } = req.user; // Assuming userId is available in req.user after authentication
-      const order = await Order.findOne({ user: userId, orderStatus: 'Pending' }).populate('items.product');
+      const order = await Order.findOne({ user: userId, orderStatus: 'Pending',  orderStatus: {
+        $ne: 'Completed' // Not equal to 'completed'
+    },paymentMethod: 'Unknown'  }).populate('items.product');
   
       if (!order) {
         return res.status(404).json({ error: 'Pending order not found for user' });
@@ -137,7 +146,9 @@ function generateOrderNumber() {
   
   const createOrder = async (userId) => {
     try {
-      const order=await Order.findOne({user:userId, orderStatus: 'Pending'})
+      const order=await Order.findOne({ user: userId, orderStatus: 'Pending',  orderStatus: {
+        $ne: 'Completed' // Not equal to 'completed'
+    },paymentMethod: 'Unknown'  });
       
       const accessToken = await generateAccessToken();
       const url = `${base}/v2/checkout/orders`;
@@ -167,7 +178,9 @@ function generateOrderNumber() {
       console.log(jsonResponse)
       // Update order status in your database based on PayPal API response
       if (httpStatusCode === 201) {
-        await Order.findOneAndUpdate({user:userId}, { orderStatus: 'Pending' }); // Update order status in your database
+        await Order.findOneAndUpdate({ user: userId, orderStatus: 'Pending',  orderStatus: {
+          $ne: 'Completed' // Not equal to 'completed'
+      },paymentMethod: 'Unknown'  }, { orderStatus: 'Pending' }); // Update order status in your database
       } else {
         await Order.findOneAndUpdate({user:userId}, { orderStatus: 'Failed' }); // Handle failure scenario
       }
@@ -204,7 +217,9 @@ function generateOrderNumber() {
       console.log(jsonResponse,httpStatusCode)
       // Update order status in your database based on PayPal API response
       if (httpStatusCode === 201) {
-        await Order.findOneAndUpdate({ user:userId }, { orderStatus: 'Completed',transactionDetails:jsonResponse,paymentMethod:'PayPal' }); // Update order status in your database
+        await Order.findOneAndUpdate({ user: userId, orderStatus: 'Pending',  orderStatus: {
+          $ne: 'Completed' // Not equal to 'completed'
+      },paymentMethod: 'Unknown'  }, { paymentStatus: 'Completed',transactionDetails:jsonResponse,paymentMethod:'PayPal',orderStatus:'Processing' }); // Update order status in your database
       } else {
         await Order.findOneAndUpdate({ user:userId }, { orderStatus: 'Failed' }); // Handle failure scenario
       }
@@ -320,6 +335,33 @@ function generateOrderNumber() {
 
 
 
+  export const getUserOrders = async (req, res) => {
+    try {
+        const {userId} = req.user; // Assuming userId is passed as a route parameter
+        const orders = await Order.find({ user:userId }); // Query orders for the specific user
+
+        const userOrders = orders.map(order => {
+            const orderObject = order.toObject(); // Convert Mongoose document to plain JavaScript object
+            orderObject.id = orderObject._id;
+            delete orderObject._id;
+            delete orderObject.transactionDetails
+            delete orderObject.user;
+            delete orderObject.paymentMethod;
+            orderObject.items=orderObject.items.length;
+            
+            return orderObject;
+        });
+
+        
+
+
+        res.status(200).json(userOrders);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json('Internal Server Error');
+    }
+};
 
 
 

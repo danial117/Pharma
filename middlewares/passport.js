@@ -9,7 +9,7 @@ dotenv.config()
 passport.use(new GoogleStrategy({ 
   clientID: process.env.goggleClientId,
   clientSecret: process.env.goggleClientSecret, 
-  callbackURL: "http://localhost:3002/oauth2/redirect/google",
+  callbackURL: "/api/oauth2/redirect/google",
   passReqToCallback: true,
   accessType: 'offline', // Ensures refresh token is issued
   prompt: 'consent' // Forces the consent screen to show

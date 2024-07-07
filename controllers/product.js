@@ -1,32 +1,12 @@
 
+import Brand from "../models/BrandModel.js";
 import Product from "../models/ProductModel.js";
 
 
 
 
-const products=[
-    {
-        name: 'G.I. Detox™ +',
-        brand: 'Biocidin Botanicals',
-        price: 34.99,
-        productImages:'2.png',
-        details: {
-            Description: 'The binding activity of G.I. Detox+™ is an essential part of any treatment strategy that includes removal. As Biocidin® works on biofilms and microbes, mobilizing LPS, metals, mycotoxins, and unwanted microbial byproducts, G.I. Detox™+ binds and clears, ensuring comfort and compliance. Microorganisms balanced. Biofilms dismantled. Detoxification done right. G.I. Detox™+ is formulated to provide broader activity than a single-ingredient product. Zeolite clay, activated charcoal, and silica, plus apple pectin, humic powder, and aloe vera. Binding and detoxification agents long used in traditional medicine and supported by modern research.',
-            Warnings: ' Not recommended for use during pregnancy. Consult your physician before using any supplement, especially if you are nursing, have a medical condition, or are taking medication. Discontinue use should adverse reactions occur.',
-            DietaryRestrictions: ['Gluten free','Dairy free','Soy free','Milk free','Animal product free'],
-            Certifications:['Vegan','cGMP','USP'],
-            More: 'Think there is no way to naturally stimulate rapid immune response? Think again! Biocidin®TS is an easy-to-use throat spray that contains our proprietary Biocidin® botanical blend. It was the subject of a human clinical trial – the gold standard in science.1 Participants (athletes tested post-workout) showed a rapid increase in immune activity within 60 minutes of use. A soothing, protective boost – so unique Biocidin Botanicals patented it.*'
-        }
-    }
-]
-
-export const InsertProduct=async(req,res)=>{
 
 
-    const product=await Product.insertMany(products).then(()=>console.log('inserted')).catch((err)=>{console.log(err)})
-
-
-}
 
 
 
@@ -37,15 +17,27 @@ export const GetProducts=async(req,res)=>{
 try{
     const page = parseInt(req.query.page) || 1; // Default to page 1 if not provided
     const limit = parseInt(req.query.limit) || 10; // Default to 10 items per page if not provided
-
-    // Calculate the number of documents to skip
+    const type = req.query.type;
+    console.log(type)
     const skip = (page - 1) * limit;
+
+    if (type) {
+      let query = {};
+      // If type parameter is provided, use regex to match products containing the type in their name
+      query = { name: { $regex: type, $options: 'i' } }; // 'i' option for case-insensitive search
+      const products = await Product.find(query).skip(skip).limit(limit);
+
+      res.status(200).json(products);
+  
+    }else
+{
+    // Calculate the number of documents to skip
+    
 
     const products=await Product.find().skip(skip).limit(limit);
 
-   
     res.status(200).json(products)
-
+}
 
 }
 catch(error){
@@ -100,11 +92,17 @@ export const SearchProduct=async(req,res)=>{
 
 export const GetProduct=async(req,res)=>{
     
+  try{
     const {productId}=req.params
     const product=await Product.findById(productId)
      console.log(product)
 
      res.status(200).json(product)
+  }
+  catch(err){
+    console.log(err)
+    res.status(501)
+  }
 }
 
 
@@ -223,12 +221,15 @@ export const AdminCreateProduct=async(req,res)=>{
       
         const data = req.body;
         const file=req.file
+
+        const brand=await Brand.findOne({name:data.brand})
        
     
         // Find the product by ID
        
       const product=new Product({
         name:data.name,
+        brandId:brand?brand._id:null,
         brand:data.brand,
         price:data.price,
         details:data.details,

@@ -5,7 +5,6 @@ import helmet from 'helmet'
 import morgan from 'morgan'
 import cors from 'cors'
 import UserRouter from './routers/user.js'
-import { InsertProduct } from './controllers/product.js';
 import ProductRouter from './routers/product.js'
 import CartRouter from './routers/cart.js'
 import path from "path";
@@ -21,7 +20,7 @@ import jwt from 'jsonwebtoken'
 import cookieParser from 'cookie-parser';
 import { verifyRefreshToken,generateAccessToken, generateRefreshToken } from './middlewares/auth.js';
 import passport from './middlewares/passport.js';
-
+import BrandRouter from './routers/brand.js'
 
 
 dotenv.config()
@@ -34,7 +33,7 @@ const __dirname = path.dirname(__filename);
 app.use("/assets/images", express.static(path.join(__dirname, "public/assets")));
 
 
-const allowedOrigins=['http://localhost:3000','http://localhost:5173']
+const allowedOrigins=['https://www.infovit.us/']
 
 app.use(cors({ origin: allowedOrigins, credentials: true }));
   app.use(helmet()); 
@@ -91,7 +90,7 @@ app.get('/oauth2/redirect/google',
         secure: process.env.NODE_ENV === 'production', // Ensure secure cookie in production
        
       });
-      res.redirect('http://localhost:3000/');
+      res.redirect('https://www.infovit.us/');
     })
     ;
 
@@ -140,7 +139,7 @@ app.use('/cart',CartRouter)
 app.use('/order',OrderRouter)
 app.use('/address',AddressRouter)
 app.use('/content',ContentRouter)
-
+app.use('/brands',BrandRouter)
 
 
 
