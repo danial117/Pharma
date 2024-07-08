@@ -34,7 +34,7 @@ const ProductPage=()=>{
 
 
      const fetchProduct=async ()=>{
-       await fetch(`http://localhost:3002/products/id/${productId}`,{
+       await fetch(`/api/products/id/${productId}`,{
             method:'GET'
         }).then((response)=>response.json()).then((data)=>{setProduct(data); })
     }
@@ -106,7 +106,7 @@ if (foundItem) {
         : 
           <img
             className="w-[60%]  h-[350px] mx-auto my-auto"
-            src={`http://localhost:3002/assets/images/${product.productImage}`}
+            src={`/api/assets/images/${product.productImage}`}
             alt={product.name}
           />
         }

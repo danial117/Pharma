@@ -67,7 +67,7 @@ const HomePage=()=>{
     
     window.onload = async() => {
         
-    const response=   await fetch('http://localhost:3002/user/', {
+    const response=   await fetch('/api/user/', {
           method: 'GET',
           credentials: 'include' // Include cookies in request
         })

@@ -34,7 +34,7 @@ const accessToken=useSelector((state)=>state.accessToken)
             },
             async createOrder() {
               try {
-                const response = await fetch(`http://localhost:3002/orderhttp://localhost:3002/`, {
+                const response = await fetch(`/api/order/api/`, {
                   method: "POST",
                   headers: {
                     "Content-Type": "application/json",
@@ -69,7 +69,7 @@ const accessToken=useSelector((state)=>state.accessToken)
             },
             async onApprove(data, actions) {
               try {
-                const response = await fetch(`http://localhost:3002/orderhttp://localhost:3002/${data.orderID}/capture`, {
+                const response = await fetch(`/api/order/api/${data.orderID}/capture`, {
                   method: "POST",
                   headers: {
                     "Content-Type": "application/json",

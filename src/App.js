@@ -35,7 +35,7 @@ const App=()=>{
 
 
   useEffect(()=>{
-    fetch('http://localhost:3002/content/',{
+    fetch('/api/content/',{
      method:'GET'
     }).then((response)=>response.json()).then((data)=>{
     

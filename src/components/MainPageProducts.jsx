@@ -37,7 +37,7 @@ const MainPageProducts=()=>{
       { 
         
         
-         fetch(`http://localhost:3002/products?type=${search}&page=${searchPage}&limit=6`,{
+         fetch(`/api/products?type=${search}&page=${searchPage}&limit=6`,{
             method:'GET'
              }).then((response)=>response.json()).then((result)=>{setProducts(result); setSelect(5);   })
             }
@@ -55,24 +55,24 @@ const MainPageProducts=()=>{
    
   
 
-   fetch(`http://localhost:3002/products?page=${page}&limit=6`,{
+   fetch(`/api/products?page=${page}&limit=6`,{
     method:'GET'
    }).then((response)=>response.json()).then((result)=>{setProducts(result);  setPage(page+1)})
 }
    else if(select ===2){
-    fetch(`http://localhost:3002/brands?page=${page}&limit=6`,{
+    fetch(`/api/brands?page=${page}&limit=6`,{
         method:'GET'
          }).then((response)=>response.json()).then((result)=>{setBrands(result);setPage(page+1);})
    }
 
    else if(select ===3){
-    fetch(`http://localhost:3002/products?type=skin&&page=${page}&limit=6`,{
+    fetch(`/api/products?type=skin&&page=${page}&limit=6`,{
         method:'GET'
          }).then((response)=>response.json()).then((result)=>{setProducts(result);setPage(page+1); })
    }
 
    else if(select ===4){
-    fetch(`http://localhost:3002/products?type=oral&&page=${page}&limit=6`,{
+    fetch(`/api/products?type=oral&&page=${page}&limit=6`,{
         method:'GET'
          }).then((response)=>response.json()).then((result)=>{setProducts(result);setPage(page+1); })
    }
@@ -84,24 +84,24 @@ const MainPageProducts=()=>{
     const RequestProducts=()=>{
 
     if(select ===1){
-        fetch(`http://localhost:3002/products?page=${page}&limit=6`,{
+        fetch(`/api/products?page=${page}&limit=6`,{
     method:'GET'
      }).then((response)=>response.json()).then((result)=>{products.push(...result);setPage(page+1); })
 
 }  else if(select ===2){
-    fetch(`http://localhost:3002/brands?page=${page}&limit=6`,{
+    fetch(`/api/brands?page=${page}&limit=6`,{
         method:'GET'
          }).then((response)=>response.json()).then((result)=>{setBrands(result);setPage(page+1); })
    }
 
    else if(select ===3){
-    fetch(`http://localhost:3002/products?type=skin&&page=${page}&limit=6`,{
+    fetch(`/api/products?type=skin&&page=${page}&limit=6`,{
         method:'GET'
          }).then((response)=>response.json()).then((result)=>{setProducts(result);setPage(page+1); })
    }
 
    else if(select ===4){
-    fetch(`http://localhost:3002/products?type=oral&&page=${page}&limit=6`,{
+    fetch(`/api/products?type=oral&&page=${page}&limit=6`,{
         method:'GET'
          }).then((response)=>response.json()).then((result)=>{setProducts(result);setPage(page+1); })
    }
@@ -213,7 +213,7 @@ const MainPageProducts=()=>{
                     <div key={index} className="flex  gap-y-2 border-2 bg-white rounded-md border-emerald-500 flex-col">
                         
                         <div onClick={()=>{navigate(`/productPage/${data._id}`)}} className=" w-[90%] cursor-pointer sm:max-md:w-[100%] xs:max-sm:w-[100%] mt-6 border-b-2 pb-2 border-gray-200  mx-auto">
-                            <img className="w-[50%] h-[100%] mx-auto my-auto" src={`http://localhost:3002/assets/images/${data.productImage}`}/>
+                            <img className="w-[50%] h-[100%] mx-auto my-auto" src={`/api/assets/images/${data.productImage}`}/>
 
                         </div>
                         <div className="m-2 relative h-[180px] flex flex-col ">

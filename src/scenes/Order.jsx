@@ -248,7 +248,7 @@ const Order=()=>{
 
       const Checkout=async()=>{
 
-        await fetch(`http://localhost:3002/user/address/`,{
+        await fetch(`/api/user/address/`,{
             method:'GET',
             
         }).then((response)=>response.json()).then(()=>{
@@ -611,7 +611,7 @@ const Order=()=>{
                       <div className="flex flex-row">
                         <div className=''>
                             <div className='w-[100%] flex  h-[100px]'>
-                            <img className='w-[80%]  h-[70px] mx-auto  ' src={`http://localhost:3002/assets/images/${data.productImage}`} />
+                            <img className='w-[80%]  h-[70px] mx-auto  ' src={`/api/assets/images/${data.productImage}`} />
                             </div>
 
                         </div>

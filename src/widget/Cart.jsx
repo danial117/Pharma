@@ -143,7 +143,7 @@ const Cart=()=>{
                     <div  onClick={()=>{navigate(`/productPage/${data._id}`); toggleCart()}}  className="flex cursor-pointer flex-row">
                         <div className=''>
                             <div className='w-[100%] flex  h-[100px]'>
-                            <img className='w-[80%]  h-[70px] mx-auto  ' src={`http://localhost:3002/assets/images/${data.productImage}`} />
+                            <img className='w-[80%]  h-[70px] mx-auto  ' src={`/api/assets/images/${data.productImage}`} />
                             </div>
 
                         </div>

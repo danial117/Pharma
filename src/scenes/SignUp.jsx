@@ -97,7 +97,7 @@ const SignUp = () => {
           dispatch(removeItemFromCart({ itemId: id }));
         });
 
-        fetch('http://localhost:3002/user/signup', {
+        fetch('/api/user/signup', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -110,7 +110,7 @@ const SignUp = () => {
             window.location.href = '/';
           });
       } else {
-        fetch('http://localhost:3002/user/signup', {
+        fetch('/api/user/signup', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -135,7 +135,7 @@ const SignUp = () => {
           dispatch(removeItemFromCart({ itemId: id }));
         });
 
-        fetch('http://localhost:3002/user/login', {
+        fetch('/api/user/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -148,7 +148,7 @@ const SignUp = () => {
             window.location.href = '/';
           });
       } else {
-        fetch('http://localhost:3002/user/login', {
+        fetch('/api/user/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
