@@ -33,7 +33,7 @@ const __dirname = path.dirname(__filename);
 app.use("/assets/images", express.static(path.join(__dirname, "public/assets")));
 
 
-const allowedOrigins=['https://www.infovit.us/']
+const allowedOrigins=['https://www.infovit.us/','http://localhost:3000']
 
 app.use(cors({ origin: allowedOrigins, credentials: true }));
   app.use(helmet()); 
