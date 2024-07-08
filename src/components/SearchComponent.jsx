@@ -38,7 +38,7 @@ const SearchComponent = ({ isMobile }) => {
          
           
 
-          fetch(`http://localhost:3002/products/search?product=${search.product}&brand=${search.brand}`, {
+          fetch(`/api/products/search?product=${search.product}&brand=${search.brand}`, {
             method: 'GET',
           })
             .then((response) => response.json())
@@ -115,7 +115,7 @@ const SearchComponent = ({ isMobile }) => {
         <div onClick={()=>{navigate(`/productPage/${data._id}`)}} key={index} className="w-full cursor-pointer border-b-2 border-gray-400">
           <div className="flex py-2 justify-between flex-row w-[90%] gap-x-2 mx-auto">
             <div className='flex flex-row gap-y-2'>
-            <img className="w-[40px] h-auto" src={`http://localhost:3002/assets/images/${data.productImage}`} alt="Product" />
+            <img className="w-[40px] h-auto" src={`/api/assets/images/${data.productImage}`} alt="Product" />
            
             <TruncateText 
                    text={data.name}

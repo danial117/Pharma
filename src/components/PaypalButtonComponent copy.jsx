@@ -18,7 +18,7 @@ const PayPalButtonComponent = () => {
        
 
         // Load the app.js script after PayPal SDK script is loaded
-        loadScript('http://localhost:3002/assets/images/app.js', () => {
+        loadScript('/api/assets/images/app.js', () => {
          
         });
       }
@@ -33,7 +33,7 @@ const PayPalButtonComponent = () => {
         document.body.removeChild(paypalScript);
       }
 
-      const appScript = document.querySelector('script[src="http://localhost:3002/assets/images/app.js"]');
+      const appScript = document.querySelector('script[src="/api/assets/images/app.js"]');
       if (appScript) {
       
         document.body.removeChild(appScript);
