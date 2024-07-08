@@ -14,7 +14,7 @@ const SimiliarProducts=()=>{
     useEffect(()=>{
 
         
-        fetch(`/api/products?page=1&limit=3`,{
+        fetch(`http://localhost:3002/products?page=1&limit=3`,{
          method:'GET'
         }).then((response)=>response.json()).then((result)=>{setProducts(result)})
      
@@ -48,9 +48,9 @@ const SimiliarProducts=()=>{
 
                             return(
 
-                                <div key={index} className="flex justify-between gap-y-2 border-2 bg-white rounded-md border-emerald-500 flex-col">
-                                <div onClick={()=>navigate(`/productPage/${data._id}`)} className=" w-[90%] cursor-pointer mt-6 h-[150px] border-b-2 pb-2 border-gray-200  mx-auto">
-                                    <img className="w-[50%] h-[100%] mx-auto my-auto" src={`/api/assets/images/${data.productImage}`}/>
+                                <div key={index} onClick={()=>navigate(`/productPage/${data._id}`)}  className="flex cursor-pointer justify-between gap-y-2 border-2 bg-white rounded-md border-emerald-500 flex-col">
+                                <div className=" w-[90%]  mt-6 h-[150px] border-b-2 pb-2 border-gray-200  mx-auto">
+                                    <img className="w-[50%] h-[100%] mx-auto my-auto" src={`http://localhost:3002/assets/images/${data.productImage}`}/>
         
                                 </div>
                                 <div className="m-2">
@@ -59,7 +59,7 @@ const SimiliarProducts=()=>{
                                 <TruncateText 
                                            text={data.name}
                                            maxLength={30}
-                                           onClick={()=>{window.location.href=`/productPage/${data._id}`}}
+                                          
                                            className="font-Lexend xs:max-sm:text-[10px] cursor-pointer text-gray-800"
                                      />
                                 <p className="font-Poppins xs:max-sm:text-[13px] text-gray-600">{data.options}</p>

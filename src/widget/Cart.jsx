@@ -11,8 +11,13 @@ import { useDispatch } from 'react-redux';
 import { CartContext } from '../cartContext/cartContext';
 import api from '../utils/api';
 import { TruncateText } from '../utility functions/TranctuateText';
+import { useNavigate } from 'react-router-dom';
+
+
+
 
 const Cart=()=>{
+    const navigate=useNavigate()
     const [hide,setHide]=useState(false)
     const isMobile = useMediaQuery('(max-width:768px)');
     const cartItems=useSelector((state)=>state.cartItems);
@@ -135,10 +140,10 @@ const Cart=()=>{
 
             <div key={index} className="m-4 pb-2 border-b-2 border-gray-500 ">
                 <div className="grid grid-cols-2">
-                    <div className="flex flex-row">
+                    <div  onClick={()=>{navigate(`/productPage/${data._id}`); toggleCart()}}  className="flex cursor-pointer flex-row">
                         <div className=''>
                             <div className='w-[100%] flex  h-[100px]'>
-                            <img className='w-[80%]  h-[70px] mx-auto  ' src={`/api/assets/images/${data.productImage}`} />
+                            <img className='w-[80%]  h-[70px] mx-auto  ' src={`http://localhost:3002/assets/images/${data.productImage}`} />
                             </div>
 
                         </div>

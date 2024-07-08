@@ -67,7 +67,7 @@ const HomePage=()=>{
     
     window.onload = async() => {
         
-    const response=   await fetch('/api/user/', {
+    const response=   await fetch('http://localhost:3002/user/', {
           method: 'GET',
           credentials: 'include' // Include cookies in request
         })
@@ -99,7 +99,7 @@ const HomePage=()=>{
 
         if(accessToken){
             api.get('/cart/').then((response)=>
-              { if(response.status===200) {
+              { if(response.status===200 && response.data) {
         
                 response.data.items.map((item)=>{
                   
