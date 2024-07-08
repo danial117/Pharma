@@ -248,7 +248,7 @@ const Order=()=>{
 
       const Checkout=async()=>{
 
-        await fetch(`/api/user/address/`,{
+        await fetch(`http://localhost:3002/user/address/`,{
             method:'GET',
             
         }).then((response)=>response.json()).then(()=>{
@@ -446,12 +446,12 @@ const Order=()=>{
 
             </div>
 
-            <div className="bg-gray-200 w-full py-4 px-12">
+            <div className="bg-gray-200 xs:max-sm:px-2 w-full py-4 px-12">
               <div className="flex flex-row gap-x-4">
 
-                <button onClick={()=>{setAddress({})}} className=" py-2 px-4 rounded-md font-Lexend bg-white">Edit</button>
-                <button onClick={RemoveAddress} className=" py-2 px-6 rounded-md font-Lexend bg-white">Remove</button>
-                <button onClick={()=>{setOrderProcess(2)}} className=" py-2 px-6 rounded-md font-Lexend bg-white">Confirm</button>
+                <button onClick={()=>{setAddress({})}} className=" py-2 px-4 rounded-md xs:max-sm:text-sm font-Lexend bg-white">Edit</button>
+                <button onClick={RemoveAddress} className=" py-2 px-6 xs:max-sm:px-2 xs:max-sm:text-sm rounded-md font-Lexend bg-white">Remove</button>
+                <button onClick={()=>{setOrderProcess(2)}} className=" py-2 px-6 xs:max-sm:px-2 xs:max-sm:text-sm rounded-md font-Lexend bg-white">Confirm</button>
 
 
                 </div>
@@ -611,7 +611,7 @@ const Order=()=>{
                       <div className="flex flex-row">
                         <div className=''>
                             <div className='w-[100%] flex  h-[100px]'>
-                            <img className='w-[80%]  h-[70px] mx-auto  ' src={`/api/assets/images/${data.productImage}`} />
+                            <img className='w-[80%]  h-[70px] mx-auto  ' src={`http://localhost:3002/assets/images/${data.productImage}`} />
                             </div>
 
                         </div>

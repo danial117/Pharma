@@ -66,7 +66,9 @@ export const decrementItemQuantityAsync = createAsyncThunk(
    
     const state = getState();
 
-    if (state.accessToken) {
+    const itemToDecrement = state.cartItems.find((item) => item._id === itemId);
+
+    if (state.accessToken && itemToDecrement && itemToDecrement.quantity > 1  ) {
        api.patch(`/cart/item/${itemId}`,JSON.stringify({action:'decrement'}),{
         headers:{
           'Content-Type':'application/json'

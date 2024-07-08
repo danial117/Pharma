@@ -44,7 +44,7 @@ const MainProductCarousal=()=>{
       useEffect(()=>{
 
         
-        fetch(`/api/products?page=1&limit=6`,{
+        fetch(`http://localhost:3002/products?page=1&limit=6`,{
          method:'GET'
         }).then((response)=>response.json()).then((result)=>{setProducts(result)})
      
@@ -105,7 +105,7 @@ const MainProductCarousal=()=>{
                     <div key={index} className="pl-4 xs:max-sm:pl-[2px]">
                     <div className="flex gap-y-2 h-[350px]  bg-white rounded-md flex-col">
                                     <div onClick={()=>{window.location.href=`/productPage/${data._id}`}} className="cursor-pointer w-[90%] h-[50%] mt-6  pb-2 border-gray-200  mx-auto">
-                                        <img className="w-[50%] h-[100%] mx-auto my-auto" src={`/api/assets/images/${data.productImage}`}/>
+                                        <img className="w-[50%] h-[100%] mx-auto my-auto" src={`http://localhost:3002/assets/images/${data.productImage}`}/>
             
                                     </div>
                                     <div className="m-2 flex flex-col gap-y-auto h-full justify-between">

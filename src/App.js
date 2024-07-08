@@ -17,9 +17,17 @@ import BrandPage from "./scenes/BrandPage";
 import { UserOrder } from "./scenes/UserOrders";
 import Contact from "./scenes/Contact";
 import NewsPage from "./scenes/NewsPage";
+import { useLocation } from "react-router-dom";
 
+function ScrollToTopOnNavigation() {
+  const { pathname } = useLocation();
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
 
+  return null;
+}
 
 
 const App=()=>{
@@ -27,7 +35,7 @@ const App=()=>{
 
 
   useEffect(()=>{
-    fetch('/api/content/',{
+    fetch('http://localhost:3002/content/',{
      method:'GET'
     }).then((response)=>response.json()).then((data)=>{
     
@@ -47,7 +55,10 @@ const App=()=>{
     <Routes>
       <Route path='/' element={<HomePage/>}> </Route>
       <Route path='/userOrders' element={<UserOrder/>}> </Route>
-      <Route path='/productPage/:productId' element={<ProductPage/>}> </Route>
+      <Route path='/productPage/:productId' element={ <>
+        <ScrollToTopOnNavigation />
+        <ProductPage />
+      </>}> </Route>
       <Route path='/createAccount' element={<SignUp />}></Route>
       <Route path="/about" element={<About/>} />
       <Route path="/contact" element={<Contact/>} />
