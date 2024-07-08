@@ -156,11 +156,12 @@ export const incrementDecrementCartItem = async (req, res) => {
     if (itemIndex === -1) {
       return res.status(404).json({ error: 'Item not found in cart' });
     }
-
+    
+    
     // Increment or decrement the quantity
     if (action === 'increment') {
       cart.items[itemIndex].quantity += 1;
-    } else if (action === 'decrement') {
+    } else if (action === 'decrement' && cart.items[itemIndex].quantity > 1) {
       cart.items[itemIndex].quantity -= 1;
       if (cart.items[itemIndex].quantity <= 0) {
         cart.items.splice(itemIndex, 1); // Remove item if quantity is 0 or less
