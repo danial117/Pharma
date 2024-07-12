@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setUser, setAccessToken } from '../state';
+import { setUser, setAccessToken, addItemToCartAsync,addItemToCart } from '../state';
 import { removeItemFromCart } from '../state';
 import NavBar from './NavBar';
 import Footer from './Footer';
 import '../styles/styles.css';
+import api from '../utils/api';
 
 const SignUp = () => {
   const dispatch = useDispatch();
@@ -68,7 +69,7 @@ const SignUp = () => {
       valid = false;
     }
 
-    if (!formData.phone.trim()){
+    if (!formData.phone.trim() && !login){
       newErrors.phone = 'Phone number is required';
       valid = false;
 
@@ -87,17 +88,38 @@ const SignUp = () => {
     return valid;
   };
 
-  const SignUpSubmit = (e) => {
-    e.preventDefault();
 
+
+
+  const SubmissionSwitch=()=>{ setLogin(!login);
+   setFormData({ name: '',
+    email: '',
+    password: '',
+    phone: ''});
+
+    setErrors({
+      name: '',
+      email: '',
+      password: '',
+      phone: '',
+    })
+
+
+    }
+
+
+
+
+  const SignUpSubmit = async(e) => {
+    e.preventDefault();
     if (validateForm()) {
-      // Process the form data (e.g., send it to the server)
+     
       if (accessToken) {
         cartItemIds.forEach((id) => {
           dispatch(removeItemFromCart({ itemId: id }));
         });
 
-        fetch('/api/user/signup', {
+        fetch('http://localhost:3002/user/signup', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -110,7 +132,7 @@ const SignUp = () => {
             window.location.href = '/';
           });
       } else {
-        fetch('/api/user/signup', {
+      const response=await  fetch('http://localhost:3002/user/signup', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -120,13 +142,47 @@ const SignUp = () => {
           .then((data) => {
             dispatch(setUser({ user: data.userData }));
             dispatch(setAccessToken({ accessToken: data.accessToken }));
-            window.location.href = '/';
+            
           });
+
+          if(response){
+             if(response.status===201 && response.data) {
+                response.data.items.map((item)=>{
+                   dispatch( addItemToCart({product:item.product,quantity:item.quantity}))
+                })
+                const dispatchPromises = [];
+                cartItems.forEach((product) => {
+                        dispatchPromises.push(dispatch(addItemToCartAsync({ product:product,quantity:product.quantity })));  
+                });
+
+                Promise.all(dispatchPromises)
+                    .then(() => {
+                       
+                        window.location.href = '/';
+                    })
+                    .catch((error) => {
+                        console.error('Error dispatching actions:', error)                      
+                    });     
+                }
+          }
       }
     }
   };
 
-  const LoginSubmit = (e) => {
+
+
+
+
+
+
+
+
+
+
+
+
+
+  const LoginSubmit =async (e) => {
     e.preventDefault();
 
     if (validateForm()) {
@@ -135,7 +191,7 @@ const SignUp = () => {
           dispatch(removeItemFromCart({ itemId: id }));
         });
 
-        fetch('/api/user/login', {
+       await fetch('http://localhost:3002/user/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -145,10 +201,12 @@ const SignUp = () => {
           .then((data) => {
             dispatch(setUser({ user: data.modifiedUser }));
             dispatch(setAccessToken({ accessToken: data.accessToken }));
+            
             window.location.href = '/';
+
           });
       } else {
-        fetch('/api/user/login', {
+     const response= await  fetch('http://localhost:3002/user/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -158,8 +216,63 @@ const SignUp = () => {
           .then((data) => {
             dispatch(setUser({ user: data.modifiedUser }));
             dispatch(setAccessToken({ accessToken: data.accessToken }));
-            window.location.href = '/';
+           
+         return data
           });
+
+          if(response){
+            api.get('/cart/').then((response)=>
+              { if(response.status===200 && response.data) {
+        
+                response.data.items.map((item)=>{
+                  
+                   dispatch( addItemToCart({product:item.product,quantity:item.quantity}))
+                })
+                
+               
+                const dispatchPromises = [];
+
+                cartItems.forEach((product) => {
+                    // Check if the product's ID exists in response.data.items
+                    const found = response.data.items.some((item) => item._id === product._id);
+                    
+                    if (!found) {
+                        // Dispatch addItemToCartAsync action for products not found in response
+                        dispatchPromises.push(dispatch(addItemToCartAsync({ product:product,quantity:product.quantity })));
+                    }
+                });
+                
+                // Wait for all dispatch operations to complete
+                Promise.all(dispatchPromises)
+                    .then(() => {
+                        // After all dispatches are performed, change location
+                        window.location.href = '/';
+                    })
+                    .catch((error) => {
+                        console.error('Error dispatching actions:', error);
+                        // Handle error if needed
+                    });
+                
+        
+        
+                }
+            }
+            )
+
+
+          }
+
+
+
+
+
+
+
+
+
+
+
+         
       }
     }
   };
@@ -251,12 +364,14 @@ const SignUp = () => {
               {!login ? (
                 <p className="font-Lexend text-xs text-center mt-28">
                   Already have an account?{' '}
-                  <span onClick={() => setLogin(!login)} className="text-blue-600 cursor-pointer">
+                  <span onClick={SubmissionSwitch} className="text-blue-600 cursor-pointer">
                     login
                   </span>
                 </p>
               ) : (
-                <p onClick={() => setLogin(!login)} className="font-Lexend text-xs text-center mt-28">
+                <p onClick={SubmissionSwitch}
+                  
+                  className="font-Lexend text-xs text-center mt-28">
                   Don't have an account?{' '}
                   <span className="text-blue-600 cursor-pointer">Create an account</span>
                 </p>

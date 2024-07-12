@@ -57,7 +57,7 @@ export const UserOrder=()=>{
 
                     {sortedOrders.map((order,index) => (
                      <>
-                        <div key={index}><p onClick={()=>{if(index == 0){window.location.href='/order'}}} className={`text-left sm:max-md:text-[10px] xs:max-sm:text-[8px] md:max-lg:text-[10px] ${index ===0 && 'underline hover:text-blue-900 cursor-pointer text-blue-500'}`}>{order.orderNumber}</p></div>
+                        <div key={index}><p onClick={()=>{if(index === 0 && order.paymentStatus==='Pending' ){window.location.href='/order'}}} className={`text-left sm:max-md:text-[10px] xs:max-sm:text-[8px] md:max-lg:text-[10px] ${index ===0 &&  order.paymentStatus==='Pending' && 'underline hover:text-blue-900 cursor-pointer text-blue-500'}`}>{order.orderNumber}</p></div>
                         <div><p  className="text-left sm:max-md:text-[10px] xs:max-sm:text-[8px] md:max-lg:text-[10px] ml-2">{order.totalAmount} $</p></div>
                         <div><p className="text-left sm:max-md:text-[10px] ml-2 xs:max-sm:text-[8px] md:max-lg:text-[10px]">{new Date(order.createdAt).toLocaleDateString()}</p></div>
                         <div><p className="text-left sm:max-md:text-[10px] xs:max-sm:text-[8px] md:max-lg:text-[10px]">{order.paymentStatus}</p></div>

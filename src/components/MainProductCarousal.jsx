@@ -10,8 +10,8 @@ import { CartContext } from '../cartContext/cartContext';
 import { useDispatch,useSelector } from 'react-redux';
 import { addItemToCartAsync } from '../state';
 import { TruncateText } from '../utility functions/TranctuateText';
-
-
+import Skeleton from '../skeleton/skeleton';
+import { useQuery } from '@tanstack/react-query';
 
 
 const MainProductCarousal=()=>{
@@ -41,15 +41,23 @@ const MainProductCarousal=()=>{
 
 
 
-      useEffect(()=>{
+     const FetchCarousalProduct=async()=>{
 
         
-        fetch(`/api/products?page=1&limit=6`,{
+       await fetch(`http://localhost:3002/products?page=1&limit=4`,{
          method:'GET'
         }).then((response)=>response.json()).then((result)=>{setProducts(result)})
      
      
-         },[])
+         }
+
+         const { isLoading, isError, data, error } = useQuery({
+            queryKey: 'carousalProducts',
+            queryFn: FetchCarousalProduct,
+            enabled:true,
+            refetchOnWindowFocus: false
+          });
+        
      
 
       const sliderRef = useRef(null);
@@ -92,11 +100,40 @@ const MainProductCarousal=()=>{
         <Slider  ref={sliderRef}  className=" py-12 xs:max-sm:py-4 xs:max-sm:my-2 my-6 flex gap-x-6  w-[70%] mx-auto " {...settings}>
 
 
+       { isLoading ?
+        [1,2,3,4].map((data,index)=>{
+            return(
+            <div  className="flex  gap-y-[4px] border-2 bg-white rounded-md border-emerald-500 flex-col">
+             
+   <div className=" w-[90%] h-[150px] cursor-pointer sm:max-md:w-[100%] xs:max-sm:w-[100%] mt-2 border-b-2  border-gray-200  mx-auto">
+                    <Skeleton  />
+                  </div>
+                  
+                  
+                  <div className="mt-[5px] relative w-[90%] mx-auto h-[30px] flex flex-col ">
+                  <Skeleton />
+                  </div>
+
+                  <div className="m-2 relative w-[90%] mx-auto h-[120px] flex flex-col ">
+                  <Skeleton />
+                  </div>
+
+
+              </div>
+            )
+            })
 
 
 
 
-          {
+
+
+
+        :
+
+
+           
+          
             products.map((data,index)=>{
                 const carted=cartItemIds.includes(data._id)
 
@@ -105,7 +142,7 @@ const MainProductCarousal=()=>{
                     <div key={index} className="pl-4 xs:max-sm:pl-[2px]">
                     <div className="flex gap-y-2 h-[350px]  bg-white rounded-md flex-col">
                                     <div onClick={()=>{window.location.href=`/productPage/${data._id}`}} className="cursor-pointer w-[90%] h-[50%] mt-6  pb-2 border-gray-200  mx-auto">
-                                        <img className="w-[50%] h-[100%] mx-auto my-auto" src={`/api/assets/images/${data.productImage}`}/>
+                                        <img className="w-[50%] h-[100%] mx-auto my-auto" src={`http://localhost:3002/assets/images/${data.productImage}`}/>
             
                                     </div>
                                     <div className="m-2 flex flex-col gap-y-auto h-full justify-between">
@@ -136,7 +173,8 @@ const MainProductCarousal=()=>{
 
                 )
             })
-          }
+          
+        }
            
 
                     

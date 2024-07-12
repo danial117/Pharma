@@ -34,7 +34,7 @@ const ProductPage=()=>{
 
 
      const fetchProduct=async ()=>{
-       await fetch(`/api/products/id/${productId}`,{
+       await fetch(`http://localhost:3002/products/id/${productId}`,{
             method:'GET'
         }).then((response)=>response.json()).then((data)=>{setProduct(data); })
     }
@@ -43,6 +43,7 @@ const ProductPage=()=>{
      const { isLoading, isError, data, error } = useQuery({
         queryKey: [productId],
         queryFn: fetchProduct,
+        refetchOnWindowFocus: false
       })
 
    
@@ -78,7 +79,7 @@ if (foundItem) {
  setCarted(false)
 }
 
-    },[cartItems])
+    },[productId,cartItems])
 
 
 
@@ -106,7 +107,7 @@ if (foundItem) {
         : 
           <img
             className="w-[60%]  h-[350px] mx-auto my-auto"
-            src={`/api/assets/images/${product.productImage}`}
+            src={`http://localhost:3002/assets/images/${product.productImage}`}
             alt={product.name}
           />
         }

@@ -18,6 +18,10 @@ import { UserOrder } from "./scenes/UserOrders";
 import Contact from "./scenes/Contact";
 import NewsPage from "./scenes/NewsPage";
 import { useLocation } from "react-router-dom";
+import Categories from "./widget/CategoriesWidget";
+
+
+
 
 function ScrollToTopOnNavigation() {
   const { pathname } = useLocation();
@@ -35,7 +39,7 @@ const App=()=>{
 
 
   useEffect(()=>{
-    fetch('/api/content/',{
+    fetch('http://localhost:3002/content/',{
      method:'GET'
     }).then((response)=>response.json()).then((data)=>{
     
@@ -64,8 +68,10 @@ const App=()=>{
       <Route path="/contact" element={<Contact/>} />
       <Route path="/news" element={<NewsBlog/>} />
       <Route path="/news/:newsId" element={<NewsPage/>} />
+      <Route path="/categories" element={<Categories/>} />
       <Route path="/brand/:brandId" element={<BrandPage/>} />
       <Route path='/order' element={<ProtectedRoute><Order /></ProtectedRoute>}></Route>
+
       </Routes>
 
       

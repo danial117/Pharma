@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useMediaQuery } from "@mui/material";
 import NavBar from "./NavBar"
 import {useNavigate} from 'react-router-dom'
-import { addItemToCart, removeItemFromCart, setAccessToken } from "../state";
+import { addItemToCart, removeItemFromCart, setAccessToken,setItemCart } from "../state";
 import { CartContext } from "../cartContext/cartContext";
 import SearchComponent from "../components/SearchComponent";
 import Slider from "react-slick";
@@ -67,7 +67,7 @@ const HomePage=()=>{
     
     window.onload = async() => {
         
-    const response=   await fetch('/api/user/', {
+    const response=   await fetch('http://localhost:3002/user/', {
           method: 'GET',
           credentials: 'include' // Include cookies in request
         })
@@ -80,9 +80,9 @@ const HomePage=()=>{
         
           
          
-           if(user.email.toString() !== data.email.toString()){         /////
+           if(user.email && (user.email.toString() !== data.email.toString())){         /////
             cartItemIds.forEach((id)=>{
-               
+                 console.log(id)
                 dispatch(removeItemFromCart({itemId:id}))
             })
            }
@@ -103,7 +103,7 @@ const HomePage=()=>{
         
                 response.data.items.map((item)=>{
                   
-                   dispatch( addItemToCart({product:item.product,quantity:item.quantity}))
+                   dispatch( setItemCart({product:item.product,quantity:item.quantity}))
                 })
         
         
@@ -199,7 +199,7 @@ const HomePage=()=>{
 
 
 
-
+    <MainProductCarousal />
 
     <MainPageProducts />
 
@@ -261,7 +261,7 @@ const HomePage=()=>{
 
     <section>
 
-<div className="w-full my-8 xs:max-sm:my-4 sm:max-lg:min-h-[50vh] h-auto">
+<div className="w-full my-32 xs:max-sm:my-16 sm:max-lg:min-h-[50vh] h-auto">
     <p className="text-center font-Abel font-bold text-[2.5rem]">3 easy steps</p>
 
     <div className="w-[5%] mx-auto bg-emerald-500 my-4 h-[3px]"></div>
@@ -316,7 +316,7 @@ const HomePage=()=>{
 
 
 
-<MainProductCarousal />
+
 
 
 

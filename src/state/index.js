@@ -213,6 +213,18 @@ export const authSlice = createSlice({
       }
       state.ItemsQuantity += quantity;
     },
+    setItemCart:(state,action)=>{
+      const { product, quantity } = action.payload;
+      const existingItem = state.cartItems.find((cartItem) => cartItem._id === product._id);
+     
+      if (existingItem) {
+        existingItem.quantity = quantity;
+      } else {
+        state.cartItems.push({ ...product, quantity });
+      }
+     
+
+    },
     setContent:(state,action)=>{
       state.content=action.payload.data
 
@@ -244,7 +256,7 @@ export const authSlice = createSlice({
   });
 
     
-  export const {setContent,incrementItemQuantity,decrementItemQuantity,removeItemFromCart,setUser,setLogout,setAccessToken,clearAccessToken,addItemToCart} =
+  export const {setContent,incrementItemQuantity,setItemCart,decrementItemQuantity,removeItemFromCart,setUser,setLogout,setAccessToken,clearAccessToken,addItemToCart} =
   authSlice.actions;
 
 export default authSlice.reducer;

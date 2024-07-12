@@ -3,7 +3,7 @@ import axios from 'axios';
 
 import { setAccessToken } from '../state/index.js';
 const api = axios.create({
-  baseURL: '/api/',
+  baseURL: 'http://localhost:3002/',
   
 });
 
@@ -54,7 +54,7 @@ api.interceptors.response.use(
     
       
       try {
-        const { data } = await axios.get('/api/refresh-token',  {
+        const { data } = await axios.get('http://localhost:3002/refresh-token',  {
             withCredentials: true, 
           });
 

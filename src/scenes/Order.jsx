@@ -248,7 +248,7 @@ const Order=()=>{
 
       const Checkout=async()=>{
 
-        await fetch(`/api/user/address/`,{
+        await fetch(`http://localhost:3002/user/address/`,{
             method:'GET',
             
         }).then((response)=>response.json()).then(()=>{
@@ -607,11 +607,11 @@ const Order=()=>{
           
           
           <div className="m-4 pb-2 border-b-2 border-gray-500 ">
-                <div className="grid grid-cols-2">
-                      <div className="flex flex-row">
+                <div onClick={() => navigate(`/productPage/${data._id}`)} className="grid grid-cols-2">
+                      <div  className="flex flex-row">
                         <div className=''>
                             <div className='w-[100%] flex  h-[100px]'>
-                            <img className='w-[80%]  h-[70px] mx-auto  ' src={`/api/assets/images/${data.productImage}`} />
+                            <img className='w-[80%]  h-[70px] mx-auto  ' src={`http://localhost:3002/assets/images/${data.productImage}`} />
                             </div>
 
                         </div>

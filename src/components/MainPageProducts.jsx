@@ -7,11 +7,27 @@ import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {TruncateText} from '../utility functions/TranctuateText'
+import { useQuery } from "@tanstack/react-query";
+import Skeleton from "../skeleton/skeleton";
 
-
-
-
-
+const renderSkeletons = () => {
+    return [1, 2, 3, 4, 5, 6].map((index) => (
+      <div key={index} className="flex gap-y-[4px] border-2 bg-white rounded-md border-emerald-500 flex-col">
+        <div className="w-[90%] h-[150px] cursor-pointer sm:max-md:w-[100%] xs:max-sm:w-[100%] mt-2 border-b-2 border-gray-200 mx-auto">
+          {/* Skeleton for image */}
+          <Skeleton />
+        </div>
+        <div className="mt-[5px] relative w-[90%] mx-auto h-[30px] flex flex-col">
+          {/* Skeleton for brand */}
+          <Skeleton />
+        </div>
+        <div className="m-2 relative w-[90%] mx-auto h-[120px] flex flex-col">
+          {/* Skeleton for description or other data */}
+          <Skeleton />
+        </div>
+      </div>
+    ));
+  };
 
 
 const MainPageProducts=()=>{
@@ -32,16 +48,122 @@ const MainPageProducts=()=>{
 
     
 
-     const SearchProductByName=()=>{
-        if(search !== false)
-      { 
-        
-        
-         fetch(`/api/products?type=${search}&page=${searchPage}&limit=6`,{
+   
+
+
+
+     const RequestProducts=async()=>{
+
+        if(select ===1){
+           await fetch(`http://localhost:3002/products?page=${page}&limit=6`,{
+        method:'GET'
+         }).then((response)=>response.json()).then((result)=>{products.push(...result);setPage(page+1); })
+    
+    }  else if(select ===2){
+       await fetch(`http://localhost:3002/brands?page=${page}&limit=6`,{
             method:'GET'
-             }).then((response)=>response.json()).then((result)=>{setProducts(result); setSelect(5);   })
-            }
-     }
+             }).then((response)=>response.json()).then((result)=>{setBrands(result);setPage(page+1); })
+       }
+    
+       else if(select ===3){
+       await fetch(`http://localhost:3002/products?type=skin&&page=${page}&limit=6`,{
+            method:'GET'
+             }).then((response)=>response.json()).then((result)=>{products.push(...result);setPage(page+1); })
+       }
+    
+       else if(select ===4){
+      await  fetch(`http://localhost:3002/products?type=oral&&page=${page}&limit=6`,{
+            method:'GET'
+             }).then((response)=>response.json()).then((result)=>{products.push(...result);setPage(page+1); })
+       }      
+        }
+    
+    
+
+
+
+
+
+    
+        const FetchProduct=async()=>{
+
+        if(select ===1)
+          {  await  fetch(`http://localhost:3002/products?page=${page}&limit=6`,{
+             method:'GET'
+            }).then((response)=>response.json()).then((result)=>{setProducts(result);  setPage(page+1)})
+          }
+          if(select ===2){
+           await fetch(`http://localhost:3002/brands?page=${page}&limit=6`,{
+                method:'GET'
+                 }).then((response)=>response.json()).then((result)=>{setBrands(result);setPage(page+1);})
+           }
+        
+           else if(select ===3){
+           await fetch(`http://localhost:3002/products?type=skin&&page=${page}&limit=6`,{
+                method:'GET'
+                 }).then((response)=>response.json()).then((result)=>{setProducts(result);setPage(page+1); })
+           }
+        
+           else if(select ===4){
+           await fetch(`http://localhost:3002/products?type=oral&&page=${page}&limit=6`,{
+                method:'GET'
+                 }).then((response)=>response.json()).then((result)=>{setProducts(result);setPage(page+1); return result; })
+           }
+        
+        
+        
+        
+        
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+         
+         const { isLoading:isLoadingFetchProducts, isError, data, error } = useQuery({
+            queryKey: ['product', select],
+             queryFn: FetchProduct,
+             refetchOnWindowFocus: false
+           })
+         
+          
+
+          const {isLoading: isLoadingRequestProducts,refetch } = useQuery({
+            queryKey: ['requestProducts'],
+             queryFn: RequestProducts,
+             enabled:false,
+             refetchOnWindowFocus: false
+           })
+         
+          console.log(isLoadingRequestProducts)
+
+
+
+          const SearchProductByName=async()=>{
+
+            if(search !== false)
+          { 
+            
+            
+             fetch(`http://localhost:3002/products?type=${search}&page=${searchPage}&limit=6`,{
+                method:'GET'
+                 }).then((response)=>response.json()).then((result)=>{setProducts(result); setSelect(5);   })
+                }
+         }
+
+
+
+
+
 
 
 
@@ -51,68 +173,17 @@ const MainPageProducts=()=>{
 
     useEffect(()=>{
 
-  if(select === 1){
-   
   
-
-   fetch(`/api/products?page=${page}&limit=6`,{
-    method:'GET'
-   }).then((response)=>response.json()).then((result)=>{setProducts(result);  setPage(page+1)})
-}
-   else if(select ===2){
-    fetch(`/api/brands?page=${page}&limit=6`,{
-        method:'GET'
-         }).then((response)=>response.json()).then((result)=>{setBrands(result);setPage(page+1);})
-   }
-
-   else if(select ===3){
-    fetch(`/api/products?type=skin&&page=${page}&limit=6`,{
-        method:'GET'
-         }).then((response)=>response.json()).then((result)=>{setProducts(result);setPage(page+1); })
-   }
-
-   else if(select ===4){
-    fetch(`/api/products?type=oral&&page=${page}&limit=6`,{
-        method:'GET'
-         }).then((response)=>response.json()).then((result)=>{setProducts(result);setPage(page+1); })
-   }
+   
 
 
     },[select])
 
 
-    const RequestProducts=()=>{
-
-    if(select ===1){
-        fetch(`/api/products?page=${page}&limit=6`,{
-    method:'GET'
-     }).then((response)=>response.json()).then((result)=>{products.push(...result);setPage(page+1); })
-
-}  else if(select ===2){
-    fetch(`/api/brands?page=${page}&limit=6`,{
-        method:'GET'
-         }).then((response)=>response.json()).then((result)=>{setBrands(result);setPage(page+1); })
-   }
-
-   else if(select ===3){
-    fetch(`/api/products?type=skin&&page=${page}&limit=6`,{
-        method:'GET'
-         }).then((response)=>response.json()).then((result)=>{setProducts(result);setPage(page+1); })
-   }
-
-   else if(select ===4){
-    fetch(`/api/products?type=oral&&page=${page}&limit=6`,{
-        method:'GET'
-         }).then((response)=>response.json()).then((result)=>{setProducts(result);setPage(page+1); })
-   }
-   
-       
-    }
-
-
+    
     
 
-        
+    
 
       
     
@@ -201,42 +272,42 @@ const MainPageProducts=()=>{
 
 
 
-                  {  
-                  (select === 1 || select === 3 || select === 4 || select ===5) &&
-                   products.map((data,index)=>{
-                     const carted=cartItemIds.includes(data._id)
-                    
-                    return(   
 
-                   
-                    
-                    <div key={index} className="flex  gap-y-2 border-2 bg-white rounded-md border-emerald-500 flex-col">
-                        
-                        <div onClick={()=>{navigate(`/productPage/${data._id}`)}} className=" w-[90%] cursor-pointer sm:max-md:w-[100%] xs:max-sm:w-[100%] mt-6 border-b-2 pb-2 border-gray-200  mx-auto">
-                            <img className="w-[50%] h-[100%] mx-auto my-auto" src={`/api/assets/images/${data.productImage}`}/>
+      {isLoadingFetchProducts ? (
+        renderSkeletons()
+      ) : (
+        (select === 1 || select === 3 || select === 4 || select === 5) &&
+        products.map((data, index) => {
+          const carted = cartItemIds.includes(data._id);
 
-                        </div>
-                        <div className="m-2 relative h-[180px] flex flex-col ">
-                        <p onClick={()=>{navigate(`/productPage/${data._id}`)}} className="cursor-pointer font-Abel text-[12px] xs:max-sm:text-[10px] font-bold text-emerald-400 my-[2px]">{data.brand}</p>
-                       
-                        <TruncateText 
-                         text={data.name}
-                         maxLength={30}
-                         onClick={()=>{navigate(`/productPage/${data._id}`)}}
-                         className="font-Lexend cursor-pointer sm:max-md:text-[12px] xs:max-sm:text-[10px] text-gray-800"
-                   />
-                        <p className="font-Poppins xs:max-sm:text-[14px] text-gray-600">{data.options}</p>
-                        <div  className="grid w-full absolute bottom-2 py-2 grid-cols-2 xs:max-sm:grid-cols-1 xs:max-sm:gap-y-2 gap-x-2 ">
-                            <div className="bg-gray-200 xs:max-sm:py-[2px] sm:max-md:py-[2px] font-Abel py-2 xs:max-sm:text-[16px] text-[20px] rounded-md text-center">${data.price}</div>
-                           {carted ?   <div style={{userSelect:'none'}} onClick={toggleCart}  className="text-md border-2 cursor-pointer rounded-md py-2 sm:max-md:text-xs xs:max-sm:text-xs font-Abel text-center border-gray-300">View in cart</div>      : <div onClick={()=>dispatch(addItemToCartAsync({product:data,quantity:1}))}  className="text-md border-2 cursor-pointer rounded-md py-2 sm:max-md:text-xs xs:max-sm:text-xs font-Abel text-center border-gray-300">Add to cart</div>}
-                        </div>
-                        </div>
+          return (
+            <div key={index} className="flex gap-y-2 border-2 bg-white rounded-md border-emerald-500 flex-col">
+              <div onClick={() => navigate(`/productPage/${data._id}`)} className="w-[90%] cursor-pointer sm:max-md:w-[100%] xs:max-sm:w-[100%] mt-6 border-b-2 pb-2 border-gray-200 mx-auto">
+                <img className="w-[50%] h-[100%] mx-auto my-auto" src={`http://localhost:3002/assets/images/${data.productImage}`} alt="Product" />
+              </div>
+              <div className="m-2 relative h-[180px] flex flex-col">
+                <p onClick={() => navigate(`/productPage/${data._id}`)} className="cursor-pointer font-Abel text-[12px] xs:max-sm:text-[10px] font-bold text-emerald-400 my-[2px]">{data.brand}</p>
+                <TruncateText
+                  text={data.name}
+                  maxLength={30}
+                  onClick={() => navigate(`/productPage/${data._id}`)}
+                  className="font-Lexend cursor-pointer sm:max-md:text-[12px] xs:max-sm:text-[10px] text-gray-800"
+                />
+                <p className="font-Poppins xs:max-sm:text-[14px] text-gray-600">{data.options}</p>
+                <div className="grid w-full absolute bottom-2 py-2 grid-cols-2 xs:max-sm:grid-cols-1 xs:max-sm:gap-y-2 gap-x-2">
+                  <div className="bg-gray-200 xs:max-sm:py-[2px] sm:max-md:py-[2px] font-Abel py-2 xs:max-sm:text-[16px] text-[20px] rounded-md text-center">${data.price}</div>
+                  {carted ? <div style={{ userSelect: 'none' }} onClick={toggleCart} className="text-md border-2 cursor-pointer rounded-md py-2 sm:max-md:text-xs xs:max-sm:text-xs font-Abel text-center border-gray-300">View in cart</div> : <div onClick={() => dispatch(addItemToCartAsync({ product: data, quantity: 1 }))} className="text-md border-2 cursor-pointer rounded-md py-2 sm:max-md:text-xs xs:max-sm:text-xs font-Abel text-center border-gray-300">Add to cart</div>}
+                </div>
+              </div>
+            </div>
+          );
+        })
+      )}
 
+      {/* Conditionally render skeletons for requestProducts */}
+      {isLoadingRequestProducts && renderSkeletons()}
+    
 
-                    </div>
-                    
-                )})  
-                    }
 
 
 
@@ -280,7 +351,7 @@ const MainPageProducts=()=>{
 
 
 
-           <div onClick={RequestProducts} className="border-2 ml-[34%] cursor-pointer xs:max-sm:mx-auto xs:max-sm:w-[50%]  sm:max-md:w-[30%] sm:max-md:ml-[36%] py-2   w-[20%] mt-6 border-emerald-500  rounded-md">
+           <div onClick={refetch} className="border-2 ml-[34%] cursor-pointer xs:max-sm:mx-auto xs:max-sm:w-[50%]  sm:max-md:w-[30%] sm:max-md:ml-[36%] py-2   w-[20%] mt-6 border-emerald-500  rounded-md">
                 <p className="font-Abel text-center text-emerald-500">Show all Products</p>
             </div>
 
