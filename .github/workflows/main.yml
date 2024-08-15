@@ -29,25 +29,35 @@ jobs:
           SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
         run: |
           sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no "$SERVER_USER@$SERVER_IP" << 'EOF'
-            # Delete the specified directory and its contents except for ecosystem.config.js
-            cd /home/infovit-api/htdocs/api.infovit.us/
+            # Navigate to the target directory
+            cd /home/infovit-api/htdocs/api.infovit.us
+
+            # Delete all files and directories except 'ecosystem.config.cjs' and 'public'
             find . -mindepth 1 -maxdepth 1 ! -name 'ecosystem.config.cjs' ! -name 'public' -exec rm -rf {} +
 
+            # Remove any existing content in the directory
+            # Remove 'public' content if needed, but keep the directory itself
+            find public -mindepth 1 -exec rm -rf {} +
 
-
-            # Remove any existing content in the director
-            rm -rf /home/infovit-api/htdocs/api.infovit.us
-
-            # Clone the specific branch of the GitHub repository into the Pharma director
+            # Clone the specific branch of the GitHub repository into a temporary directory
             git clone -b server https://github.com/danial117/Pharma.git ./git
 
-            # Change to the directory and install dependencie
+            # Move the contents of the temporary directory to the target directory
+            mv ./git/* ./
+            mv ./git/.[!.]* ./  # Move hidden files
+
+            # Clean up by removing the temporary directory
             rm -rf ./git
-            cd /home/infovit-api/htdocs/api.infovit.us/
+
+            # Install dependencies
             npm install
           
             # Start the application with pm2
             pm2 start ecosystem.config.cjs --env production
 
-           
+            # Create the 'public' directory with 'brands', 'products', and 'news' subdirectories if they don't exist
+            mkdir -p public/brands
+            mkdir -p public/products
+            mkdir -p public/news
           EOF
+
