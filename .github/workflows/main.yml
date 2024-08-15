@@ -1,4 +1,4 @@
-name: SSH Server Deployment
+name: SSH Client CICD 
 
 on:
   push:
