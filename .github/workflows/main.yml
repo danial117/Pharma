@@ -3,11 +3,11 @@ name: SSH Server Deployment
 on:
   push:
     branches:
-      - server
+      - client
 
   pull_request:
     branches:
-      - server
+      - client
 
 jobs:
   ssh-folder-management:
