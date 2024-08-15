@@ -35,7 +35,7 @@ jobs:
 
 
 
-            # Remove any existing content in the directory
+            # Remove any existing content in the director
             rm -rf /home/infovit-api/htdocs/api.infovit.us
 
             # Clone the specific branch of the GitHub repository into the Pharma director
