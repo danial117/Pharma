@@ -3,32 +3,49 @@ import { useEffect,useState } from "react";
 import { CheckRounded } from "@mui/icons-material";
 import NavBar from "./NavBar"
 import Footer from "./Footer";
-import { useSelector } from "react-redux";
+import { useSelector,useDispatch } from "react-redux";
 import { EditRounded } from "@mui/icons-material";
 import PayPalButtonComponent from "../components/PaypalButtonComponent";
 import api from "../utils/api";
 import { TruncateText } from "../utility functions/TranctuateText";
-const Order=()=>{
+import { useNavigate } from "react-router-dom";
+import { removeItemFromCart } from "../state";
+import ReactGA from 'react-ga4';
 
-    const user=useSelector((state)=>state.user)
-    const cartItems=useSelector((state)=>state.cartItems)
+
+
+
+
+
+const Order=()=>{
+    
+    const navigate=useNavigate();
+    const dispatch=useDispatch()
+    
     const [totalPrice, setTotalPrice] = useState(0);
-    const accessToken=useSelector((state)=>state.accessToken)
+    const [address,setAddress]=useState({})
     const [products,setProducts]=useState([])
     const [orderProcess,setOrderProcess]=useState(1)
-    const [address,setAddress]=useState({})
+    const cartItems=useSelector((state)=>state.cartItems);
+    const [order,setOrder]=useState(false)
+    const cartItemIds = cartItems.map(item => item._id);
+     
+     console.log(cartItemIds)
+     
 
-      const [edit,setEdit]=useState(false);
-      const [formData, setFormData] = useState({
-        email:'',
-        firstName: '',
-        lastName: '',
-        streetAddress: '',
-        state: '',
-        city:''
+
+
+
+
+     const PayPalEventClick = () => {
+      // Track PayPal button click
+      ReactGA.event({
+          category: 'Ecommerce',
+          action: 'Paypal Event initiated',
+          label: 'PayPal Checkout'
       });
-      const [errors, setErrors] = useState({});
-      const [submitted, setSubmitted] = useState(false);
+      // Handle PayPal button click logic here
+  };
 
 
 
@@ -38,52 +55,7 @@ const Order=()=>{
 
 
 
-
-
-
-
-
-
-
-      const validateForm = () => {
-        const newErrors = {};
-        // Name validation
-        if (formData.firstName && formData.firstName.length < 3) {
-          newErrors.firstName = 'Name should be at least 3 characters long.';
-        }
-        if (!formData.firstName) {
-            newErrors.firstName = 'First Name is required.';
-        }
-        if (!formData.lastName) {
-            newErrors.lastName = 'lastName is required.';
-        }
-
-        if (formData.lastName && formData.lastName.length < 3) {
-            newErrors.lastName = 'Name should be at least 3 characters long.';
-          }
     
-
-        // Email validation
-        if (!formData.email.endsWith('@gmail.com')) {
-          newErrors.email = 'Email should end with @gmail.com.';
-        }
-       
-        if (!formData.state) {
-            newErrors.state = 'State is required.';
-        }
-    
-        if (!formData.streetAddress) {
-            newErrors.streetAddress = 'Street Address is required.';
-        }
-    
-        if (!formData.city) {
-            newErrors.city = 'City is required.';
-        }
-       
-        return newErrors;
-      };
-
-
 
 
 
@@ -98,22 +70,40 @@ const Order=()=>{
 
       useEffect(()=>{
 
-         api.get('/order').then((response)=>response.data).then((data)=>{
-       
-       const items=  data.items.map((item)=>{
-            return item.product
-         })
-
-         
-
-         setProducts(items)
-         setTotalPrice(data.totalAmount)
-
-         
-
-
-
-         })
+        const fetchOrder = async () => {
+          try {
+            const response = await api.get('/order/createOrder');
+            
+            if (response.status === 201) {
+              
+              cartItemIds.forEach((data) => {
+                console.log(data)
+                dispatch(removeItemFromCart({ itemId: data }));
+              });
+            }
+          } catch (error) {
+            console.error('Error creating order:', error);
+          } finally {
+            // Always run the second request
+            try {
+              const orderResponse = await api.get('/order');
+              if (orderResponse.status === 404) {
+                window.location.href = '/';
+              } else {
+                const data = orderResponse.data;
+                const items = data.items.map((item) => item.product);
+                setOrder(data);
+                setProducts(items);
+                setTotalPrice(data.totalAmount);
+              }
+            } catch (error) {
+              console.error('Error fetching order:', error);
+            }
+          }
+        };
+    
+        fetchOrder();
+        
 
 
       },[])
@@ -151,13 +141,7 @@ const Order=()=>{
 
 
 
-      const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({
-          ...formData,
-          [name]: value
-        });
-      };
+      
 
 
 
@@ -179,46 +163,7 @@ const Order=()=>{
 
 
 
-      const handleSubmit = async(e) => {
-
-        e.preventDefault();
-        const validationErrors = validateForm();
-
-        if(!edit && user.email){
-            formData.email=user.email;
-        }
-
-        if (Object.keys(validationErrors).length > 0) {
-            setErrors(validationErrors);
-            return;
-          }
-          else{
-            setErrors({})
-          }
-        // Process the form data (e.g., send it to the server)
-        await api.post('/address/create', JSON.stringify(formData), {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }).then((response)=>response.data).then((data)=>{
-
-       
-          setAddress(data)
-          setOrderProcess(2)
-
-          setFormData({
-            email:'',
-        firstName: '',
-        lastName: '',
-        streetAddress: '',
-        state: '',
-        city:''
-          });
-        
-        
-        })
-       
-      };
+     
 
 
 
@@ -229,15 +174,7 @@ const Order=()=>{
 
 
 
-      const RemoveAddress=async()=>{
-      const response=  await api.delete('/address',{},{headers:{'Content-Type':'application/json'}}).then((response)=>{
-        if(response.status=200){
-          setAddress({})
-        }
-      })
-      
-
-      }
+  
 
 
 
@@ -248,19 +185,12 @@ const Order=()=>{
 
       const Checkout=async()=>{
 
-        await fetch(`/api/user/address/`,{
+        await fetch(`${process.env.REACT_APP_API_URL}/user/address/`,{
             method:'GET',
             
         }).then((response)=>response.json()).then(()=>{
 
         })
-
-        
-
-
-
-
-
       }
     
     
@@ -269,8 +199,13 @@ const Order=()=>{
 
 
 
-   
 
+
+
+
+
+
+   
 
 
 
@@ -337,83 +272,7 @@ const Order=()=>{
         <div onClick={()=>{if(orderProcess!==1){setOrderProcess(1)}}} className={`w-full  ${orderProcess==2 && 'cursor-pointer'} bg-black p-4`}>
           <p className="text-white  font-Lexend text-xl">1. Shipping Address</p>
         </div>
-        {
-          orderProcess === 1
-
-          &&
-
-          !address._id
-
-          &&
-
-          <div className="border-2 border-gray-200">
-          <form>
-             <div className="flex flex-col gap-y-8">
-             <div className="w-full border-b-2 border-gray-200 p-8 ">
-                 
-     {  edit ? <input className="focus:outline-none w-full bg-gray-100 border-2 p-2  border-gray-300 rounded-sm" name='email' value={edit ? formData.email : user.email} onChange={handleChange}  type="text" placeholder="Enter Email Address *" /> :
-                 <div className="border-gray-300 rounded-sm text-gray-300 flex flex-row justify-between   bg-gray-100 border-2 p-2"><p>{user.email}</p>  <div className="text-black"><EditRounded onClick={()=>setEdit(true)} style={{cursor:'pointer'}}/> </div>   </div>
-                 }
-                  {edit && errors.email && <p className="text-red-500">{errors.email}</p>}
-             </div>
-
-             <div className="w-full flex border-b-2 border-gray-200 p-8 flex-row gap-x-4">
-                 <div className="w-full">
-                 <input className="focus:outline-none w-full bg-gray-100 border-2 border-gray-300 rounded-md p-2"
-                 value={formData.firstName} onChange={handleChange}
-                 name="firstName"
-                 type="text"
-                 placeholder="First Name *" />
-                  {errors.firstName && <p className="text-red-500 ">{errors.firstName}</p>} 
-                  </div>
-                  <div className="w-full">
-                 <input className="focus:outline-none w-full bg-gray-100 border-2 border-gray-300 rounded-md p-2" name="lastName" type="text"  value={formData.lastName} onChange={handleChange} placeholder="Last Name *" />
-                 {errors.lastName && <p className="text-red-500">{errors.lastName}</p>}
-                 </div>
-             </div>
-
-
-
-             <div className="p-8 flex flex-col gap-y-14">
-             <div className="w-full ">
-                 <input className="focus:outline-none w-full bg-gray-100 border-2 p-2  border-gray-300 rounded-md "  value={formData.state} onChange={handleChange} name="state"  type="text" placeholder="State" />
-                 {errors.state && <p className="text-red-500">{errors.state}</p>}
-             </div>
-
-
-             <div className="w-full">
-                 <input className="focus:outline-none w-full bg-gray-100 border-2 p-2  border-gray-300 rounded-md"  value={formData.streetAddress} onChange={handleChange} name="streetAddress"  type="text" placeholder="Street Address 1" />
-                 {errors.streetAddress && <p className="text-red-500">{errors.streetAddress}</p>}
-             </div>
-
-         
-
-             <div className="w-full flex  flex-col gap-y-2">
-                 <input className="focus:outline-none w-full bg-gray-100 border-2 border-gray-300 rounded-md p-2"  value={formData.city} onChange={handleChange} name="city"  type="text" placeholder="City *" />
-                 {errors.city && <p className="text-red-500">{errors.city}</p>}
-                
-             </div>
-
-             <div>
-                 <button type="submit" onClick={handleSubmit} className="bg-black text-white rounded-md py-2 px-4">Enter Address</button>
-             </div>
-             
-
-            </div>
-
-
-
-           
-
-
-
-             </div>
-             </form>
-             </div>
-
-
-        }
-
+      
 
 
 
@@ -439,7 +298,7 @@ const Order=()=>{
               <p className=" text-xl font-Lexend">{address.firstName} {address.lastName}</p>
               <p className=" text-lg font-Lexend">{address.streetAddress}</p>
               <p className=" text-lg font-Lexend">{address.state}</p>
-              <p className=" text-lg font-Lexend">{address.city} , 20459</p>
+              <p className=" text-lg font-Lexend">{address.city} ,{address.zip}</p>
 
 
               </div>
@@ -449,9 +308,8 @@ const Order=()=>{
             <div className="bg-gray-200 xs:max-sm:px-2 w-full py-4 px-12">
               <div className="flex flex-row gap-x-4">
 
-                <button onClick={()=>{setAddress({})}} className=" py-2 px-4 rounded-md xs:max-sm:text-sm font-Lexend bg-white">Edit</button>
-                <button onClick={RemoveAddress} className=" py-2 px-6 xs:max-sm:px-2 xs:max-sm:text-sm rounded-md font-Lexend bg-white">Remove</button>
-                <button onClick={()=>{setOrderProcess(2)}} className=" py-2 px-6 xs:max-sm:px-2 xs:max-sm:text-sm rounded-md font-Lexend bg-white">Confirm</button>
+                <button onClick={()=>{window.location.href='/address'}} className=" py-2 px-4 rounded-md xs:max-sm:text-sm font-Lexend bg-white">Edit</button>
+                <button onClick={()=>{setOrderProcess(2); PayPalEventClick()}} className=" py-2 px-6 xs:max-sm:px-2 xs:max-sm:text-sm rounded-md font-Lexend bg-white">Confirm</button>
 
 
                 </div>
@@ -523,7 +381,7 @@ const Order=()=>{
 
                     <div className="flex flex-row justify-between">
                         <p className="font-Lexend  md:max-lg:text-sm">SubTotal</p>
-                        <p className="font-Lexend  md:max-lg:text-sm">${totalPrice}</p>
+                        <p className="font-Lexend  md:max-lg:text-sm">${order.itemsAmount}</p>
 
                     </div>
 
@@ -535,19 +393,19 @@ const Order=()=>{
                     </div>
 
 
-                    <div className="flex flex-row justify-between">
+                    <div className="flex flex-row border-b-2 pb-2 border-gray-200 justify-between">
                         <p className="font-Lexend  md:max-lg:text-sm">Tax</p>
-                        <p className="font-Lexend  md:max-lg:text-sm">$0.00</p>
+                        <p className="font-Lexend  md:max-lg:text-sm">${order.tax}</p>
 
                     </div>
 
 
-                    <div className="flex flex-row border-b-2 pb-4 border-gray-200 mt-6 justify-between">
+                    <div className="flex flex-row  mt-2 justify-between">
                         <p className="font-Lexend text-[1.3rem]">Total</p>
                         <p className="font-Lexend">${totalPrice}</p>
 
                     </div>
-                    <div  className="text-center p-4 my-auto w-[60%] mx-auto bg-black text-white">Continue to Checkout</div>
+                    
 
                     
 
@@ -607,11 +465,11 @@ const Order=()=>{
           
           
           <div className="m-4 pb-2 border-b-2 border-gray-500 ">
-                <div className="grid grid-cols-2">
-                      <div className="flex flex-row">
+                <div onClick={() => navigate(`/productPage/${data._id}`)} className="grid cursor-pointer grid-cols-2">
+                      <div  className="flex flex-row">
                         <div className=''>
                             <div className='w-[100%] flex  h-[100px]'>
-                            <img className='w-[80%]  h-[70px] mx-auto  ' src={`/api/assets/images/${data.productImage}`} />
+                            <img className='w-[80%]  h-[70px] mx-auto  ' src={`${process.env.REACT_APP_API_URL}/assets/products/${data.productImage}`} />
                             </div>
 
                         </div>

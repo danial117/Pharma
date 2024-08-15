@@ -1,13 +1,17 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setUser, setAccessToken } from '../state';
+import { setUser, setAccessToken, addItemToCartAsync,addItemToCart } from '../state';
 import { removeItemFromCart } from '../state';
 import NavBar from './NavBar';
 import Footer from './Footer';
 import '../styles/styles.css';
+import api from '../utils/api';
+import ReactGA from 'react-ga4'
+import { useNavigate } from 'react-router-dom';
 
 const SignUp = () => {
   const dispatch = useDispatch();
+  const Navigate=useNavigate()
   const [login, setLogin] = useState(true);
   const accessToken = useSelector((state) => state.accessToken);
   const cartItems = useSelector((state) => state.cartItems);
@@ -40,6 +44,37 @@ const SignUp = () => {
     });
   };
 
+  const UserRegisterationEvent = () => {
+    // Track PayPal button click
+    ReactGA.event({
+        category: 'Ecommerce',
+        action: 'Users Registered',
+        label: 'Form submission'
+    });
+  }
+
+
+    const UserSignedInEvent = () => {
+      // Track PayPal button click
+      ReactGA.event({
+          category: 'Ecommerce',
+          action: 'Users Logged',
+          label: 'Form submission'
+      });
+    }
+    
+
+    const GoogleSignEvent = () => {
+      // Track PayPal button click
+      ReactGA.event({
+          category: 'Ecommerce',
+          action: 'Google Button Clicked',
+          label: '3rd party'
+      });
+    }
+
+
+
   const validateForm = () => {
     let valid = true;
     const newErrors = {};
@@ -68,7 +103,7 @@ const SignUp = () => {
       valid = false;
     }
 
-    if (!formData.phone.trim()){
+    if (!formData.phone.trim() && !login){
       newErrors.phone = 'Phone number is required';
       valid = false;
 
@@ -87,17 +122,38 @@ const SignUp = () => {
     return valid;
   };
 
-  const SignUpSubmit = (e) => {
-    e.preventDefault();
 
+
+
+  const SubmissionSwitch=()=>{ setLogin(!login);
+   setFormData({ name: '',
+    email: '',
+    password: '',
+    phone: ''});
+
+    setErrors({
+      name: '',
+      email: '',
+      password: '',
+      phone: '',
+    })
+
+
+    }
+
+
+
+
+  const SignUpSubmit = async(e) => {
+    e.preventDefault();
     if (validateForm()) {
-      // Process the form data (e.g., send it to the server)
+     
       if (accessToken) {
         cartItemIds.forEach((id) => {
           dispatch(removeItemFromCart({ itemId: id }));
         });
 
-        fetch('/api/user/signup', {
+        fetch(`${process.env.REACT_APP_API_URL}/user/signup`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -107,10 +163,11 @@ const SignUp = () => {
           .then((data) => {
             dispatch(setUser({ user: data.userData }));
             dispatch(setAccessToken({ accessToken: data.accessToken }));
+            UserRegisterationEvent();
             window.location.href = '/';
           });
       } else {
-        fetch('/api/user/signup', {
+      const response=await  fetch(`${process.env.REACT_APP_API_URL}/user/signup`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -120,13 +177,48 @@ const SignUp = () => {
           .then((data) => {
             dispatch(setUser({ user: data.userData }));
             dispatch(setAccessToken({ accessToken: data.accessToken }));
-            window.location.href = '/';
+            
           });
+
+          if(response){
+             if(response.status===201 && response.data) {
+              UserRegisterationEvent()
+                response.data.items.map((item)=>{
+                   dispatch( addItemToCart({product:item.product,quantity:item.quantity}))
+                })
+                const dispatchPromises = [];
+                cartItems.forEach((product) => {
+                        dispatchPromises.push(dispatch(addItemToCartAsync({ product:product,quantity:product.quantity })));  
+                });
+
+                Promise.all(dispatchPromises)
+                    .then(() => {
+                       
+                        window.location.href = '/';
+                    })
+                    .catch((error) => {
+                        console.error('Error dispatching actions:', error)                      
+                    });     
+                }
+          }
       }
     }
   };
 
-  const LoginSubmit = (e) => {
+
+
+
+
+
+
+
+
+
+
+
+
+
+  const LoginSubmit =async (e) => {
     e.preventDefault();
 
     if (validateForm()) {
@@ -135,7 +227,7 @@ const SignUp = () => {
           dispatch(removeItemFromCart({ itemId: id }));
         });
 
-        fetch('/api/user/login', {
+       await fetch(`${process.env.REACT_APP_API_URL}/user/login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -145,10 +237,12 @@ const SignUp = () => {
           .then((data) => {
             dispatch(setUser({ user: data.modifiedUser }));
             dispatch(setAccessToken({ accessToken: data.accessToken }));
+            UserSignedInEvent()
             window.location.href = '/';
+
           });
       } else {
-        fetch('/api/user/login', {
+     const response= await  fetch(`${process.env.REACT_APP_API_URL}/user/login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -156,10 +250,66 @@ const SignUp = () => {
         })
           .then((response) => response.json())
           .then((data) => {
+            UserSignedInEvent()
             dispatch(setUser({ user: data.modifiedUser }));
             dispatch(setAccessToken({ accessToken: data.accessToken }));
-            window.location.href = '/';
+           
+         return data
           });
+
+          if(response){
+            api.get('/cart/').then((response)=>
+              { if(response.status===200 && response.data) {
+        
+                response.data.items.map((item)=>{
+                  
+                   dispatch( addItemToCart({product:item.product,quantity:item.quantity}))
+                })
+                
+               
+                const dispatchPromises = [];
+
+                cartItems.forEach((product) => {
+                    // Check if the product's ID exists in response.data.items
+                    const found = response.data.items.some((item) => item._id === product._id);
+                    
+                    if (!found) {
+                        // Dispatch addItemToCartAsync action for products not found in response
+                        dispatchPromises.push(dispatch(addItemToCartAsync({ product:product,quantity:product.quantity })));
+                    }
+                });
+                
+                // Wait for all dispatch operations to complete
+                Promise.all(dispatchPromises)
+                    .then(() => {
+                        // After all dispatches are performed, change location
+                        window.location.href = '/';
+                    })
+                    .catch((error) => {
+                        console.error('Error dispatching actions:', error);
+                        // Handle error if needed
+                    });
+                
+        
+        
+                }
+            }
+            )
+
+
+          }
+
+
+
+
+
+
+
+
+
+
+
+         
       }
     }
   };
@@ -182,7 +332,7 @@ const SignUp = () => {
               <p className="font-Abel text-center">Create an account</p>
 
               <div className="container w-full my-4">
-                <a href="/oauth2/redirect/google/">
+                <a onClick={GoogleSignEvent} href={`${process.env.REACT_APP_API_URL}/oauth2/redirect/google/`}>
                   <div class="g-sign-in-button">
                     <div class="content-wrapper">
                       <div class="logo-wrapper">
@@ -211,6 +361,7 @@ const SignUp = () => {
                       placeholder="Name"
                       className={`focus:outline-none font-Poppins border-b-2 border-gray-600 w-[90%] ${errors.name ? 'border-red-500' : ''}`}
                     />
+
                   )}
                   {errors.name && <p className="text-red-500 text-xs">{errors.name}</p>}
                   <input
@@ -230,6 +381,7 @@ const SignUp = () => {
                     placeholder="Password"
                     className={`focus:outline-none font-Poppins border-b-2 border-gray-600 w-[90%] ${errors.password ? 'border-red-500' : ''}`}
                   />
+                 {login && <p onClick={()=>window.location.href='/account-security/forgot-password'} className='font-Livvic cursor-pointer  hover:underline text-sm text-blue-800 -mt-4'>forgot password</p>}
                   {errors.password && <p className="text-red-500 text-xs">{errors.password}</p>}
                   {!login && (
                     <input
@@ -251,12 +403,14 @@ const SignUp = () => {
               {!login ? (
                 <p className="font-Lexend text-xs text-center mt-28">
                   Already have an account?{' '}
-                  <span onClick={() => setLogin(!login)} className="text-blue-600 cursor-pointer">
+                  <span onClick={SubmissionSwitch} className="text-blue-600 cursor-pointer">
                     login
                   </span>
                 </p>
               ) : (
-                <p onClick={() => setLogin(!login)} className="font-Lexend text-xs text-center mt-28">
+                <p onClick={SubmissionSwitch}
+                  
+                  className="font-Lexend text-xs text-center mt-28">
                   Don't have an account?{' '}
                   <span className="text-blue-600 cursor-pointer">Create an account</span>
                 </p>

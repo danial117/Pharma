@@ -1,13 +1,26 @@
 import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
-
+import ReactGA from 'react-ga4';
 
 
 
 
 const PayPalButtonComponent = ({onPaymentSuccess}) => {
 
-const accessToken=useSelector((state)=>state.accessToken)
+const accessToken=useSelector((state)=>state.accessToken);
+
+
+const PayPalPaymentEvent = () => {
+  // Track PayPal button click
+  ReactGA.event({
+      category: 'Ecommerce',
+      action: 'Paypal Payment Successfull',
+      label: 'PayPal Checkout'
+  });
+  // Handle PayPal button click logic here
+};
+
+
 
    useEffect(() => {
     // Function to load a script
@@ -34,7 +47,7 @@ const accessToken=useSelector((state)=>state.accessToken)
             },
             async createOrder() {
               try {
-                const response = await fetch(`/api/order/api/`, {
+                const response = await fetch(`${process.env.REACT_APP_API_URL}/order/api/`, {
                   method: "POST",
                   headers: {
                     "Content-Type": "application/json",
@@ -69,7 +82,7 @@ const accessToken=useSelector((state)=>state.accessToken)
             },
             async onApprove(data, actions) {
               try {
-                const response = await fetch(`/api/order/api/${data.orderID}/capture`, {
+                const response = await fetch(`${process.env.REACT_APP_API_URL}/order/api/${data.orderID}/capture`, {
                   method: "POST",
                   headers: {
                     "Content-Type": "application/json",
@@ -89,6 +102,7 @@ const accessToken=useSelector((state)=>state.accessToken)
                 } else {
                  
                   onPaymentSuccess()
+                  PayPalPaymentEvent();
                   const transaction =
                     orderData?.purchase_units?.[0]?.payments?.captures?.[0] ||
                     orderData?.purchase_units?.[0]?.payments?.authorizations?.[0];

@@ -1,12 +1,12 @@
 
 
-import { ShoppingCartRounded,KeyboardArrowDownRounded,Inventory2Rounded,SearchRounded,MedicationRounded,LocalPhoneRounded,EmailRounded, KeyboardArrowLeftRounded, KeyboardArrowRightRounded} from "@mui/icons-material"
+import { ShoppingCartRounded,KeyboardArrowDownRounded,Inventory2Rounded,SearchRounded,MedicationRounded,LocalPhoneRounded,EmailRounded, KeyboardArrowLeftRounded, KeyboardArrowRightRounded, CloseRounded} from "@mui/icons-material"
 import { useState, useRef,useEffect,useContext } from "react"
 import { useDispatch, useSelector } from "react-redux";
 import { useMediaQuery } from "@mui/material";
 import NavBar from "./NavBar"
 import {useNavigate} from 'react-router-dom'
-import { addItemToCart, removeItemFromCart, setAccessToken } from "../state";
+import { addItemToCart, removeItemFromCart, setAccessToken,setItemCart } from "../state";
 import { CartContext } from "../cartContext/cartContext";
 import SearchComponent from "../components/SearchComponent";
 import Slider from "react-slick";
@@ -18,8 +18,8 @@ import Cart from "../widget/Cart";
 import MainPageProducts from "../components/MainPageProducts";
 import MainProductCarousal from "../components/MainProductCarousal";
 import api from "../utils/api";
-
-
+import UAParser from 'ua-parser-js';
+import AD_1 from '../assets/AD.png'
 
 
 
@@ -31,6 +31,7 @@ const HomePage=()=>{
     const xs = useMediaQuery('(min-width:576px)');
     const { cart, toggleCart } = useContext(CartContext);
     const [DomContent,setDomContent]=useState([])
+    const [showAd,setShowAd]=useState(true)
    const accessToken=useSelector((state)=>state.accessToken)
     const cartItems=useSelector((state)=>state.cartItems);
    const user=useSelector((state)=>state.user)
@@ -38,9 +39,17 @@ const HomePage=()=>{
     const dispatch=useDispatch()
     const cartItemIds = cartItems.map(item => item._id);
     const Content=useSelector((state)=>state.content)
+  
 
+    const [deviceInfo, setDeviceInfo] = useState({});
     
-
+    
+    useEffect(() => {
+      const parser = new UAParser();
+      const result = parser.getResult();
+      console.log(result)
+      setDeviceInfo(result);
+    }, []);
   
  
 
@@ -63,54 +72,43 @@ const HomePage=()=>{
 
       
 
- useEffect(()=>{
+      useEffect(() => {
+        const fetchUserData = async () => {
+          try {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/user/`, {
+              method: 'GET',
+              credentials: 'include' // Include cookies in request
+            });
+            
+            if (response.ok) {
+              const data = await response.json();
+              const { accessToken, ...rest } = data;
+              
+              dispatch(setUser({ user: rest }));
+              dispatch(setAccessToken({ accessToken }));
     
-    window.onload = async() => {
-        
-    const response=   await fetch('/api/user/', {
-          method: 'GET',
-          credentials: 'include' // Include cookies in request
-        })
-        .then(response => response.json())
-        .then(data => {
-          const {accessToken,...rest}=data
-          
-          dispatch(setUser({user:rest}));
-          dispatch(setAccessToken({accessToken:accessToken}));
-        
-          
-         
-           if(user.email.toString() !== data.email.toString()){         /////
-            cartItemIds.forEach((id)=>{
-               
-                dispatch(removeItemFromCart({itemId:id}))
-            })
-           }
-           return accessToken
-          
-          
-        
-        }); 
-
-
-      
-
-        const accessToken=response
-
-        if(accessToken){
-            api.get('/cart/').then((response)=>
-              { if(response.status===200 && response.data) {
-        
-                response.data.items.map((item)=>{
-                  
-                   dispatch( addItemToCart({product:item.product,quantity:item.quantity}))
-                })
-        
-        
+              if (user.email && (user.email.toString() !== data.email.toString())) {
+                cartItemIds.forEach((id) => {
+                  dispatch(removeItemFromCart({ itemId: id }));
+                });
+              }
+    
+              if (accessToken) {
+                const cartResponse = await api.get('/cart/');
+                if (cartResponse.status === 200 && cartResponse.data) {
+                  cartResponse.data.items.forEach((item) => {
+                    dispatch(setItemCart({ product: item.product, quantity: item.quantity }));
+                  });
                 }
+              }
             }
-            )
-        }
+          } catch (error) {
+            console.error('Error fetching user data:', error);
+          }
+        };
+    
+        fetchUserData();
+      }, []);
 
 
 
@@ -118,28 +116,6 @@ const HomePage=()=>{
 
 
 
-    };
-
-
-
-      
-
-
-
-
-
-
-
-
-
-
-
-      
-
-
-
-
- },[])
 
 
 
@@ -150,7 +126,7 @@ const HomePage=()=>{
     const settings = {
         dots: false,
         infinite: true,
-        speed: 2000,
+        speed: 4000,
         slidesToShow: !isMobile ? 3 :1,
         slidesToScroll: 1,
         autoplay:true,
@@ -169,6 +145,14 @@ const HomePage=()=>{
 
     <NavBar/>
 
+    {showAd && <section className="h-[250px] relative xs:max-md:h-[150px]">
+      <div className="absolute cursor-pointer z-[20] hover:scale-125 text-white top-0  right-4">
+      <CloseRounded onClick={()=>setShowAd(false)} style={{fontSize:40}} />
+      </div>
+      <img src={AD_1} className="h-[100%]  w-[100%]"  />
+
+    </section>
+}
     
 
 
@@ -176,6 +160,8 @@ const HomePage=()=>{
 
 
     <section style={{backgroundImage: `linear-gradient(to right,rgba(0,0,0,0.5), rgba(0,0,0,0.1)), url(${require('../assets/Poster1.jpeg')})`}} className="w-[100%] bg-cover bg-center xs:max-sm:h-[400px] h-[500px] relative ">
+        
+
         
 
         <div className="w-[50%] xs:max-sm:w-[100%] xs:max-sm:py-24 xs:max-sm:px-2 sm:max-md:w-[100%] md:max-lg:w-[80%] py-32 px-12">
@@ -199,7 +185,7 @@ const HomePage=()=>{
 
 
 
-
+    <MainProductCarousal />
 
     <MainPageProducts />
 
@@ -261,7 +247,7 @@ const HomePage=()=>{
 
     <section>
 
-<div className="w-full my-8 xs:max-sm:my-4 sm:max-lg:min-h-[50vh] h-auto">
+<div className="w-full my-32 xs:max-sm:my-16 sm:max-lg:min-h-[50vh] h-auto">
     <p className="text-center font-Abel font-bold text-[2.5rem]">3 easy steps</p>
 
     <div className="w-[5%] mx-auto bg-emerald-500 my-4 h-[3px]"></div>
@@ -316,7 +302,7 @@ const HomePage=()=>{
 
 
 
-<MainProductCarousal />
+
 
 
 

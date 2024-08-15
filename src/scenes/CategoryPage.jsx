@@ -11,11 +11,10 @@ import { useContext } from "react"
 import { CartContext } from "../cartContext/cartContext"
 
 
-const BrandPage = () => {
+const CategoryPage = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const {brandName}=useParams();
-    
+    const {categoryName}=useParams();
     const cartItems = useSelector((state) => state.cartItems);
     const cartItemIds = cartItems.map(item => item._id);
     const [products,setProducts]=useState([])
@@ -24,13 +23,11 @@ const BrandPage = () => {
 
     useEffect(()=>{
 
-        fetch(`${process.env.REACT_APP_API_URL}/brands/${brandName}`,{method:'GET'}).then((response)=>response.json()).then((data)=>{
+        fetch(`${process.env.REACT_APP_API_URL}/products/category/${categoryName}`,{method:'GET'}).then((response)=>response.json()).then((data)=>{
           setProducts(data)
         })
 
     },[])
-
-    
   
     return (
       <>
@@ -69,4 +66,4 @@ const BrandPage = () => {
     );
   };
   
-  export default BrandPage;
+  export default CategoryPage;

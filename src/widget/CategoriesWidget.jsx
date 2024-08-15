@@ -1,222 +1,46 @@
 
-import { KeyboardArrowDownRounded,ShoppingCartRounded,MenuRounded,CloseRounded,AccountCircle } from "@mui/icons-material";
-import { useEffect, useState,useContext } from "react";
-import LoginWidget from "../widget/LoginWidget";
-import Cart from "../widget/Cart";
-import { useMediaQuery } from "@mui/material";
-import { useSelector } from "react-redux";
-import { CartContext } from "../cartContext/cartContext";
-import { Menu, MenuItem, IconButton, Avatar } from '@mui/material';
-import { useDispatch } from "react-redux";
-import { setLogoutAsync } from "../state";
-import { TruncateText } from "../utility functions/TranctuateText";
-import { useLocation, useNavigate } from "react-router-dom";
+
+import { useState } from "react"
+import { CloseRounded } from "@mui/icons-material"
+import NavBar from "../scenes/NavBar"
 
 
 
 
 
+const Categories=()=>{
+
+    const [categories,setCategories]=useState(1)
 
 
 
 
 
-
-
-const NavBar=()=>{
-
-    const isMobile = useMediaQuery('(min-width:768px)');
-    const navigate=useNavigate()
-    const isMobileCategories = useMediaQuery('(min-width:1024px)');
-    const { cart, toggleCart } = useContext(CartContext);
-    const dispatch=useDispatch()
-    const [categories,setCategories]=useState(false)
-    const location = useLocation();
-    const pathname= location.pathname
-  const [toggleMenu,setToggleMenu] = useState(false)
-  const user=useSelector((state)=>state.user)
-  const accessToken=useSelector((state)=>state.accessToken)
-  const [profilePicture,setProfilePicture]=useState(false)
-
-  const [anchorEl, setAnchorEl] = useState(null);
-
-  const handleClick = (event) => {
-    
-    if(accessToken){
-    setAnchorEl(event.currentTarget);
-  }
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-
-  
-  
-
-  useEffect(()=>{
-   
-  },[user])
 
 
 
 
 
     return(
-        <nav style={{userSelect:'none'}} className="w-[100%] border-b-2 border-gray-300 ">
-        <div className="flex w-[100%] border-b-2 border-gray-700 mx-auto xs:max-md:justify-between flex-row">
-            <div className="Logo  basis-[10%]  ">
-                 <p onClick={()=>{window.location.href='/'}}   className="text-[2rem] ml-4 cursor-pointer md:max-lg:text-center md:max-lg:my-2 md:max-lg:text-[1.6rem]">Info<span>vit</span></p>
+      <>
+        <NavBar />
 
-            </div>
-           {isMobile && <div className="flex text-center my-auto justify-center   className='font-Abel text-lg' mx-auto gap-x-16 md:max-lg:gap-x-4 basis-[70%] md:max-lg:basis-[80%] mx-auto flex-row">
-                <p onClick={()=>{window.location.href='/'}} className='font-Lexend cursor-pointer md:max-lg:text-[14px] text-lg'>Home <span><KeyboardArrowDownRounded/></span></p>
-                <p onClick={()=>{window.location.href='/about'}} className='font-Lexend cursor-pointer md:max-lg:text-[14px] text-lg'>About <span><KeyboardArrowDownRounded/></span></p>
-                <p onClick={()=>{window.location.href='/news'}} className='font-Lexend cursor-pointer md:max-lg:text-[14px] text-lg'>News <span><KeyboardArrowDownRounded/></span></p>
-                <p  onClick={()=>{window.location.href='/contact'}} className='font-Lexend cursor-pointer md:max-lg:text-[14px] text-lg'>Contact Us <span><KeyboardArrowDownRounded/></span></p>
-               {!isMobileCategories && <p  onClick={()=>{window.location.href='/categories'}} className='font-Lexend cursor-pointer md:max-lg:text-[14px] text-lg'>Categories<span><KeyboardArrowDownRounded/></span></p> }
-            </div>}
-
-          {isMobile &&  <div className="basis-[20%] md:max-lg:basis-[30%] md:max-lg:justify-end md:max-lg:gap-x-6  w-full gap-x-8 flex flex-row py-2 ml-auto mr-[4px]">
-                <ShoppingCartRounded onClick={toggleCart} style={{cursor:'pointer',fontSize:30,margin:'auto 0'}}/>
-                <button onClick={()=>{window.location.href='/createAccount'}}  className="px-4  md:max-lg:text-[12px] md:max-lg:px-2   text-emerald-600 border-2 border-emerald-300  rounded-md text-sm  font-Poppins">
-                    Sign Up
-                </button>
-                <div className="flex flex-col justify-center">
-             {user && user.profilePicture ?     
-             
-              <img onClick={handleClick} src={user.profilePicture} className="w-[30px] cursor-pointer rounded-full mx-auto h-auto"  />
-
-             
-
-             :
-                <AccountCircle onClick={handleClick} style={{fontSize:30,cursor:'pointer',margin:'auto'}}/>}
-              {user &&  
-              <TruncateText
-              text={user.name}
-              maxLength={8}
-              className={'font-Lexend my-auto text-xs'}
-              
-             />}
-               <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleClose}
-      >
-        <MenuItem onClick={handleClose}>Account Settings</MenuItem>
-        <MenuItem onClick={()=>{window.location.href='/userOrders'; handleClose()}}>Orders</MenuItem>
-        <MenuItem onClick={toggleCart}>Cart</MenuItem>
-        <MenuItem onClick={()=>{ dispatch(setLogoutAsync({}));   handleClose()}}>Logout</MenuItem>
-      </Menu> 
-                </div>
-
-
-            </div>}
-
-            { !isMobile &&
-            <div className="my-auto">
-              <div className="flex mr-2 flex-row gap-x-4">
-           
-                 <ShoppingCartRounded onClick={toggleCart} style={{cursor:'pointer'}}/>
-                 <MenuRounded onClick={()=>{setToggleMenu(!toggleMenu)}}  style={{cursor:'pointer'}}/>
-                 <div className="flex flex-col justify-center">
-            <div className="flex flex-row gap-y-2">
-             {user && user.profilePicture ?     
-                      
-              <img onClick={handleClick} src={user.profilePicture} className="w-[30px] cursor-pointer rounded-full mx-auto h-auto"  />
-
-             
-
-             :
-                <AccountCircle onClick={handleClick} style={{fontSize:30,cursor:'pointer',margin:'auto'}}/>}
-              {user && 
-              <TruncateText
-              text={user.name}
-              maxLength={8}
-              className={'font-Lexend my-auto xs:max-md:ml-[4px] text-xs'}
-              
-             />
-              
-              }
-              </div>
-              <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleClose}
-      >
-        <MenuItem onClick={handleClose}>Account Settings</MenuItem>
-        <MenuItem  onClick={()=>{window.location.href='/userOrders'; handleClose()}}>Orders</MenuItem>
-        <MenuItem onClick={toggleCart}>Cart</MenuItem>
-        <MenuItem onClick={()=>{ dispatch(setLogoutAsync({}));   handleClose()}}>Logout</MenuItem>
-      </Menu>
-                </div>
-
-
-              </div>
-                </div>
-
-            }
-
-           
-              { toggleMenu &&
-              
-              <div className="w-[30%] h-[100vh] right-0 z-[1000] fixed bg-gray-200"> 
-                <div className="absolute text-emerald-500 right-[3%] top-[3%]">
-                  <CloseRounded onClick={()=>{setToggleMenu(!toggleMenu)}} style={{fontSize:'40px',cursor:'pointer'}}/>
-                </div>
-                   <div className="flex w-[80%] text-white mx-auto gap-y-6 mt-24 text-black flex-col ">
-                    <p onClick={()=>{window.location.href='/'}} className="font-Abel border-2 bg-emerald-500 cursor-pointer  text-center p-2 border-emerald-500">Home</p>
-                    <p onClick={()=>{window.location.href='/about'}}  className="font-Abel border-2 bg-emerald-500 cursor-pointer text-center p-2 border-emerald-500">About</p>
-                    <p onClick={()=>{window.location.href='/createAccount'}} className="font-Abel border-2 bg-emerald-500 cursor-pointer  text-center p-2 border-emerald-500">Sign Up</p>
-                    <p onClick={()=>{window.location.href='/news'}}  className="font-Abel border-2 bg-emerald-500 cursor-pointer text-center p-2 border-emerald-500">News</p>
-                    <p onClick={()=>{window.location.href='/contact'}}  className="font-Abel border-2 bg-emerald-500 cursor-pointer text-center p-2 border-emerald-500">Contact</p>
-                   {!isMobileCategories && <p onClick={()=>{window.location.href='/categories'}}  className="font-Abel border-2 bg-emerald-500 cursor-pointer text-center p-2 border-emerald-500">Categories</p>}
-
-                   </div>
-
-                    </div>}
-            
-
-        </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-{  isMobileCategories && pathname !== '/categories' &&    <div className="relative bg-white  xs:max-ml:top-0 z-[999]  w-[100%]">
+        <div className="relative mt-2 bg-white  xs:max-ml:top-0 z-[999]  w-[100%]">
        
 
 
 
 
-        <div className="flex w-[100%]  grid py-2 px-4 grid-cols-8 mx-auto xs:max-md:justify-between flex-row">
-        <div onClick={()=>setCategories(1)} className={`w-full ${categories===1 && 'relative'}`}>  <p className={`text-center  ml:max-lg:text-sm   ${categories ===1 && 'bg-white border-t-8  border-l-[1px] border-l-black border-r-[1px] border-r-black absolute z-[12]  border-emerald-500'} font-Abel font-bold cursor-pointer w-[80%] text-lg text-emerald-900`}>Vitamins & Supplements</p></div>
-        <div onClick={()=>setCategories(2)} className={`w-full ${categories===2 && 'relative'}`}>  <p className={`text-center   ml:max-lg:text-sm  ${categories ===2 && ' bg-white border-t-8  border-l-[1px] border-l-black border-r-[1px] border-r-black absolute z-[12]  border-emerald-500'} font-Abel font-bold cursor-pointer w-[80%] text-lg text-emerald-900`}>Gastrointestinal Health</p></div>
-        <div onClick={()=>setCategories(3)} className={`w-full ${categories===3 && 'relative'}`}>  <p className={`text-center   ml:max-lg:text-sm  ${categories ===3 && ' bg-white border-t-8  border-l-[1px] border-l-black border-r-[1px] border-r-black absolute z-[12]  border-emerald-500'} font-Abel font-bold cursor-pointer w-[80%] text-lg text-emerald-900`}>Targeted Health Solutions</p></div>
+        <div className="flex w-[90%] xs:max-ml:w-[95%] mx-auto xs:max-md:grid-cols-3 xs:max-md:text-sm xs:max-md:gap-y-12 md:max-ml:grid-cols-4 md:max-ml:gap-y-8  grid py-2 px-4 grid-cols-8 mx-auto xs:max-md:justify-between flex-row">
+        <div onClick={()=>setCategories(1)} className={`w-full ${categories===1 && 'relative'}`}>  <p className={`text-center  ml:max-lg:text-sm xs:max-md:text-[14px]  font-Abel font-bold cursor-pointer w-[80%] text-lg text-emerald-900 ${categories ===1 && 'bg-white  absolute z-[12] scale-125  border-b-8 border-emerald-500 text-emerald-800 '} `}>Vitamins & Supplements</p></div>
+        <div onClick={()=>setCategories(2)} className={`w-full ${categories===2 && 'relative'}`}>  <p className={`text-center   ml:max-lg:text-sm xs:max-md:text-[14px]  font-Abel font-bold cursor-pointer w-[80%] text-lg text-emerald-900 ${categories ===2 && ' bg-white  absolute z-[12] scale-125  border-b-8 border-emerald-500 text-emerald-800 '}`}>Gastrointestinal Health</p></div>
+        <div onClick={()=>setCategories(3)} className={`w-full ${categories===3 && 'relative'}`}>  <p className={`text-center  ml:max-lg:text-sm  xs:max-md:text-[14px] font-Abel font-bold cursor-pointer w-[80%] text-lg text-emerald-900 ml:max-lg:pb-[20px]  ${categories ===3 && ' bg-white  absolute z-[12] scale-125  border-b-8 border-emerald-500 text-emerald-800 '}`}>Targeted Health Solutions</p></div>
           
-        <div onClick={()=>setCategories(4)} className={`w-full  ${categories===4 && 'relative'}`}>  <p className={`text-center  ml:max-lg:text-sm  ${categories ===4 && ' bg-white border-t-8  border-l-[1px] border-l-black border-r-[1px] border-r-black absolute z-[12]  border-emerald-500'} font-Abel font-bold cursor-pointer w-[80%] text-lg text-emerald-900 ml:max-lg:pb-[20px] pb-[28px]`}>Optimal Weight</p></div>
-        <div onClick={()=>setCategories(5)} className={`w-full  ${categories===5 && 'relative'}`}>  <p className={`text-center  ml:max-lg:text-sm  ${categories ===5 && ' bg-white border-t-8  border-l-[1px] border-l-black border-r-[1px] border-r-black absolute z-[12]  border-emerald-500'} font-Abel font-bold cursor-pointer w-[80%] text-lg text-emerald-900 ml:max-lg:pb-[20px] pb-[28px]`}>Oral Health</p></div>
-        <div onClick={()=>setCategories(6)} className={`w-full  ${categories===6 && 'relative'}`}>  <p className={`text-center  ml:max-lg:text-sm  ${categories ===6 && ' bg-white border-t-8  border-l-[1px] border-l-black border-r-[1px] border-r-black absolute z-[12]  border-emerald-500'} font-Abel font-bold cursor-pointer w-[80%] text-lg text-emerald-900 ml:max-lg:pb-[20px] pb-[28px]`}>Brands</p></div>
-        <div onClick={()=>setCategories(7)} className={`w-full  ${categories===7 && 'relative'}`}>  <p className={`text-center  ml:max-lg:text-sm  ${categories ===7 && ' bg-white border-t-8  border-l-[1px] border-l-black border-r-[1px] border-r-black absolute z-[12]  border-emerald-500'} font-Abel font-bold cursor-pointer w-[80%] text-lg text-emerald-900 ml:max-lg:pb-[20px] pb-[28px]`}>Skin Healthcare</p></div>
-        <div  className='w-full '>  <p className={`text-center bg-emerald-500   font-Abel font-bold cursor-pointer w-[80%] text-lg text-white p-4 ml:max-lg:text-sm rounded-bl-xl rounded-tr-xl`}>Best Sellers</p></div>
+        <div onClick={()=>setCategories(4)} className={`w-full  ${categories===4 && 'relative'}`}>  <p className={`text-center  ml:max-lg:text-sm xs:max-md:text-[14px]  font-Abel font-bold cursor-pointer w-[80%] text-lg text-emerald-900 ml:max-lg:pb-[20px]  ${categories ===4 && ' bg-white  absolute z-[12] scale-125  border-b-8 border-emerald-500 text-emerald-800 '}`}>Optimal Weight</p></div>
+        <div onClick={()=>setCategories(5)} className={`w-full  ${categories===5 && 'relative'}`}>  <p className={`text-center  ml:max-lg:text-sm xs:max-md:text-[14px]  font-Abel font-bold cursor-pointer w-[80%] text-lg text-emerald-900 ml:max-lg:pb-[20px]  ${categories ===5 && ' bg-white  absolute z-[12] scale-125  border-b-8 border-emerald-500 text-emerald-800 '}`}>Oral Health</p></div>
+        <div onClick={()=>setCategories(6)} className={`w-full  ${categories===6 && 'relative'}`}>  <p className={`text-center  ml:max-lg:text-sm xs:max-md:text-[14px]  font-Abel font-bold cursor-pointer w-[80%] text-lg text-emerald-900 ml:max-lg:pb-[20px]  ${categories ===6 && ' bg-white  absolute z-[12] scale-125  border-b-8 border-emerald-500 text-emerald-800 '}`}>Brands</p></div>
+        <div onClick={()=>setCategories(7)} className={`w-full  ${categories===7 && 'relative'}`}>  <p className={`text-center  ml:max-lg:text-sm xs:max-md:text-[14px]  font-Abel font-bold cursor-pointer w-[80%] text-lg text-emerald-900 ml:max-lg:pb-[20px]  ${categories ===7 && ' bg-white  absolute z-[12] scale-125  border-b-8 border-emerald-500 text-emerald-800 '}`}>Skin Healthcare</p></div>
+        <div  className='w-full '>  <p className={`text-center bg-emerald-500   font-Abel font-bold cursor-pointer w-[80%] text-lg text-white p-4 ml:max-lg:text-sm xs:max-md:text-[14px] rounded-bl-xl rounded-tr-xl`}>Best Sellers</p></div>
 
 
         </div>
@@ -235,14 +59,9 @@ const NavBar=()=>{
 
 
 {   categories &&
-        <div className="w-[95%] ml:max-lg:top-[54px] top-[70px] mx-4 border-[1px] border-black bg-white absolute z-[10]  h-[550px] ">
+        <div className="w-[95%]   mx-auto   z-[10]  h-auto ">
           
-          <div className="text-emerald-500  absolute top-2 right-5">
-            <CloseRounded onClick={()=>setCategories(false)} style={{fontSize:40,cursor:'pointer'}}/>
           
-          </div>
-
-
 
 
 
@@ -833,6 +652,7 @@ const NavBar=()=>{
 
 
 
+
 { categories ===6 &&
   <div className="w-full p-4">
     <p className="font-bold text-emerald-700 py-8 font-Poppins text-[1.5rem]">Brands</p>
@@ -840,53 +660,53 @@ const NavBar=()=>{
 
       <div className="flex flex-col gap-y-2">
         <p className="text-emerald-600 font-bold">New</p>
-        <p onClick={() => window.location.href='/brand/Designs-for-Health'} className="font-Livvic cursor-pointer hover:underline text-sm">Designs for Health</p>
-        <p onClick={() => window.location.href='/brand/Pure-Encapsulations'} className="font-Livvic cursor-pointer hover:underline text-sm">Pure Encapsulations</p>
-        <p onClick={() => window.location.href='/brand/Thorne'} className="font-Livvic cursor-pointer hover:underline text-sm">Thorne</p>
-        <p onClick={() => window.location.href='/brand/Orthomolecular-Products'} className="font-Livvic cursor-pointer hover:underline text-sm">Orthomolecular Medicine</p>
+        <p onClick={() => window.location.href='/category/Designs-for-Health'} className="font-Livvic cursor-pointer hover:underline text-sm">Designs for Health</p>
+        <p onClick={() => window.location.href='/category/Pure-Encapsulations'} className="font-Livvic cursor-pointer hover:underline text-sm">Pure Encapsulations</p>
+        <p onClick={() => window.location.href='/category/Thorn'} className="font-Livvic cursor-pointer hover:underline text-sm">Thorne Research</p>
+        <p onClick={() => window.location.href='/category/Orthomolecular-Products'} className="font-Livvic cursor-pointer hover:underline text-sm">Orthomolecular Medicine</p>
       </div>
 
       <div className="flex flex-col gap-y-2">
         <p className="text-emerald-600 font-bold">Popular</p>
-        <p onClick={() => window.location.href='/brand/Metagenics'} className="font-Livvic cursor-pointer hover:underline text-sm">Metagenics</p>
-        <p onClick={() => window.location.href='/brand/Xymogen'} className="font-Livvic cursor-pointer hover:underline text-sm">Xymogen</p>
-        <p onClick={() => window.location.href='/brand/Klaire-Labs/SFI-Health'} className="font-Livvic cursor-pointer hover:underline text-sm">Klaire Labs</p>
-        <p onClick={() => window.location.href='/brand/Jarrow-Formulas'} className="font-Livvic cursor-pointer hover:underline text-sm">Jarrow Formulas</p>
-        <p onClick={() => window.location.href='/brand/Life-Extension'} className="font-Livvic cursor-pointer hover:underline text-sm">Life Extension</p>
+        <p onClick={() => window.location.href='/category/Metagenics'} className="font-Livvic cursor-pointer hover:underline text-sm">Metagenics</p>
+        <p onClick={() => window.location.href='/category/Xymogen'} className="font-Livvic cursor-pointer hover:underline text-sm">Xymogen</p>
+        <p onClick={() => window.location.href='/category/Klaire-Labs/SFI-Health'} className="font-Livvic cursor-pointer hover:underline text-sm">Klaire Labs</p>
+        <p onClick={() => window.location.href='/category/Jarrow-Formulas'} className="font-Livvic cursor-pointer hover:underline text-sm">Jarrow Formulas</p>
+        <p onClick={() => window.location.href='/category/Life-Extension'} className="font-Livvic cursor-pointer hover:underline text-sm">Life Extension</p>
       </div>
 
       <div className="flex flex-col gap-y-2">
         <p className="text-emerald-600 font-bold">Our Family Of Brands</p>
-        <p onClick={() => window.location.href='/brand/Douglas-Laboratories'} className="font-Livvic cursor-pointer hover:underline text-sm">Douglas Laboratories</p>
-        <p onClick={() => window.location.href='/brand/Standard-Process'} className="font-Livvic cursor-pointer hover:underline text-sm">Standard Process</p>
-        <p onClick={() => window.location.href='/brand/Nutramax-Labs'} className="font-Livvic cursor-pointer hover:underline text-sm">Nutramax Labs</p>       
-        <p onClick={() => window.location.href='/brand/Enzymedica'} className="font-Livvic cursor-pointer hover:underline text-sm">Enzymedica</p>
-        <p onClick={() => window.location.href='/brand/Vital-Nutrients'} className="font-Livvic cursor-pointer hover:underline text-sm">Vital Nutrients</p>
+        <p onClick={() => window.location.href='/category/Douglas-Laboratories'} className="font-Livvic cursor-pointer hover:underline text-sm">Douglas Laboratories</p>
+        <p onClick={() => window.location.href='/category/Standard-Process'} className="font-Livvic cursor-pointer hover:underline text-sm">Standard Process</p>
+        <p onClick={() => window.location.href='/category/Nutramax-Labs'} className="font-Livvic cursor-pointer hover:underline text-sm">Nutramax Labs</p>       
+        <p onClick={() => window.location.href='/category/Enzymedica'} className="font-Livvic cursor-pointer hover:underline text-sm">Enzymedica</p>
+        <p onClick={() => window.location.href='/category/Vital-Nutrients'} className="font-Livvic cursor-pointer hover:underline text-sm">Vital Nutrients</p>
       </div>
 
       <div className="flex flex-col gap-y-2">
         <p className="text-emerald-600 font-bold">Web Exclusives</p>
-        <p onClick={() => window.location.href='/brand/BioMatrix'} className="font-Livvic cursor-pointer hover:underline text-sm">BioMatrix</p>
-        <p onClick={() => window.location.href='/brand/Designs-for-Health'} className="font-Livvic cursor-pointer hover:underline text-sm">Designs for Health</p>
-        <p onClick={() => window.location.href='/brand/Pterostilbene'} className="font-Livvic cursor-pointer hover:underline text-sm">Pterostilbene</p>
-        <p onClick={() => window.location.href='/brand/Sovereign-Silver'} className="font-Livvic cursor-pointer hover:underline text-sm">Sovereign Silver</p>
+        <p onClick={() => window.location.href='/category/BioMatrix'} className="font-Livvic cursor-pointer hover:underline text-sm">BioMatrix</p>
+        <p onClick={() => window.location.href='/category/Designs-for-Health'} className="font-Livvic cursor-pointer hover:underline text-sm">Designs for Health</p>
+        <p onClick={() => window.location.href='/category/Pterostilbene'} className="font-Livvic cursor-pointer hover:underline text-sm">Pterostilbene</p>
+        <p onClick={() => window.location.href='/category/Sovereign-Silver'} className="font-Livvic cursor-pointer hover:underline text-sm">Sovereign Silver</p>
       </div>
 
       <div className="flex flex-col gap-y-2">
         <p className="text-emerald-600 font-bold">Earth-Friendly</p>
-        <p onClick={() => window.location.href='/brand/Garden-of-Life'} className="font-Livvic cursor-pointer hover:underline text-sm">Garden of Life</p>
-        <p onClick={() => window.location.href='/brand/Natures-Way'} className="font-Livvic cursor-pointer hover:underline text-sm">Nature's Way</p>
-        <p onClick={() => window.location.href='/brand/New-Chapter'} className="font-Livvic cursor-pointer hover:underline text-sm">New Chapter</p>
-        <p onClick={() => window.location.href='/brand/MegaFood'} className="font-Livvic cursor-pointer hover:underline text-sm">MegaFood</p>
-        <p onClick={() => window.location.href='/brand/Vital-Nutrients'} className="font-Livvic cursor-pointer hover:underline text-sm">Vital Nutrients</p>
-        <p onClick={() => window.location.href='/brand/Herb-Pharm'} className="font-Livvic cursor-pointer hover:underline text-sm">Herb Pharm</p>
+        <p onClick={() => window.location.href='/category/Garden-of-Life'} className="font-Livvic cursor-pointer hover:underline text-sm">Garden of Life</p>
+        <p onClick={() => window.location.href='/category/Natures-Way'} className="font-Livvic cursor-pointer hover:underline text-sm">Nature's Way</p>
+        <p onClick={() => window.location.href='/category/New-Chapter'} className="font-Livvic cursor-pointer hover:underline text-sm">New Chapter</p>
+        <p onClick={() => window.location.href='/category/MegaFood'} className="font-Livvic cursor-pointer hover:underline text-sm">MegaFood</p>
+        <p onClick={() => window.location.href='/category/Vital-Nutrients'} className="font-Livvic cursor-pointer hover:underline text-sm">Vital Nutrients</p>
+        <p onClick={() => window.location.href='/category/Herb-Pharm'} className="font-Livvic cursor-pointer hover:underline text-sm">Herb Pharm</p>
       </div>
 
       <div className="flex flex-col gap-y-2">
         <p className="text-emerald-600 font-bold">Vegan</p>
-        <p onClick={() => window.location.href='/brand/Sunwarrior'} className="font-Livvic cursor-pointer hover:underline text-sm">Sunwarrior</p>
-        <p onClick={() => window.location.href='/brand/Deva'} className="font-Livvic cursor-pointer hover:underline text-sm">Deva</p>
-        <p onClick={() => window.location.href='/brand/Garden-of-Life'} className="font-Livvic cursor-pointer hover:underline text-sm">Garden of Life</p>
+        <p onClick={() => window.location.href='/category/Sunwarrior'} className="font-Livvic cursor-pointer hover:underline text-sm">Sunwarrior</p>
+        <p onClick={() => window.location.href='/category/Deva'} className="font-Livvic cursor-pointer hover:underline text-sm">Deva</p>
+        <p onClick={() => window.location.href='/category/Garden-of-Life'} className="font-Livvic cursor-pointer hover:underline text-sm">Garden of Life</p>
       </div>
 
     
@@ -894,6 +714,12 @@ const NavBar=()=>{
     </div>
   </div>
 }
+
+
+
+
+
+
 
 
 
@@ -927,7 +753,7 @@ const NavBar=()=>{
 
 
         </div>
-}
+        </>
 
 
 
@@ -937,46 +763,29 @@ const NavBar=()=>{
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-    
-
-      {cart &&  <Cart />}
-
-
-
-
-        
-
-
-
-
-
-
-    </nav>
     )
+
+
+
+
+
+
 }
 
 
 
-export default NavBar;
+
+
+export default Categories;
+
+
+
+
+
+
+
+
+
 
 
 

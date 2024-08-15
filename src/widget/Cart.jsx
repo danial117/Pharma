@@ -2,7 +2,7 @@
 
 
 
-import { CloseRounded,Add,Remove,KeyboardArrowLeftRounded } from '@mui/icons-material';
+import { CloseRounded,Add,Remove,KeyboardArrowLeftRounded, WindowSharp } from '@mui/icons-material';
 import { useEffect, useState,useContext } from 'react';
 import { useMediaQuery } from '@mui/material';
 import { useSelector } from 'react-redux';
@@ -20,7 +20,8 @@ const Cart=()=>{
     const navigate=useNavigate()
     const [hide,setHide]=useState(false)
     const isMobile = useMediaQuery('(max-width:768px)');
-    const cartItems=useSelector((state)=>state.cartItems);
+   const cartItems=useSelector((state)=>state.cartItems);
+    
     const user=useSelector((state)=>state.user)
     const accessToken=useSelector((state)=>state.accessToken)
     const dispatch=useDispatch()
@@ -37,28 +38,11 @@ const Cart=()=>{
     const CartCheckout=async()=>{
 
               
-          if(accessToken)
-{
-          await api.get(`/order/createOrder`,{ 
-               headers:{'Authorization': `Bearer ${accessToken}`}
-             }).then((response)=>{
-
-             if(response.status === 201){
-              
-             cartItemIds.map((data)=>{
-                 dispatch(removeItemFromCart({itemId:data.product}))
-                })
-                 
-                window.location.href='/order'
-                
-             }
-             })
-            }
-
-            else{
-                 window.location.href='/createAccount'
-                
-            }
+        if(accessToken){
+               window.location.href='/address'
+        }else{
+             window.location.href='/createAccount'
+        }
         
        
 
@@ -143,7 +127,7 @@ const Cart=()=>{
                     <div  onClick={()=>{navigate(`/productPage/${data._id}`); toggleCart()}}  className="flex cursor-pointer flex-row">
                         <div className=''>
                             <div className='w-[100%] flex  h-[100px]'>
-                            <img className='w-[80%]  h-[70px] mx-auto  ' src={`/api/assets/images/${data.productImage}`} />
+                            <img className='w-[80%]  h-[70px] mx-auto  ' src={`${process.env.REACT_APP_API_URL}/assets/products/${data.productImage}`} />
                             </div>
 
                         </div>

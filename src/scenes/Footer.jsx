@@ -25,7 +25,7 @@ const Footer=()=>{
         <>
         
 
-    <section>
+    <section className="">
 
 <div className="bg-teal-900   h-auto w-full">
 

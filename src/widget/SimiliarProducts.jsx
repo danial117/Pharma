@@ -14,7 +14,7 @@ const SimiliarProducts=()=>{
     useEffect(()=>{
 
         
-        fetch(`/api/products?page=1&limit=3`,{
+        fetch(`${process.env.REACT_APP_API_URL}/products?page=1&limit=3`,{
          method:'GET'
         }).then((response)=>response.json()).then((result)=>{setProducts(result)})
      
@@ -50,7 +50,7 @@ const SimiliarProducts=()=>{
 
                                 <div key={index} onClick={()=>navigate(`/productPage/${data._id}`)}  className="flex cursor-pointer justify-between gap-y-2 border-2 bg-white rounded-md border-emerald-500 flex-col">
                                 <div className=" w-[90%]  mt-6 h-[150px] border-b-2 pb-2 border-gray-200  mx-auto">
-                                    <img className="w-[50%] h-[100%] mx-auto my-auto" src={`/api/assets/images/${data.productImage}`}/>
+                                    <img className="w-[50%] h-[100%] mx-auto my-auto" src={`${process.env.REACT_APP_API_URL}/assets/products/${data.productImage}`}/>
         
                                 </div>
                                 <div className="m-2">
