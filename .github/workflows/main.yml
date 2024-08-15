@@ -41,7 +41,7 @@ jobs:
             # Clone the specific branch of the GitHub repository into the Pharma director
             git clone -b server https://github.com/danial117/Pharma.git ./git
 
-            # Change to the directory and install dependencies
+            # Change to the directory and install dependencie
             rm -rf ./git
             cd /home/infovit-api/htdocs/api.infovit.us/
             npm install
