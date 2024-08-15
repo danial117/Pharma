@@ -157,7 +157,7 @@ const About=()=>{
              <div className="w-[70%] xs:max-sm:w-[80%] xs:max-sm:py-4 py-8 mx-auto">
             <p className="text-center sm:max-md:text-[1.5rem] my-8 font-Poppins font-bold xs:max-sm:text-[1rem] md:max-lg:text-[2rem] text-[3rem]">Join and be a part of better health care system.</p>
 
-            <div onClick={()=>{window.location.href='https://abdurrehmana.github.io/signUp/'}} className="w-[50%] bg-blue-600 xs:max-md:w-[70%] xs:max-sm:py-2 cursor-pointer py-6 mx-auto cursor-pointer text-center b"><p className="font-Lexend text-[1.3rem] xs:max-sm:text-[1rem] text-white">Create an account</p></div>
+            <div onClick={()=>{window.location.href='/createAccount'}} className="w-[50%] bg-blue-600 xs:max-md:w-[70%] xs:max-sm:py-2 cursor-pointer py-6 mx-auto cursor-pointer text-center b"><p className="font-Lexend text-[1.3rem] xs:max-sm:text-[1rem] text-white">Create an account</p></div>
             </div>
 
 

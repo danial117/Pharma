@@ -44,7 +44,7 @@ const MainProductCarousal=()=>{
      const FetchCarousalProduct=async()=>{
 
         
-       await fetch(`http://localhost:3002/products?page=1&limit=4`,{
+       await fetch(`${process.env.REACT_APP_API_URL}/products?page=1&limit=4`,{
          method:'GET'
         }).then((response)=>response.json()).then((result)=>{setProducts(result)})
      
@@ -65,11 +65,11 @@ const MainProductCarousal=()=>{
       const settings = {
           dots: false,
           infinite: true,
-          speed: 2000,
+          speed: 1300,
           slidesToShow: !isMobile ? 3 :1,
           slidesToScroll: 1,
           autoplay:true,
-          autoplaySpeed: 5000,
+          autoplaySpeed: 3000,
           loop:true,
           pauseOnHover: false,
           arrows:false
@@ -142,7 +142,7 @@ const MainProductCarousal=()=>{
                     <div key={index} className="pl-4 xs:max-sm:pl-[2px]">
                     <div className="flex gap-y-2 h-[350px]  bg-white rounded-md flex-col">
                                     <div onClick={()=>{window.location.href=`/productPage/${data._id}`}} className="cursor-pointer w-[90%] h-[50%] mt-6  pb-2 border-gray-200  mx-auto">
-                                        <img className="w-[50%] h-[100%] mx-auto my-auto" src={`http://localhost:3002/assets/images/${data.productImage}`}/>
+                                        <img className="w-[50%] h-[100%] mx-auto my-auto" src={`${process.env.REACT_APP_API_URL}/assets/products/${data.productImage}`}/>
             
                                     </div>
                                     <div className="m-2 flex flex-col gap-y-auto h-full justify-between">

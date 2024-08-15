@@ -34,7 +34,7 @@ const ProductPage=()=>{
 
 
      const fetchProduct=async ()=>{
-       await fetch(`http://localhost:3002/products/id/${productId}`,{
+       await fetch(`${process.env.REACT_APP_API_URL}/products/id/${productId}`,{
             method:'GET'
         }).then((response)=>response.json()).then((data)=>{setProduct(data); })
     }
@@ -48,7 +48,10 @@ const ProductPage=()=>{
 
    
     
-
+      const handleBrandClick = () => {
+       
+        window.location.href=`/brand/${product.brand}`;
+      };
 
  
    
@@ -107,7 +110,7 @@ if (foundItem) {
         : 
           <img
             className="w-[60%]  h-[350px] mx-auto my-auto"
-            src={`http://localhost:3002/assets/images/${product.productImage}`}
+            src={`${process.env.REACT_APP_API_URL}/assets/products/${product.productImage}`}
             alt={product.name}
           />
         }
@@ -136,11 +139,16 @@ if (foundItem) {
                    />
 
                
+
+
+              <div onClick={handleBrandClick}>
                 <TruncateText 
                          text={product.brand}
                          maxLength={30}
-                         className="font-Lexend underline text-emerald-700"
+                        
+                         className="font-Lexend cursor-pointer underline text-emerald-700"
                    />
+                   </div>
                 </>
 }
                
@@ -151,16 +159,17 @@ if (foundItem) {
                         </div>
                         :
                     
-                    <div className="flex mt-4 mb-8 flex-row">
-                   {
-                    product.details.DietaryRestrictions.map((data,index)=>{
-
-                        return(
-                            <p className="font-Lexend bg-gray-100 mx-2 px-[4px]">{data}</p>
-                        )
-                    })
-                   }
-                   
+                        <div className="mt-4 mb-8 flex flex-row text-center gap-y-4">
+                        {product.details.DietaryRestrictions.slice(0, 3).map((data, index) => (
+                            <p key={index} className="font-Lexend text-xs p-[4px] bg-gray-100 mx-2 rounded-sm">
+                                {data}
+                            </p>
+                        ))}
+                        {product.details.DietaryRestrictions.length > 3 && (
+                            <p className="font-Lexend text-xs p-[4px] bg-gray-100 mx-2 rounded-sm">
+                                +{product.details.DietaryRestrictions.length - 3} more
+                            </p>
+                        )}
                     </div>
                     
                     }

@@ -6,9 +6,12 @@ import NavBar from './NavBar';
 import Footer from './Footer';
 import '../styles/styles.css';
 import api from '../utils/api';
+import ReactGA from 'react-ga4'
+import { useNavigate } from 'react-router-dom';
 
 const SignUp = () => {
   const dispatch = useDispatch();
+  const Navigate=useNavigate()
   const [login, setLogin] = useState(true);
   const accessToken = useSelector((state) => state.accessToken);
   const cartItems = useSelector((state) => state.cartItems);
@@ -40,6 +43,37 @@ const SignUp = () => {
       [name]: '',
     });
   };
+
+  const UserRegisterationEvent = () => {
+    // Track PayPal button click
+    ReactGA.event({
+        category: 'Ecommerce',
+        action: 'Users Registered',
+        label: 'Form submission'
+    });
+  }
+
+
+    const UserSignedInEvent = () => {
+      // Track PayPal button click
+      ReactGA.event({
+          category: 'Ecommerce',
+          action: 'Users Logged',
+          label: 'Form submission'
+      });
+    }
+    
+
+    const GoogleSignEvent = () => {
+      // Track PayPal button click
+      ReactGA.event({
+          category: 'Ecommerce',
+          action: 'Google Button Clicked',
+          label: '3rd party'
+      });
+    }
+
+
 
   const validateForm = () => {
     let valid = true;
@@ -119,7 +153,7 @@ const SignUp = () => {
           dispatch(removeItemFromCart({ itemId: id }));
         });
 
-        fetch('http://localhost:3002/user/signup', {
+        fetch(`${process.env.REACT_APP_API_URL}/user/signup`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -129,10 +163,11 @@ const SignUp = () => {
           .then((data) => {
             dispatch(setUser({ user: data.userData }));
             dispatch(setAccessToken({ accessToken: data.accessToken }));
+            UserRegisterationEvent();
             window.location.href = '/';
           });
       } else {
-      const response=await  fetch('http://localhost:3002/user/signup', {
+      const response=await  fetch(`${process.env.REACT_APP_API_URL}/user/signup`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -147,6 +182,7 @@ const SignUp = () => {
 
           if(response){
              if(response.status===201 && response.data) {
+              UserRegisterationEvent()
                 response.data.items.map((item)=>{
                    dispatch( addItemToCart({product:item.product,quantity:item.quantity}))
                 })
@@ -191,7 +227,7 @@ const SignUp = () => {
           dispatch(removeItemFromCart({ itemId: id }));
         });
 
-       await fetch('http://localhost:3002/user/login', {
+       await fetch(`${process.env.REACT_APP_API_URL}/user/login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -201,12 +237,12 @@ const SignUp = () => {
           .then((data) => {
             dispatch(setUser({ user: data.modifiedUser }));
             dispatch(setAccessToken({ accessToken: data.accessToken }));
-            
+            UserSignedInEvent()
             window.location.href = '/';
 
           });
       } else {
-     const response= await  fetch('http://localhost:3002/user/login', {
+     const response= await  fetch(`${process.env.REACT_APP_API_URL}/user/login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -214,6 +250,7 @@ const SignUp = () => {
         })
           .then((response) => response.json())
           .then((data) => {
+            UserSignedInEvent()
             dispatch(setUser({ user: data.modifiedUser }));
             dispatch(setAccessToken({ accessToken: data.accessToken }));
            
@@ -295,7 +332,7 @@ const SignUp = () => {
               <p className="font-Abel text-center">Create an account</p>
 
               <div className="container w-full my-4">
-                <a href="/oauth2/redirect/google/">
+                <a onClick={GoogleSignEvent} href={`${process.env.REACT_APP_API_URL}/oauth2/redirect/google/`}>
                   <div class="g-sign-in-button">
                     <div class="content-wrapper">
                       <div class="logo-wrapper">
@@ -324,6 +361,7 @@ const SignUp = () => {
                       placeholder="Name"
                       className={`focus:outline-none font-Poppins border-b-2 border-gray-600 w-[90%] ${errors.name ? 'border-red-500' : ''}`}
                     />
+
                   )}
                   {errors.name && <p className="text-red-500 text-xs">{errors.name}</p>}
                   <input
@@ -343,6 +381,7 @@ const SignUp = () => {
                     placeholder="Password"
                     className={`focus:outline-none font-Poppins border-b-2 border-gray-600 w-[90%] ${errors.password ? 'border-red-500' : ''}`}
                   />
+                 {login && <p onClick={()=>window.location.href='/account-security/forgot-password'} className='font-Livvic cursor-pointer  hover:underline text-sm text-blue-800 -mt-4'>forgot password</p>}
                   {errors.password && <p className="text-red-500 text-xs">{errors.password}</p>}
                   {!login && (
                     <input

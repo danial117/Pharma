@@ -3,7 +3,7 @@ import axios from 'axios';
 
 import { setAccessToken } from '../state/index.js';
 const api = axios.create({
-  baseURL: 'http://localhost:3002/',
+  baseURL: process.env.REACT_APP_API_URL,
   
 });
 
@@ -48,13 +48,16 @@ api.interceptors.response.use(
   },
   async (error) => {
     const originalRequest = error.config;
+    if(error.response.status === 404){
+      return error.response
+    }
 
     if (error.response.status === 403 && !originalRequest._retry) {
       originalRequest._retry = true;
     
       
       try {
-        const { data } = await axios.get('http://localhost:3002/refresh-token',  {
+        const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/refresh-token`,  {
             withCredentials: true, 
           });
 

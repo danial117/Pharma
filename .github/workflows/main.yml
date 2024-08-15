@@ -1,0 +1,72 @@
+name: SSH Server Deployment
+
+on:
+  push:
+    branches:
+      - server
+
+  pull_request:
+    branches:
+      - server
+
+jobs:
+  ssh-folder-management:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up SSH client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y sshpass
+
+      - name: Connect to SSH and perform operations
+        env:
+          SERVER_IP: ${{ secrets.SERVER_IP }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
+        run: |
+          sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no "$SERVER_USER@$SERVER_IP" << 'EOF'
+            # Navigate to the target directory
+            cd /home/infovit-api/htdocs/api.infovit.us
+
+            # Delete all files and directories
+            find . -mindepth 1 -maxdepth 1  -exec rm -rf {} +
+
+            # Remove any existing content in the directory
+            # Remove 'public' content if needed, but keep the directory itself
+            find public -mindepth 1 -exec rm -rf {} +
+
+            # Clone the specific branch of the GitHub repository into a temporary directory
+            git clone -b client https://github.com/danial117/Pharma.git ./git
+
+            # Move the contents of the temporary directory to the target directory
+           
+            cd /home/infovit-api/htdocs/api.infovit.us/.git
+
+           
+
+            # Install dependencies
+            npm install
+
+
+            # Build 
+            npm run build
+
+
+
+            mv ./git/build/* ./
+            
+            
+
+             # Clean up by removing the temporary directory
+            rm -rf ./git
+            rm -rf ./.git
+            rm -rf ./.github
+          
+          
+            
+
+          EOF
