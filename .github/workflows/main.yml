@@ -33,7 +33,7 @@ jobs:
             cd /home/infovit-api/htdocs/api.infovit.us
 
             # Delete all files and directories except 'ecosystem.config.cjs' and 'public'
-            find . -mindepth 1 -maxdepth 1 ! -name 'ecosystem.config.cjs' ! -name 'public' -exec rm -rf {} +
+            find . -mindepth 1 -maxdepth 1 ! -name 'ecosystem.config.cjs' ! -name 'public' ! -name '.env' -exec rm -rf {} +
 
             # Remove any existing content in the directory
             # Remove 'public' content if needed, but keep the directory itself
@@ -55,7 +55,7 @@ jobs:
             npm install
           
             # Start the application with pm2
-            pm2 start ecosystem.config.cjs --env production
+            npm run start
 
             # Create the 'public' directory with 'brands', 'products', and 'news' subdirectories if they don't exist
             mkdir -p public/brands
