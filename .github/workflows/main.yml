@@ -35,9 +35,7 @@ jobs:
             # Delete all files and directories except 'ecosystem.config.cjs' and 'public'
             find . -mindepth 1 -maxdepth 1 ! -name 'ecosystem.config.cjs' ! -name 'public' ! -name '.env' -exec rm -rf {} +
 
-            # Remove any existing content in the directory
-            # Remove 'public' content if needed, but keep the directory itself
-            find public -mindepth 1 -exec rm -rf {} +
+            
 
             # Clone the specific branch of the GitHub repository into a temporary directory
             git clone -b server https://github.com/danial117/Pharma.git ./git
