@@ -30,7 +30,7 @@ jobs:
         run: |
           sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no "$SERVER_USER@$SERVER_IP" << 'EOF'
             # Delete the specified directory and its contents except for ecosystem.config.js
-            cd /home/infovit-api/htdocs/api.infovit.us
+            cd /home/infovit-api/htdocs/api.infovit.us/
             find . -mindepth 1 -maxdepth 1 ! -name 'ecosystem.config.cjs' ! -name 'public' -exec rm -rf {} +
 
 
