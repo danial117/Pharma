@@ -36,7 +36,7 @@ jobs:
             # Remove any existing content in the directory
             rm -rf /home/infovit-api/htdocs/api.infovit.us
 
-            # Clone the specific branch of the GitHub repository into the Pharma directory
+            # Clone the specific branch of the GitHub repository into the Pharma director
             git clone -b server https://github.com/danial117/Pharma.git /home/infovit-api/htdocs/api.infovit.us
 
             # Change to the directory and install dependencies
