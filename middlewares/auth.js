@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-
+import User from '../models/UserModel.js';
 // Generate Access Token
 export const generateAccessToken = (userId) => {
   return jwt.sign({ userId }, process.env.JWT_ACCESS_SECRET, { expiresIn: '15m' });
@@ -10,9 +10,15 @@ export const generateRefreshToken = (userId) => {
   return jwt.sign({ userId }, process.env.JWT_REFRESH_SECRET, { expiresIn: '7d' });
 };
 
+export const generateAdminRefreshToken = (userId) => {
+  return jwt.sign({ userId }, process.env.JWT_REFRESH_SECRET, { expiresIn: '1d' });
+};
+
 // Verify Access Token
 export const verifyAccessToken = (req, res, next) => {
-   
+
+  try{
+
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1]; // Bearer <token>
   
@@ -29,10 +35,17 @@ export const verifyAccessToken = (req, res, next) => {
       
       next();
     });
+  }
+  catch(error){
+    res.status(501).json('Internal Server Error')
+  }
   };
   
   // Verify Refresh Token
   export const verifyRefreshToken = (token) => {
+
+    try{
+
    
     return new Promise((resolve, reject) => {
       if (!token) {
@@ -49,6 +62,10 @@ export const verifyAccessToken = (req, res, next) => {
         resolve(decoded);
       });
     });
+  }
+  catch(error){
+    res.status(501).json('Internal Server Error')
+  }
   };
 
 
@@ -111,3 +128,65 @@ export const verifyAccessToken = (req, res, next) => {
       res.sendStatus(500);
     }
   };
+
+
+
+
+
+
+
+
+ export const VerifyUserJWTToken=async(token)=>{
+  console.log(token)
+  const data= jwt.verify(token, process.env.JWT_REFRESH_SECRET, (err, decoded) => {
+    if (err) {
+      console.error('Access token verification error:', err);
+      
+    }
+    
+    return decoded.userId
+    
+    
+  })
+
+  return data
+ }
+
+
+
+
+
+  
+
+  export const adminAuthenticateJwt = async (req, res, next) => {
+    const token = req.headers.authorization?.split(' ')[1];
+    
+    if (!token) return res.status(401).json({ message: 'No token provided' });
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
+       
+        const user = await User.findById(decoded.userId);
+       
+        if (!user || !user.isAdmin) {
+            return res.status(403).json({ message: 'Access denied' });
+        }
+       
+        req.user = user;
+        next();
+    } catch (err) {
+      console.log(err)
+        res.status(401).json({ message: 'Invalid token' });
+    }
+};
+
+
+
+
+
+
+
+
+export const JWTUserPasswordRecovery=async(userId)=>{
+  return jwt.sign({ userId }, process.env.JWT_REFRESH_SECRET, { expiresIn: '4h' });
+}

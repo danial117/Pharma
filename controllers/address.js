@@ -5,9 +5,9 @@ export const createAddress = async (req, res) => {
   try {
     // Assuming req.user is populated with user data by authMiddleware
     const { userId } = req.user;
-    const { firstName, lastName, email, streetAddress, city, state } = req.body;
+    const { firstName, lastName, email, streetAddress, city, state,stateCode,zip } = req.body;
 
-    if (!firstName || !lastName || !email || !streetAddress || !city || !state ) {
+    if (!firstName || !lastName || !email || !streetAddress || !city || !state ||!stateCode ||!zip ) {
       return res.status(400).json({ error: 'All fields are required' });
     }
 
@@ -21,7 +21,9 @@ export const createAddress = async (req, res) => {
       address.email = email;
       address.streetAddress = streetAddress;
       address.city = city;
+      address.stateCode=stateCode;
       address.state = state;
+      address.zip=zip;
      
     } else {
       // Create new address
@@ -32,7 +34,9 @@ export const createAddress = async (req, res) => {
         email,
         streetAddress,
         city,
+        stateCode,
         state,
+        zip
        
       });
     }

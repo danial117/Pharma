@@ -11,10 +11,12 @@ const orderSchema = new Schema({
     quantity: { type: Number, required: true },
     price: { type: Number, required: true },
   }],
+  tax:{ type: Number, required: true },
   paymentMethod: { type: String, default: 'Unknown' },
   paymentStatus: { type: String, default: 'Pending' },
   orderStatus: { type: String, default: 'Pending' },
   totalAmount: { type: Number, required: true },
+  itemsAmount: { type: Number, required: true },
   transactionDetails:{type:Object}
 
 }, {

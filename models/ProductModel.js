@@ -3,10 +3,13 @@
 
 import mongoose from "mongoose";
 import { Schema } from "mongoose";
+
 const ProductSchema= mongoose.Schema({
     name:{
         type:String,
-        required:true
+        required:true,
+        unique: true,
+        trim: true
     },
    brandId:{
         type:Schema.Types.ObjectId,
@@ -15,17 +18,24 @@ const ProductSchema= mongoose.Schema({
     },
     brand:{
         type:String,
+        trim: true
     },
     productImage:{
-         type:String
+         type:String,
+         trim: true
     },
-    option:{
-        type:String
+    options:{
+        type:String,
+        trim: true
 
     },
-    price:{
-        type:Number,
-        required:true
+     category:{ type:[String]}
+    ,
+    price: {
+        type: mongoose.Schema.Types.Decimal128,
+        required: true,
+        get: v => v ? parseFloat(v.toString()).toFixed(2) : undefined,
+        set: v => v ? mongoose.Types.Decimal128.fromString(v) : undefined // Optional: Convert string to Decimal128
     },
     details:{
         Description:String,
@@ -34,7 +44,10 @@ const ProductSchema= mongoose.Schema({
         Certifications: [String],
         More:String
 
-    }
+    }},{
+        toJSON: { getters: true }, // Ensure getters are used when converting to JSON
+        toObject: { getters: true } // Ensure getters are used when converting to plain object
+    
   
 })
 

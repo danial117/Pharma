@@ -1,13 +1,21 @@
 import User from "../models/UserModel.js";
-import { generateAccessToken } from '../middlewares/auth.js';
-import { generateRefreshToken } from "../middlewares/auth.js";
+import { generateAccessToken, JWTUserPasswordRecovery } from '../middlewares/auth.js';
+import { generateRefreshToken,generateAdminRefreshToken } from "../middlewares/auth.js";
+import { sendPasswordRecoveryEmail } from "../middlewares/nodemailer.js";
+import {VerifyUserJWTToken} from '../middlewares/auth.js';
 
 
 
-export const Register=async(req,res)=>{
+
+
+
+
+
+
+export const Register=async(req,res,next)=>{
     try{
 
-    
+    console.log(req)
     const {name,email,password,phone}=req.body;
     const user= await new User({
      name:name, 
@@ -27,8 +35,13 @@ export const Register=async(req,res)=>{
     secure: process.env.NODE_ENV === 'production', // Set to true in production
     sameSite: '', // Adjust as per your CORS settings
   });
-  console.log(userSaved,accessToken)
-  res.status(201).json({userData:userSaved,accessToken})
+  req.userData = {
+    email: userSaved.email,
+    username:userSaved.name
+   
+  };
+  res.status(201).json({userData:userSaved,accessToken});
+  next()
 }
 catch(error){
     console.log(error)
@@ -41,6 +54,9 @@ catch(error){
 
 export const Logout=async(req,res)=>{
 
+  try{
+
+  
     res.clearCookie('refreshToken', {
         path: '/', // Ensure the path matches the one used while setting the cookie
         secure: process.env.NODE_ENV === 'production', // Set to true in production
@@ -51,6 +67,10 @@ export const Logout=async(req,res)=>{
 
     res.status(200).json({ message: 'Logout successful' });
 
+  }
+  catch(error){
+    res.status(501).json('Internal Server Error')
+  }
 }
 
 
@@ -95,6 +115,10 @@ export const Logout=async(req,res)=>{
 
 
 
+
+
+
+
 export const AdminGetAllUsers=async(req,res)=>{
 
   try{
@@ -110,7 +134,7 @@ export const AdminGetAllUsers=async(req,res)=>{
       'X-Content-Header': 'application/json',
       'X-Total-Count': modifiedUsers.length,
     });
-    console.log(modifiedUsers)
+    
 
     res.status(200).json(modifiedUsers);
 
@@ -122,6 +146,73 @@ export const AdminGetAllUsers=async(req,res)=>{
 
   }
 }
+
+
+
+
+
+
+
+
+
+
+export const UserForgotPasswoard=async(req,res)=>{
+
+
+  try{
+  const { email } = req.body;
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    return res.status(404).json({ message: 'User not found' });
+  }
+
+    const token= await JWTUserPasswordRecovery(user._id)
+
+  
+  await sendPasswordRecoveryEmail(email, token);
+
+  res.status(200).json({ message: 'Reset link sent' });
+}
+catch(error){
+  console.log(error)
+  res.status(501).json('Internal Server Error')
+}
+}
+
+
+
+
+
+
+export const UserResetPassword=async(req,res)=>{
+
+
+  try{
+  const { token, password } = req.body;
+   console.log(req,password)
+   const userId=await VerifyUserJWTToken(token)
+   const user=await User.findById(userId)
+
+  if (!user) {
+    return res.status(400).json({ message: 'Password reset token is invalid or has expired.' });
+  }
+
+  user.password = password;
+ 
+  await user.save();
+
+  res.status(200).json({ message: 'Password has been reset.' });
+}
+ catch(error){
+  res.status(501).json('Internal Server Error')
+  console.log(error)
+ }
+}
+
+
+
+
 
 
 

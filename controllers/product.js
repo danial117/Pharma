@@ -26,8 +26,9 @@ try{
       // If type parameter is provided, use regex to match products containing the type in their name
       query = { name: { $regex: type, $options: 'i' } }; // 'i' option for case-insensitive search
       const products = await Product.find(query).skip(skip).limit(limit);
-
+     
       res.status(200).json(products);
+    
   
     }else
 {
@@ -35,8 +36,12 @@ try{
     
 
     const products=await Product.find().skip(skip).limit(limit);
+  
+   
 
-    res.status(200).json(products)
+      res.status(200).json(products)
+   
+    
 }
 
 }
@@ -54,7 +59,7 @@ export const SearchProduct=async(req,res)=>{
     
         try {
           // Parse query parameters
-          const { product, brand, page = 1, limit = 10 } = req.query;
+          const { product,  page = 1, limit = 10 } = req.query;
       
           // Initialize query object
           const query = {};
@@ -63,9 +68,7 @@ export const SearchProduct=async(req,res)=>{
           if (product) {
             query.name = { $regex: product, $options: 'i' }; // Case-insensitive regex search
           }
-          if (brand) {
-            query.brand = { $regex: brand, $options: 'i' }; // Case-insensitive regex search
-          }
+         
       
           // Calculate the number of documents to skip
           const skip = (parseInt(page) - 1) * parseInt(limit);
@@ -78,7 +81,12 @@ export const SearchProduct=async(req,res)=>{
           const totalPages = Math.ceil(totalProducts / parseInt(limit));
       
           // Send the paginated results along with additional information
-          res.status(200).json({products:products});
+         
+
+            res.status(200).json({products:products});
+
+          
+          
         } catch (error) {
           console.log(error);
           res.status(500).json({ error: 'Internal server error' });
@@ -95,7 +103,7 @@ export const GetProduct=async(req,res)=>{
   try{
     const {productId}=req.params
     const product=await Product.findById(productId)
-     console.log(product)
+    
 
      res.status(200).json(product)
   }
@@ -115,7 +123,7 @@ export const AdminGetUserProducts=async(req,res)=>{
     try{
     
         const products =await Product.find({});
-        console.log(products)
+       
         const modifiedProducts = products.map(products => {
           const productsObject = products.toObject(); // Convert Mongoose document to plain JavaScript object
           productsObject.id = productsObject._id;
@@ -126,7 +134,7 @@ export const AdminGetUserProducts=async(req,res)=>{
           'X-Content-Header': 'application/json',
           'X-Total-Count': modifiedProducts.length,
         });
-        console.log(modifiedProducts)
+      
     
         res.status(200).json(modifiedProducts);
     
@@ -176,14 +184,26 @@ export const AdminModifyProduct=async(req,res)=>{
     try{
 
         const data=req.body;
+       console.log(req.body)
+       console.log(req.file)
         const {productId} =req.params;
+        if(req.file){
+          const file=req.file
+          console.log(file)
+          data['productImage']=file.filename
 
+        }
+        
         const product = await Product.findById(productId);
-
+        
+        Number(data.price).toFixed(2)
+        delete data.id
+      
         if (!product) {
           return res.status(404).json({ error: 'Product not found' });
         }
-    
+        else
+    {
         // Overwrite product fields with the fields from req.body
         Object.keys(data).forEach(key => {
           product[key] = data[key];
@@ -202,7 +222,7 @@ export const AdminModifyProduct=async(req,res)=>{
           res.status(200).json(modifiedProduct)
 
 
-
+          }
 
 
 
@@ -220,6 +240,7 @@ export const AdminCreateProduct=async(req,res)=>{
     try{
       
         const data = req.body;
+        console.log(data)
         const file=req.file
 
         const brand=await Brand.findOne({name:data.brand})
@@ -231,8 +252,10 @@ export const AdminCreateProduct=async(req,res)=>{
         name:data.name,
         brandId:brand?brand._id:null,
         brand:data.brand,
-        price:data.price,
+        price:Number(data.price).toFixed(2),
         details:data.details,
+        category:data.category,
+        options:data.options,
         productImage:file.filename
       })
 
@@ -246,8 +269,10 @@ export const AdminCreateProduct=async(req,res)=>{
     
         // Save the updated product
        
-        console.log(updatedProduct)
+       
+       
         res.status(200).json(updatedProduct);
+
 
 
     }catch(error){
@@ -259,8 +284,56 @@ export const AdminCreateProduct=async(req,res)=>{
 
 
 
+export const SearchProductCategory = async (req, res) => {
+  try {
+    const { search } = req.params;
+    const words = search.trim().toLowerCase().split(/\s+/);
+
+    // Escape special characters for regex safety
+    const escapedWords = words.map(word => word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+
+    // Create a regex pattern to match the exact phrases or words
+    const pattern = new RegExp(`\\b${escapedWords.join('\\b.*?\\b')}\\b`, 'i'); // 'i' for case-insensitive
+    console.log(pattern)
+    const results = await Product.find({
+      category: {
+        $elemMatch: {
+          $regex: pattern
+        }
+      }
+    });
+   console.log(results)
+    res.status(200).json(results);
+  } catch (error) {
+    console.error('Error searching products:', error);
+    res.status(500).json({ error: 'An error occurred while searching for products.' });
+  }
+};
 
 
 
+export const AdminDeleteProduct=async(req,res)=>{
+  try {
+    // Assuming req.user is populated with user data by authMiddleware
+    const { productId } = req.params;
+   
 
+    // Check if the user is trying to delete their own address
+    
+
+    // Delete the address associated with the userId
+    const deletedProduct = await Product.findOneAndDelete({ _id: productId });
+
+    if (!deletedProduct) {
+      return res.status(404).json({ error: 'Address not found for deletion' });
+    }
+
+    res.status(200).json({ message: 'Address deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting address:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+
+
+}
 

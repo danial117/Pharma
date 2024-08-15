@@ -6,12 +6,22 @@ const UserSchema= mongoose.Schema({
         type:String,
         required:true
     },
+    isAdmin:{
+      type:Boolean,
+      default:false
+    },
+    isSuperAdmin:{
+      type:Boolean,
+      default:false
+    },
    email:{
         type:String,
-        required:true
+        required:true,
+        trim: true
     },
     phone:{
         type:String,
+        trim:true
        
     }, 
     password: {
@@ -23,6 +33,7 @@ const UserSchema= mongoose.Schema({
       },
       picturePath: {
         type: String,
+        trim: true,
         default: "",
       }, googleId: {
         type: String, // For Google users
@@ -38,7 +49,13 @@ const UserSchema= mongoose.Schema({
       },
       refreshToken:{
         type:String
-      }
+      },
+      otp: {
+         type: String
+      },
+      otpExpires: {
+         type: Date 
+        }
     },
   { timestamps: true }
 )
