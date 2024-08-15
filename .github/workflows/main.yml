@@ -30,43 +30,29 @@ jobs:
         run: |
           sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no "$SERVER_USER@$SERVER_IP" << 'EOF'
             # Navigate to the target directory
-            cd /home/infovit/htdocs/www.infovit.us
+            cd /home/infovit/htdocs/www.infovit.us || exit
 
-            # Delete all files and directories
-            find . -mindepth 1 -maxdepth 1  -exec rm -rf {} +
+            # Delete all files and directories except 'public'
+            find . -mindepth 1 -maxdepth 1 ! -name 'public' -exec rm -rf {} +
 
-            # Remove any existing content in the directory
-            # Remove 'public' content if needed, but keep the directory itself
+            # Remove all contents inside 'public' directory
             find public -mindepth 1 -exec rm -rf {} +
 
             # Clone the specific branch of the GitHub repository into a temporary directory
             git clone -b client https://github.com/danial117/Pharma.git ./git
 
-           
-           
-            cd /home/infovit/htdocs/www.infovit.us/.git
+            # Navigate to the temporary repository directory
+            cd ./git || exit
 
-           
-
-            # Install dependencies
+            # Install dependencies and build the project
             npm install
-
-
-            # Build 
             npm run build
 
+            # Move build files to the target directory
+            mv build/* ../
 
-
-            mv ./git/build/* ./
-            
-
-
-             # Clean up by removing the temporary directory
-            cd /home/infovit/htdocs/www.infovit.us/
+            # Clean up by removing the temporary directory
+            cd ..
             rm -rf ./git
-            
-          
-          
-            
-
           EOF
+
