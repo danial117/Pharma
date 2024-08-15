@@ -30,7 +30,7 @@ jobs:
         run: |
           sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no "$SERVER_USER@$SERVER_IP" << 'EOF'
             # Navigate to the target directory
-            cd /home/infovit-api/htdocs/api.infovit.us
+            cd /home/infovit/htdocs/www.infovit.us
 
             # Delete all files and directories
             find . -mindepth 1 -maxdepth 1  -exec rm -rf {} +
@@ -42,9 +42,9 @@ jobs:
             # Clone the specific branch of the GitHub repository into a temporary directory
             git clone -b client https://github.com/danial117/Pharma.git ./git
 
-            # Move the contents of the temporary directory to the target directory
            
-            cd /home/infovit-api/htdocs/api.infovit.us/.git
+           
+            cd /home/infovit/htdocs/www.infovit.us/.git
 
            
 
@@ -59,12 +59,12 @@ jobs:
 
             mv ./git/build/* ./
             
-            
+
 
              # Clean up by removing the temporary directory
+            cd /home/infovit/htdocs/www.infovit.us/
             rm -rf ./git
-            rm -rf ./.git
-            rm -rf ./.github
+            
           
           
             
