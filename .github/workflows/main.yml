@@ -55,7 +55,10 @@ jobs:
             npm install
           
             # Start the application with pm2
-            npm run start
+            pm2 delete all
+
+            pm2 start ecosystem.config.cjs --env production
+            
 
             # Create the 'public' directory with 'brands', 'products', and 'news' subdirectories if they don't exist
             mkdir -p public/brands
