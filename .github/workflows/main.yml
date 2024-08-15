@@ -30,24 +30,24 @@ jobs:
         run: |
           sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no "$SERVER_USER@$SERVER_IP" << 'EOF'
             # Delete the specified directory and its contents except for ecosystem.config.js
-            cd /home/infovit-api/htdocs/
-            find api.infovit.us -mindepth 1 -maxdepth 1 ! -name 'ecosystem.config.cjs' -exec rm -rf {} +
+            cd /home/infovit-api/htdocs/api.infovit.us
+            find . -mindepth 1 -maxdepth 1 ! -name 'ecosystem.config.cjs' ! -name 'public' -exec rm -rf {} +
+
+
 
             # Remove any existing content in the directory
             rm -rf /home/infovit-api/htdocs/api.infovit.us
 
             # Clone the specific branch of the GitHub repository into the Pharma director
-            git clone -b server https://github.com/danial117/Pharma.git /home/infovit-api/htdocs/api.infovit.us/
+            git clone -b server https://github.com/danial117/Pharma.git ./git
 
             # Change to the directory and install dependencies
+            rm -rf ./git
             cd /home/infovit-api/htdocs/api.infovit.us/
             npm install
           
             # Start the application with pm2
             pm2 start ecosystem.config.cjs --env production
 
-            # Create the 'public' directory with 'brands', 'products', and 'news' subdirectories
-            mkdir -p /home/infovit-api/htdocs/api.infovit.us/public/brands
-            mkdir -p /home/infovit-api/htdocs/api.infovit.us/public/products
-            mkdir -p /home/infovit-api/htdocs/api.infovit.us/public/news
+           
           EOF
