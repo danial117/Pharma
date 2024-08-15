@@ -4,11 +4,12 @@ import mongoose from "mongoose";
 const brandSchema = new mongoose.Schema({
     name: {
         type: String,
-        
-        unique: true
+        unique: true,
+        trim: true
     },
-    logoUrl: {
+    brandLogoPath: {
         type: String,
+        trim: true
         
     }
 });

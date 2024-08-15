@@ -1,15 +1,22 @@
 import express from 'express';
-import { Register,Logout,Login,AdminGetAllUsers } from '../controllers/user.js';
-import { verifyRefreshToken,generateAccessToken } from '../middlewares/auth.js';
+import { Register,Logout,Login,AdminGetAllUsers, UserForgotPasswoard, UserResetPassword } from '../controllers/user.js';
+import { verifyRefreshToken,generateAccessToken,adminAuthenticateJwt } from '../middlewares/auth.js';
 import User from '../models/UserModel.js';
+import { welcomeMail } from '../middlewares/nodemailer.js';
+
+
 
 const router = express.Router();
 
 
-router.post('/signup',Register);
+router.post('/signup',Register,welcomeMail);
 router.post('/login',Login)
 router.get('/logout',Logout)
-router.get('/show',AdminGetAllUsers)
+router.post('/forgot-password',UserForgotPasswoard)
+router.post('/reset-password',UserResetPassword)
+
+
+
 router.get('/',async (req, res) => {
     try {
         // Extract refresh token from cookie
@@ -44,6 +51,20 @@ router.get('/',async (req, res) => {
        
     
    });
+
+
+
+
+
+//admin routes
+router.get('/show',adminAuthenticateJwt,AdminGetAllUsers)
+
+
+
+
+
+
+
 
 
 export default router;

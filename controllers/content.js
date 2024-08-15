@@ -10,7 +10,7 @@ export const GetContent=async(req,res)=>{
     try{
 
         const content=await DomModel.findOne({});
-        console.log(content)
+        
 
         res.status(200).json(content)
 

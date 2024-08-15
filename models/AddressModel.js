@@ -27,11 +27,15 @@ const addressSchema = new Schema({
     type: String,
     required: true,
   },
+  stateCode:{
+    type: String,
+    required: true,
+  },
   city: {
     type: String,
     required: true,
   },
-  zipCode: {
+  zip: {
     type: String, // Assuming zip code is a string; adjust data type as needed
    
   },

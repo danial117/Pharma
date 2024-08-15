@@ -1,0 +1,53 @@
+name: SSH Server Deployment
+
+on:
+  push:
+    branches:
+      - server
+
+  pull_request:
+    branches:
+      - server
+
+jobs:
+  ssh-folder-management:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up SSH client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y sshpass
+
+      - name: Connect to SSH and perform operations
+        env:
+          SERVER_IP: ${{ secrets.SERVER_IP }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
+        run: |
+          sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no "$SERVER_USER@$SERVER_IP" << 'EOF'
+            # Delete the specified directory and its contents except for ecosystem.config.js
+            cd /home/infovit-api/htdocs
+            find api.infovit.us -mindepth 1 -maxdepth 1 ! -name 'ecosystem.config.js' -exec rm -rf {} +
+
+            # Remove any existing content in the directory
+            rm -rf /home/infovit-api/htdocs/api.infovit.us
+
+            # Clone the specific branch of the GitHub repository into the Pharma directory
+            git clone -b server https://github.com/danial117/Pharma.git /home/infovit-api/htdocs/api.infovit.us
+
+            # Change to the directory and install dependencies
+            cd /home/infovit-api/htdocs/api.infovit.us
+            npm install
+          
+            # Start the application with pm2
+            pm2 start ecosystem.config.cjs --env production
+
+            # Create the 'public' directory with 'brands', 'products', and 'news' subdirectories
+            mkdir -p /home/infovit-api/htdocs/api.infovit.us/public/brands
+            mkdir -p /home/infovit-api/htdocs/api.infovit.us/public/products
+            mkdir -p /home/infovit-api/htdocs/api.infovit.us/public/news
+          EOF

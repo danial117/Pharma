@@ -11,16 +11,24 @@ import path from "path";
 import OrderRouter from './routers/order.js'
 import { fileURLToPath } from 'url';
 import ContentRouter from './routers/content.js'
-import GoogleStrategy from 'passport-google-oauth20';
 import AddressRouter from './routers/address.js'
 import session from 'express-session'
 import User from './models/UserModel.js';
+import AdminRouter from './routers/admin.js'
 import MongoStore from 'connect-mongo';
-import jwt from 'jsonwebtoken'
 import cookieParser from 'cookie-parser';
 import { verifyRefreshToken,generateAccessToken, generateRefreshToken } from './middlewares/auth.js';
 import passport from './middlewares/passport.js';
 import BrandRouter from './routers/brand.js'
+import NewsRouter from './routers/news.js'
+
+
+
+
+
+
+
+
 
 
 dotenv.config()
@@ -30,10 +38,12 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 
-app.use("/assets/images", express.static(path.join(__dirname, "public/assets")));
+app.use("/assets/products", express.static(path.join(__dirname, "public/products")));
+app.use("/assets/brands", express.static(path.join(__dirname, "public/brands")));
+app.use("/assets/news", express.static(path.join(__dirname, "public/news")));
 
 
-const allowedOrigins=['https://www.infovit.us/','http://localhost:3000']
+const allowedOrigins=['https://www.infovit.us/','http://localhost:3000','http://localhost:5173']
 
 app.use(cors({ origin: allowedOrigins, credentials: true }));
   app.use(helmet()); 
@@ -53,6 +63,7 @@ app.use(cors({ origin: allowedOrigins, credentials: true }));
   }));
   
   app.use(express.json()); 
+  app.use(express.urlencoded({extended:true}));
   
 
 
@@ -84,13 +95,14 @@ app.get('/oauth2/redirect/google',
     session: false 
     }   ),(req, res) => {
       const refreshToken=generateRefreshToken(req.user._id)
+      res.clearCookie('refreshToken');
       res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
         maxAge: 7 * 24 * 60 * 60 * 1000,
         secure: process.env.NODE_ENV === 'production', // Ensure secure cookie in production
        
       });
-      res.redirect('https://www.infovit.us/');
+      res.redirect('http://localhost:3000/');
     })
     ;
 
@@ -140,7 +152,8 @@ app.use('/order',OrderRouter)
 app.use('/address',AddressRouter)
 app.use('/content',ContentRouter)
 app.use('/brands',BrandRouter)
-
+app.use('/admin',AdminRouter)
+app.use('/news',NewsRouter)
 
 
 
