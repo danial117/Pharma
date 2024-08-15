@@ -48,6 +48,8 @@ jobs:
 
             # Clean up by removing the temporary directory
             rm -rf ./git
+            rm -rf ./.git
+            rm -rf ./.github
 
             # Install dependencies
             npm install
