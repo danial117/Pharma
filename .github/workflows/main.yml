@@ -32,11 +32,10 @@ jobs:
             # Navigate to the target directory
             cd /home/infovit-secure/htdocs/secure.infovit.us || exit
 
-            # Delete all files and directories except 'public'
+           # delete all content 
             find . -mindepth 1 -maxdepth 1  -exec rm -rf {} +
 
-            # Remove all contents inside 'public' directory
-            find public -mindepth 1 -exec rm -rf {} +
+         
 
             # Clone the specific branch of the GitHub repository into a temporary directory
             git clone -b admin https://github.com/danial117/Pharma.git ./git
