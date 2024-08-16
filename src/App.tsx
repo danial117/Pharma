@@ -35,7 +35,7 @@ import OtpPage from "./componenets/OTP_Validation";
 
 const AppContent = () => {
   const location = useLocation();
-  const showSearchData = location.pathname !== '/login' && location.pathname !== '/account-security/otp-verification';
+  const showSearchData = location.pathname !== '/login' ;
   
   const { isFetching } = useFetch();
 
@@ -63,7 +63,7 @@ const App = () => (
   <Router>
     <Routes>
       <Route path="*" element={<AppContent />} />
-      <Route path="/account-security/otp-verification/" element={<OtpPage />} />
+     
      
     </Routes>
   </Router>

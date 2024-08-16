@@ -16,13 +16,13 @@ export const authProvider: AuthProvider = {
     });
     return fetch(request)
         .then(response => {
+            
             if (response.status < 200 || response.status >= 300) {
                 throw new Error(response.statusText);
             }
+            return response
            
-            if(response.status ===200){
-                window.location.href='/account-security/otp-verification'
-            }
+           
         })
         
 },
