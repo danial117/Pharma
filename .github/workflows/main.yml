@@ -48,7 +48,7 @@ jobs:
             npm run build
 
             # Move build files to the target directory
-            mv build/* ../
+            mv dist/* ../
 
             # Clean up by removing the temporary directory
             cd ..
