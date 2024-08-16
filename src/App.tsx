@@ -1,4 +1,4 @@
-import { Admin, Resource} from "react-admin";
+import { Admin, Resource,CustomRoutes} from "react-admin";
 import customDataProvider from "./dataProvider";
 import { authProvider } from "./authProvider";
 import ProductsList from "./Data Lists/Products/ProductsList";
@@ -35,7 +35,8 @@ import OtpPage from "./componenets/OTP_Validation";
 
 const AppContent = () => {
   const location = useLocation();
-  const showSearchData = location.pathname !== '/login';
+  const showSearchData = location.pathname !== '/login' && location.pathname !== '/account-security/otp-verification';
+  
   const { isFetching } = useFetch();
 
   return (
@@ -50,8 +51,13 @@ const AppContent = () => {
         <Resource name="products" list={ProductsList} edit={ProductEdit} create={ProductCreate} hasCreate />
         <Resource name="brands" show={BrandShow} edit={BrandEdit} list={BrandsList} create={BrandsCreate} hasShow hasCreate />
         <Resource name="content" list={DomList} show={DOM_Show} edit={DomEdit} hasEdit hasShow />
+        <CustomRoutes noLayout>
+            <Route  path="/account-security/otp-verification/" element={<OtpPage />} />
+            
+        </CustomRoutes>
       </Admin>
       </div>
+
       }
     </>
   );
@@ -61,10 +67,10 @@ const App = () => (
   <Router>
     <Routes>
       <Route path="*" element={<AppContent />} />
-      <Route path="/account-security/otp-verification" element={<OtpPage />} />
-      
+     
     </Routes>
   </Router>
 );
+
 
  export default App;
