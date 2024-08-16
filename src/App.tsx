@@ -51,7 +51,7 @@ const AppContent = () => {
         <Resource name="products" list={ProductsList} edit={ProductEdit} create={ProductCreate} hasCreate />
         <Resource name="brands" show={BrandShow} edit={BrandEdit} list={BrandsList} create={BrandsCreate} hasShow hasCreate />
         <Resource name="content" list={DomList} show={DOM_Show} edit={DomEdit} hasEdit hasShow />
-        <CustomRoutes noLayout>
+        <CustomRoutes >
             <Route  path="/account-security/otp-verification/" element={<OtpPage />} />
             
         </CustomRoutes>
