@@ -35,7 +35,7 @@ import OtpPage from "./componenets/OTP_Validation";
 
 const AppContent = () => {
   const location = useLocation();
-  const showSearchData = location.pathname !== '/login' && location.pathname !== '/account-security/otp-verification';
+  const showSearchData = location.pathname !== '/login' ;
   
   const { isFetching } = useFetch();
 
@@ -51,10 +51,6 @@ const AppContent = () => {
         <Resource name="products" list={ProductsList} edit={ProductEdit} create={ProductCreate} hasCreate />
         <Resource name="brands" show={BrandShow} edit={BrandEdit} list={BrandsList} create={BrandsCreate} hasShow hasCreate />
         <Resource name="content" list={DomList} show={DOM_Show} edit={DomEdit} hasEdit hasShow />
-        <CustomRoutes >
-            <Route  path="/account-security/otp-verification/" element={<OtpPage />} />
-            
-        </CustomRoutes>
       </Admin>
       </div>
 
@@ -67,6 +63,7 @@ const App = () => (
   <Router>
     <Routes>
       <Route path="*" element={<AppContent />} />
+     
      
     </Routes>
   </Router>

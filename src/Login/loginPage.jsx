@@ -3,11 +3,13 @@ import { useLogin, useNotify, Notification } from 'react-admin';
 import BackgroundImage from '../assets/form.jpg'
 import {LockRounded} from '@mui/icons-material'
 import { useMediaQuery } from '@mui/material';
-
+import OtpPage from '../componenets/OTP_Validation';
 
 const MyLoginPage = ({  }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [otp,setOtp]=useState(false)
+    const apiUrl=process.env.VITE_API_URL
     
     const login = useLogin();
     const notify = useNotify();
@@ -16,7 +18,19 @@ const MyLoginPage = ({  }) => {
 
     const handleSubmit = e => {
         e.preventDefault();
-        login({ email, password }).catch(() =>
+        fetch(`${apiUrl}/admin/login`,{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            credentials:'include',
+            body:JSON.stringify({email:email,password:password})
+        }).then((response)=>{
+            
+            if(response.status===200){
+                console.log(response)
+                setOtp(true)
+
+            }
+        }).catch(() =>
             notify('Invalid email or password')
         );
     };
@@ -33,7 +47,12 @@ const MyLoginPage = ({  }) => {
 
 
     return (
-        <div style={{width:'100%',height:'100vh',backgroundImage: `linear-gradient(to right,rgba(0,0,0,0.5), rgba(0,0,0,0.1)), url(${BackgroundImage})`,backgroundPosition:'center',backgroundSize:'cover',display:'flex'}}>
+       
+     otp
+         ?(
+          <OtpPage />)
+        :
+      (  <div style={{width:'100%',height:'100vh',backgroundImage: `linear-gradient(to right,rgba(0,0,0,0.5), rgba(0,0,0,0.1)), url(${BackgroundImage})`,backgroundPosition:'center',backgroundSize:'cover',display:'flex'}}>
 
        
         <form style={{background:'white', width:md?'60%':'40%',display:'flex',flexDirection:'column',gap:'20px',margin:'auto',padding:'2rem' }} onSubmit={handleSubmit}>
@@ -65,6 +84,8 @@ const MyLoginPage = ({  }) => {
 
         
         </div>
+    )
+    
     );
 };
 
