@@ -27,8 +27,8 @@ import NewsEdit from "./Data Lists/News/NewsEdit";
 import BrandEdit from "./Data Lists/Brands/BrandsEdit";
 import { BrandShow } from "./Data Lists/Brands/BrandShow";
 import OtpPage from "./componenets/OTP_Validation";
-
-
+import ContactList from "./Data Lists/contact/ContactList";
+import { ContactShow } from "./Data Lists/contact/ContactShow";
 
 
 
@@ -50,7 +50,8 @@ const AppContent = () => {
         <Resource name="cart" list={<CartsList />} />
         <Resource name="products" list={ProductsList} edit={ProductEdit} create={ProductCreate} hasCreate />
         <Resource name="brands" show={BrandShow} edit={BrandEdit} list={BrandsList} create={BrandsCreate} hasShow hasCreate />
-        <Resource name="content" list={DomList} show={DOM_Show} edit={DomEdit} hasEdit hasShow />
+        {/* <Resource name="content" list={DomList} show={DOM_Show} edit={DomEdit} hasEdit hasShow /> */}
+        <Resource name="contact"  list={ContactList} show={ContactShow} hasEdit hasShow />
       </Admin>
       </div>
 

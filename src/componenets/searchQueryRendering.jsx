@@ -7,7 +7,7 @@ import { useMediaQuery } from '@mui/material';
 
 
 
-const UserData = ({ user, order, cart, address,product }) => {
+const UserData = ({ user, order, cart, address,product,brand }) => {
 
   const isMobile = useMediaQuery('(max-width:768px)');
 
@@ -79,6 +79,13 @@ const UserData = ({ user, order, cart, address,product }) => {
       display: 'block',
       margin: '0 auto',
     },
+    brandImage: {
+      width: '300px',
+      height: '200px',
+      borderRadius: '8px',
+      display: 'block',
+      margin: '0 auto',
+    }
   };
 
 
@@ -197,6 +204,16 @@ const UserData = ({ user, order, cart, address,product }) => {
     <p className='font-Lexend ml-2'><strong>Description:</strong> {product.details?.Description || 'N/A'}</p>
     <p className='font-Lexend ml-2'><strong>Warnings:</strong> {product.details?.Warnings || 'N/A'}</p>
     <p className='font-Lexend ml-2'><strong>More:</strong> {product.details?.More || 'N/A'}</p>
+  </div>
+)}
+
+{brand && (
+  <div style={styles.productSection}>
+    <h2 className='font-Abel text-[2rem] text-center'>Brand Information</h2>
+    <img src={`${process.env.VITE_API_URL}/assets/brands/${brand.brandLogoPath || '404.jpeg'}`} alt={brand.name || 'No name'} style={styles.brandImage} />
+    <p className='font-Lexend ml-2'><strong>Brand ID:</strong> {brand._id || 'N/A'}</p>
+    <p className='font-Lexend ml-2'><strong>Name:</strong> {brand.name || 'N/A'}</p>
+
   </div>
 )}
 

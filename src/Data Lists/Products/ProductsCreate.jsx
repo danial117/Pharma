@@ -59,13 +59,55 @@ const ProductCreate = (props) =>
         
     };
 
-    const transform = (data) => ({
-        ...data,
-        dietaryRestrictions,
-        Certifications,
-        category:categories
+    const transform = (data) => {
+       
+
+        const formData = new FormData();
+    
+        // Append the image file if it exists
+       
+    
+        // Append basic fields
+        console.log(data)
+        if (data.name) formData.append('name', data.name);
+        if (data.productImage) formData.append('file', data.productImage.rawFile);
+        if (data.brand) formData.append('brand', data.brand);
+        if (data.price) formData.append('price', Number(data.price).toFixed(2));
+        if (data.options) formData.append('options', data.options);
+    
+        // Append category if it exists and is not empty
+        if (data.category && data.category.length > 0) {
+           categories.forEach((cat, index) => {
+                formData.append(`category[${index}]`, cat);
+            });
+        }
+    
+        // Append Certifications if they exist
+        if (data.details && data.details.Certifications) {
+            Certifications.forEach((cert, index) => {
+                formData.append(`details[Certifications][${index}]`, cert);
+            });
+        }
+    
+        // Append Dietary Restrictions if they exist
+        if (data.details && data.details.DietaryRestrictions) {
+            dietaryRestrictions.forEach((restriction, index) => {
+                formData.append(`details[DietaryRestrictions][${index}]`, restriction);
+            });
+        }
+    
+        // Append other details if they exist
+        if (data.details) {
+            Object.entries(data.details).forEach(([key, value]) => {
+                if (key !== 'Certifications' && key !== 'DietaryRestrictions') {
+                    formData.append(`details[${key}]`, value === undefined || value === null ? '' : value.toString());
+                }
+            });
+        }
+    
+        return formData;
         
-    });
+    };
 
 
    

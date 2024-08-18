@@ -133,7 +133,7 @@ const SearchData=()=>{
 
     <div className="h-auto  z-[20] bg-slate-100 w-full">
         <div className="w-[80%]   mx-auto">
-            <UserData user={data.user} order={data.order} cart={data.cart} address={data.address} product={data.product}/>
+            <UserData user={data.user} order={data.order} cart={data.cart} address={data.address} product={data.product} brand={data.brand}/>
         </div>
     </div>
 
