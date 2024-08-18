@@ -38,9 +38,14 @@ export const httpClient = async (url, options = {}) => {
     const token = localStorage.getItem('token');
     console.log(token)
     const headers = new Headers();
-    if (!options.headers) {
+    if (options.headers && options.headers['Content-Type'] === 'application/json' && options.body) {
         headers.append( 'Content-Type', 'application/json' );
     }
+
+    if (options.headers && options.headers['Content-Type'] === 'multipart/form-data' && options.body) {
+        headers.append( 'Content-Type', 'multipart/form-data' );
+    }
+
     if (token) {
         headers.append('Authorization', `Bearer ${token}`);
     }
@@ -87,73 +92,6 @@ export const httpClient = async (url, options = {}) => {
 
 
 
-
-
-
-type PostParams = {
-    brand: string;
-    name: string;
-    price: string;
-    details?: Record<string, any>;
-    category:string[],
-    options:string,
-    productImage: {
-      rawFile: File;
-      src?: string;
-      title?: string;
-    };
-  };
-  
-  const createPostFormData = (
-    params: CreateParams<PostParams> | UpdateParams<PostParams>
-  ) => {
-    
-    const formData = new FormData();
-    params.data.productImage?.rawFile && formData.append("file", params.data.productImage.rawFile);
-    params.data.name && formData.append("name", params.data.name);
-    params.data.brand && formData.append("brand", params.data.brand);
-    params.data.price && formData.append("price", Number(params.data.price).toFixed(2));
-   
-    params.data.options && formData.append("options", params.data.options);
-    if (params.data.category && params.data.category.length > 0) {
-        params.data.category.forEach((cat, index) => {
-            formData.append(`category[${index}]`, cat);
-        });
-    }
-    if (params.data.Certifications) {
-        params.data.Certifications.forEach((cert, index) => {
-          formData.append(`details[Certifications][${index}]`, cert);
-        });
-      }
-    
-      if (params.data.dietaryRestrictions      ) {
-        params.data.dietaryRestrictions.forEach((restriction, index) => {
-          formData.append(`details[DietaryRestrictions][${index}]`, restriction);
-        });
-      }
-    
-      // Append other details
-      if (params.data.details) {
-        const details = params.data.details;
-    
-        // Handle other fields in details
-        Object.entries(details).forEach(([key, value]) => {
-          if (key !== 'Certifications' && key !== 'DietaryRestrictions') {
-            if (value === undefined || value === null) {
-              formData.append(`details[${key}]`, '');
-            } else {
-              formData.append(`details[${key}]`, value.toString());
-            }
-          }
-        });
-      }
-    
-
-
-
-   
-    return formData
-}
 
 
 
@@ -329,12 +267,13 @@ const customDataProvider = {
            data= params.data
         }
         if(resource === 'brands'){
-           
+            
             data= params.data
          }
          if(resource === 'order'){
            
-            data= params.data
+            data= JSON.stringify(params.data)
+            headers={'Content-Type':'application/json'}
          }
 
         
@@ -391,24 +330,31 @@ const customDataProvider = {
                     resolve({ data: params.data });
                 });
             }
+            console.log(params.data)
     
             createRequestInProgress = true;
             let formData;
+            let headers={};
             if (resource === 'products') { 
-                formData = createPostFormData(params);
+                formData = params.data
             } else if (resource === 'brands') {
                 formData = createBrandFormData(params);
             } else if(resource === 'news') {
                 formData = createNewsFormData(params);
+                
             }
     
+              
+           
             try {
                 const response = await httpClient(`${apiUrl}/${resource}/create`, {
                     method: 'POST',
+                    headers:headers,
                     body: formData,
                 });
                 handleHttpError(response);
-                const json = await response.json();
+                console.log(response)
+                const json = response;
                 return { data: { ...params.data, id: json.id } };
             } catch (error) {
                 console.error('Error creating resource:', error);

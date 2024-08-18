@@ -74,6 +74,7 @@ const BrandEdit = (props) => {
         const formData = new FormData();
     
         if (imageFile) {
+            console.log(imageFile)
             formData.append('file', imageFile);
         }
        

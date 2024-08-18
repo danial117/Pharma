@@ -32,7 +32,7 @@ const CustomImageUpload = ({ source, onChange }) => {
             {showImage && (
                 <div className="mb-2  flex w-full">
                     <img
-                        src={`${process.env.VITE_API_URL}/assets/${resource}/${showImage}`}
+                        src={`${process.env.VITE_API_URL}/assets/${resource}/md/${showImage.medium}`}
                         alt="Product"
                         className="w-[50%] mx-auto h-auto object-cover border border-gray-300 rounded-md"
                     />

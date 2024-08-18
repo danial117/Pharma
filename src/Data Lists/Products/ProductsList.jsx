@@ -6,29 +6,59 @@ import { List, Datagrid, TextField, useRecordContext, useResourceContext,CreateB
     SelectColumnsButton,
     TopToolbar,
     SearchInput,
-    ShowButton, } from 'react-admin';
+    ShowButton,FilterForm,TextInput } from 'react-admin';
+
+     import { Stack } from '@mui/material';
 
     const ImageField = ({ source }) => {
         const record = useRecordContext();
         
         if (!record ) return null;
-        return <img src={`${process.env.VITE_API_URL}/assets/products/${record.productImage}`} alt="" style={{ maxWidth: '200px', height: '100px' }} />;
+        return <img src={`${process.env.VITE_API_URL}/assets/products/sm/${record.productImage.small}`} alt="" style={{ maxWidth: '200px', height: '100px' }} />;
     };
 
-    const ListActions = () => (
-        <TopToolbar>
-            <SelectColumnsButton />
-            <ImageField />
-            <CreateButton/>
-            <ExportButton/>
-        </TopToolbar>
-    );
+
+    const postFilters = [
+   
+        <TextInput label="Product Name" source="name" defaultValue="" />,
+        <TextInput label="Product Brand" source="brand" defaultValue="" />,
+        <TextInput label="Product Price" source="price" defaultValue="" />,
+        <TextInput label="Product Options" source="option" defaultValue="" />
+        
+       
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    ];
+    
+    const ListToolbar = () => (
+        <Stack direction="column"  >
+            <FilterForm filters={postFilters} />
+            <div >
+                <FilterButton filters={postFilters} />
+                <ExportButton/>
+                <CreateButton />
+              
+              
+            </div>
+        </Stack>
+    )
+
+  
 
 const ProductsList = (props) =>{ 
   
     
     return(
-    <List actions={<ListActions/>}>
+    <List actions={<ListToolbar/>}>
         <Datagrid rowClick="edit">
             <TextField  source="id" />
             <ImageField />
