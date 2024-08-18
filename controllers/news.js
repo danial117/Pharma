@@ -10,7 +10,7 @@ export const AdminCreateNews=async(req,res)=>{
         const data = req.body;
         
         const file=req.file
-       
+        console.log(file)
        
        
     
@@ -32,7 +32,7 @@ export const AdminCreateNews=async(req,res)=>{
        
        
        
-        res.status(201).json(updatedNews);
+        res.status(201).json({id:updatedNews._id});
 
 
 
@@ -146,38 +146,74 @@ export const AdminModifyNews=async(req,res)=>{
 
 
 
-export const AdminGetAllNewsBlogs=async(req,res)=>{
 
 
 
-  try{
-      
-      const news =await NewsBlog.find();
-      
-      const modifiedNews = news.map(news => {
-        const newsObject = news.toObject(); // Convert Mongoose document to plain JavaScript object
-        newsObject.id = newsObject._id;
-        delete newsObject._id;
-        return newsObject;
-      });
-      res.set({
-        'X-Content-Header': 'application/json',
-        'X-Total-Count': modifiedNews.length,
-      });
+
+
+
+export const AdminGetAllNewsBlogs = async (req, res) => {
+  try {
+    // Extract filter, range, and sort parameters from the query
+    const filter = JSON.parse(req.query.filter || '{}');
+    const range = JSON.parse(req.query.range || '[0, 10]');
+    const sort = JSON.parse(req.query.sort || '["createdAt", "ASC"]');
     
-  
-      res.status(200).json(modifiedNews);
-  
-  
-  
-    }catch(error){
-      console.log(error)
-      res.status(500).json('Internal Server Error')
-  
+    // Convert the sort array to an object for MongoDB
+    const sortObject = {};
+    sortObject[sort[0]] = sort[1] === 'DESC' ? -1 : 1;
+
+    // Extract pagination parameters
+    const skip = range[0];
+    const limit = range[1] - range[0] + 1;
+
+    // Build the query based on filter
+    const query = {};
+    if (filter) {
+      for (const key in filter) {
+        if (filter.hasOwnProperty(key)) {
+          // Check if the value is a number or a string
+          if (!isNaN(filter[key])) {
+            query[key] = filter[key]; // Direct match for numeric fields
+          } else {
+            query[key] = { $regex: new RegExp(filter[key], 'i') }; // Case-insensitive search for string fields
+          }
+        }
+      }
     }
 
-  
-}
+    console.log(query)
+    // Find orders based on the filter, sort, skip, and limit
+    const newsBlogs = await NewsBlog.find(query).sort(sortObject).skip(skip).limit(limit);
+    const totalNews = await NewsBlog.countDocuments(query);
+
+    
+    const modifiedNews = newsBlogs.map(news => {
+      const newsObject = news.toObject(); // Convert Mongoose document to plain JavaScript object
+      newsObject.id = newsObject._id;
+      delete newsObject._id;
+      return newsObject;
+    });
+
+    res.set({
+      'Content-Range': `news ${range[0]}-${range[1]}/${totalNews}`,
+      'X-Total-Count': totalNews,
+    });
+
+    res.status(200).json(modifiedNews);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json('Internal Server Error');
+  }
+};
+
+
+
+
+
+
+
+
 
 
 

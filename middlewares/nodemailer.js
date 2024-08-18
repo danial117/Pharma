@@ -903,15 +903,37 @@ next()
 
 
 
+export const ThankYouMail=async(name,email)=>{
+
+
+const injectHTML = `
+    <html>
+    <body>
+      <h1>Thank You for Contacting Us</h1>
+      <p>Hi ${name},</p>
+      <p>Thank you for reaching out to us. We have received your message and our team is reviewing it. We will get back to you as soon as possible.</p>
+      <p>Best regards,<br>Infovit Team</p>
+    </body>
+    </html>
+  `;
+
+
+  const info = await transporter.sendMail({
+    from: '"SOCIOPEDIA" <danigondal117@gmail.com>', // sender address
+    to: email, // list of receivers
+    html: injectHTML, // html body
+    subject:'Thankyou for contacting us' 
+                                        });
+    
+  
+  
+  console.log("Message sent: %s", info.messageId);
 
 
 
 
 
-
-
-
-
+}
 
 
 

@@ -1,6 +1,7 @@
 
 import Brand from "../models/BrandModel.js";
 import Product from "../models/ProductModel.js";
+import { compressAndSaveProductImage } from "../utils/compressImages.js";
 
 
 
@@ -116,38 +117,87 @@ export const GetProduct=async(req,res)=>{
 
 
 
-export const AdminGetUserProducts=async(req,res)=>{
 
 
 
-    try{
-    
-        const products =await Product.find({});
-       
-        const modifiedProducts = products.map(products => {
-          const productsObject = products.toObject(); // Convert Mongoose document to plain JavaScript object
-          productsObject.id = productsObject._id;
-          delete productsObject._id;
-          return productsObject;
-        });
-        res.set({
-          'X-Content-Header': 'application/json',
-          'X-Total-Count': modifiedProducts.length,
-        });
+
+
+
+
+
+
+  export const AdminGetUserProducts = async (req, res) => {
+    try {
+      // Extract filter, range, and sort parameters from the query
+      const filter = JSON.parse(req.query.filter || '{}');
+      const range = JSON.parse(req.query.range || '[0, 10]');
+      const sort = JSON.parse(req.query.sort || '["createdAt", "ASC"]');
       
-    
-        res.status(200).json(modifiedProducts);
-    
-    
-    
-      }catch(error){
-        console.log(error)
-        res.status(500).json('Internal Server Error')
-    
+      // Convert the sort array to an object for MongoDB
+      const sortObject = {};
+      sortObject[sort[0]] = sort[1] === 'DESC' ? -1 : 1;
+  
+      // Extract pagination parameters
+      const skip = range[0];
+      const limit = range[1] - range[0] + 1;
+  
+      // Build the query based on filter
+      const query = {};
+      if (filter) {
+        for (const key in filter) {
+          if (filter.hasOwnProperty(key)) {
+            // Check if the value is a number or a string
+            if (!isNaN(filter[key])) {
+              query[key] = filter[key]; // Direct match for numeric fields
+            } else {
+              query[key] = { $regex: new RegExp(filter[key], 'i') }; // Case-insensitive search for string fields
+            }
+          }
+        }
       }
+  
+      console.log(query)
+      // Find orders based on the filter, sort, skip, and limit
+      const products = await Product.find(query).sort(sortObject).skip(skip).limit(limit);
+      const totalProducts = await Product.countDocuments(query);
+  
+      
+      const modifiedProducts = products.map(product => {
+        const productObject = product.toObject(); // Convert Mongoose document to plain JavaScript object
+        productObject.id = productObject._id;
+        delete productObject._id;
+        return productObject;
+      });
+  
+      res.set({
+        'Content-Range': `orders ${range[0]}-${range[1]}/${totalProducts}`,
+        'X-Total-Count': totalProducts,
+      });
+  
+      res.status(200).json(modifiedProducts);
+    } catch (error) {
+      console.log(error);
+      res.status(500).json('Internal Server Error');
+    }
+  };
 
-    
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -184,13 +234,20 @@ export const AdminModifyProduct=async(req,res)=>{
     try{
 
         const data=req.body;
-       console.log(req.body)
-       console.log(req.file)
+      
         const {productId} =req.params;
+        
+        
+
         if(req.file){
           const file=req.file
-          console.log(file)
-          data['productImage']=file.filename
+        const {outputMediumFileName,outputSmallFileName}= await compressAndSaveProductImage(file.filename)
+          
+          data['productImage'] = {
+            large: file.filename,
+            medium:outputMediumFileName,
+            small:outputSmallFileName
+          };
 
         }
         
@@ -240,12 +297,14 @@ export const AdminCreateProduct=async(req,res)=>{
     try{
       
         const data = req.body;
-        console.log(data)
+        
         const file=req.file
-
+        
+        
         const brand=await Brand.findOne({name:data.brand})
-       
-    
+
+       const {outputMediumFileName,outputSmallFileName}= await compressAndSaveProductImage(file.filename)
+      
         // Find the product by ID
        
       const product=new Product({
@@ -256,13 +315,18 @@ export const AdminCreateProduct=async(req,res)=>{
         details:data.details,
         category:data.category,
         options:data.options,
-        productImage:file.filename
+        productImage:{
+          medium:outputMediumFileName,
+          large:file.filename,
+          small:outputSmallFileName
+        }
       })
 
         if (!product) {
           return res.status(404).json({ error: 'Product not found' });
         }
         const updatedProduct = await product.save();
+       
     
         // Overwrite product fields with the fields from req.body
      
@@ -271,11 +335,12 @@ export const AdminCreateProduct=async(req,res)=>{
        
        
        
-        res.status(200).json(updatedProduct);
+        res.status(200).json({id:updatedProduct._id});
 
 
 
     }catch(error){
+      console.log(error)
         res.status(500).json('Internal Server Error')
     }
 }

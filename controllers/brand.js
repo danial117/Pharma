@@ -2,35 +2,69 @@ import Brand from "../models/BrandModel.js"
 import Product from "../models/ProductModel.js";
 
 
-export const GetAdminBrands=async(req,res)=>{
 
-    try{
 
-        const brands=await Brand.find({});
 
-        
-        const modifiedBrands = brands.map(brand => {
-          const brandObject = brand.toObject(); // Convert Mongoose document to plain JavaScript object
-          brandObject.id = brandObject._id;
-          delete brandObject._id;
-          return brandObject;
-        });
-        res.set({
-          'X-Content-Header': 'application/json',
-          'X-Total-Count': modifiedBrands.length,
-        });
-       
+
+
+
+export const GetAdminBrands = async (req, res) => {
+  try {
+    // Extract filter, range, and sort parameters from the query
+    const filter = JSON.parse(req.query.filter || '{}');
+    const range = JSON.parse(req.query.range || '[0, 10]');
+    const sort = JSON.parse(req.query.sort || '["createdAt", "ASC"]');
     
-        res.status(200).json(modifiedBrands);
+    // Convert the sort array to an object for MongoDB
+    const sortObject = {};
+    sortObject[sort[0]] = sort[1] === 'DESC' ? -1 : 1;
 
+    // Extract pagination parameters
+    const skip = range[0];
+    const limit = range[1] - range[0] + 1;
 
-
-
+    // Build the query based on filter
+    const query = {};
+    if (filter) {
+      for (const key in filter) {
+        if (filter.hasOwnProperty(key)) {
+          // Check if the value is a number or a string
+          if (!isNaN(filter[key])) {
+            query[key] = filter[key]; // Direct match for numeric fields
+          } else {
+            query[key] = { $regex: new RegExp(filter[key], 'i') }; // Case-insensitive search for string fields
+          }
+        }
+      }
     }
-    catch(err){
-        console.log(err)
-    }
-}
+
+    console.log(query)
+    // Find orders based on the filter, sort, skip, and limit
+    const brands = await Brand.find(query).sort(sortObject).skip(skip).limit(limit);
+    const totalBrands = await Brand.countDocuments(query);
+
+    
+    const modifiedBrands = brands.map(brand => {
+      const brandObject = brand.toObject(); // Convert Mongoose document to plain JavaScript object
+      brandObject.id = brandObject._id;
+      delete brandObject._id;
+      return brandObject;
+    });
+
+    res.set({
+      'Content-Range': `brands ${range[0]}-${range[1]}/${totalBrands}`,
+      'X-Total-Count': totalBrands,
+    });
+
+    res.status(200).json(modifiedBrands);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json('Internal Server Error');
+  }
+};
+
+
+
 
 
 
@@ -48,7 +82,7 @@ export const AdminCreateBrand=async(req,res)=>{
         
         const brandSaved=await brand.save()
 
-        res.status(201).json('Created')
+        res.status(201).json({id:brandSaved._id})
 
 
         
@@ -149,7 +183,7 @@ export const AdminModifyBrand=async(req,res)=>{
 
         const data=req.body;
         const {brandId} =req.params;
-
+        console.log(data)
         if(req.file){
           const file=req.file
          
@@ -157,7 +191,7 @@ export const AdminModifyBrand=async(req,res)=>{
    
         }
 
-        const brand = await Product.findById(brandId);
+        const brand = await Brand.findById(brandId);
 
         if (!brand) {
           return res.status(404).json({ error: 'Brand not found' });

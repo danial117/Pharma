@@ -21,12 +21,7 @@ import { verifyRefreshToken,generateAccessToken, generateRefreshToken } from './
 import passport from './middlewares/passport.js';
 import BrandRouter from './routers/brand.js'
 import NewsRouter from './routers/news.js'
-
-
-
-
-
-
+import ContactRouter from './routers/customerContact.js'
 
 
 
@@ -38,7 +33,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 
-app.use("/assets/products", express.static(path.join(__dirname, "public/products")));
+app.use("/assets/products/lg", express.static(path.join(__dirname, "public/products/large")));
+app.use("/assets/products/md", express.static(path.join(__dirname, "public/products/medium")));
+app.use("/assets/products/sm", express.static(path.join(__dirname, "public/products/small")));
 app.use("/assets/brands", express.static(path.join(__dirname, "public/brands")));
 app.use("/assets/news", express.static(path.join(__dirname, "public/news")));
 
@@ -63,7 +60,7 @@ app.use(cors({ origin: allowedOrigins, credentials: true }));
   }));
   
   app.use(express.json()); 
-  app.use(express.urlencoded({extended:true}));
+  app.use(express.urlencoded({  extended: true }));
   
 
 
@@ -154,6 +151,7 @@ app.use('/content',ContentRouter)
 app.use('/brands',BrandRouter)
 app.use('/admin',AdminRouter)
 app.use('/news',NewsRouter)
+app.use('/contact',ContactRouter)
 
 
 

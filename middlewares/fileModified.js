@@ -25,9 +25,27 @@ export const modifiedProductFile = async (req, res,next) => {
         }
 
         // Extract productImage file name and construct the file path
-        const productImageFileName = product.productImage // Adjust according to your schema
+        const productImageFileName = product.productImage.large.replace('_large','') // Adjust according to your schema
         if (productImageFileName) {
-            const imagePath = path.join(__dirname, '../public/products', productImageFileName);
+            const imageSizes = ['large', 'medium', 'small']; // Array of directory names corresponding to image sizes
+            const imageBaseName = productImageFileName.replace(/(_large|_medium|_small)/, '').replace('.png',''); // Remove size suffix
+            console.log(imageBaseName)
+            imageSizes.forEach((size) => {
+                const imagePath = path.join(__dirname, `../public/products/${size}`, `${imageBaseName}_${size}.png`);
+                
+                // Remove the image file if it exists
+                if (fs.existsSync(imagePath)) {
+                    fs.unlinkSync(imagePath);
+                    console.log('Deleted:', imagePath);
+                } else {
+                    console.log('File not found:', imagePath);
+                }
+            }
+            )
+        }
+
+        if (productImageFileName) {
+            const imagePath = path.join(__dirname, '../public/products/lg', productImageFileName);
 
             // Remove the image file if it exists
             if (fs.existsSync(imagePath)) {
@@ -110,7 +128,7 @@ export const modifiedBrandFile = async (req, res,next) => {
         const brandImageFileName = brand.brandLogoPath
         // Adjust according to your schema
         if (brandImageFileName) {
-            const imagePath = path.join(__dirname, '../public/branda', brandImageFileName);
+            const imagePath = path.join(__dirname, '../public/brands', brandImageFileName);
 
             // Remove the image file if it exists
             if (fs.existsSync(imagePath)) {

@@ -10,7 +10,7 @@ const __dirname = path.dirname(__filename);
 
 // Define directories for different routes
 const newsDir = path.join(__dirname, '../public/news');
-const productsDir = path.join(__dirname, '../public/products');
+const productsDir = path.join(__dirname, '../public/products/large');
 const brandsDir = path.join(__dirname, '../public/brands');
 
 // Create directories if they don't exist
@@ -24,7 +24,7 @@ if (!fs.existsSync(productsDir)) {
 
 // Function to determine the upload directory based on request URL
 const getDestinationFolder = (req) => {
-  console.log(req.body)
+ 
   if (req.originalUrl.startsWith('/news/')) {
     return newsDir;
   } else if (req.originalUrl.startsWith('/products/')) {
@@ -49,8 +49,8 @@ const storage = multer.diskStorage({
     }
   },
   filename: (req, file, cb) => {
-    console.log(file)
-    cb(null, `${Date.now()}-${file.originalname}`);
+  
+    cb(null, `${Date.now()}-${file.originalname.replace(/ /g, '_').replace('.png','_large.png')}`);
   },
 });
 
@@ -68,7 +68,7 @@ const fileFilter = (req, file, cb) => {
       cb(new Error('Only images are allowed'));
     }
   } catch (error) {
-    console.log(error);
+    
     cb(new Error('Error processing file'));
   }
 };
@@ -78,7 +78,7 @@ const fileFilter = (req, file, cb) => {
 // Initialize multer with storage and file filter
 export const upload = multer({
   storage: storage,
-  limits: { fileSize: 1024 * 1024 * 5 }, // Limit file size to 5MB
+  limits: { fileSize: 1024 * 1024 * 10 }, // Limit file size to 5MB
   fileFilter: fileFilter,
 });
 

@@ -495,7 +495,7 @@ function generateOrderNumber() {
       // Extract filter, range, and sort parameters from the query
       const filter = JSON.parse(req.query.filter || '{}');
       const range = JSON.parse(req.query.range || '[0, 10]');
-      const sort = JSON.parse(req.query.sort || '["_id", "ASC"]');
+      const sort = JSON.parse(req.query.sort || '["createdAt", "ASC"]');
       
       // Convert the sort array to an object for MongoDB
       const sortObject = {};

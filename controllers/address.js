@@ -107,32 +107,62 @@ export const deleteAddress = async (req, res) => {
 
 
 
-  export const GetAdminUserAddresses=async(req,res)=>{
 
-    try{
 
-      const addresses=await Address.find({});
+
+
+  
+  export const GetAdminUserAddresses = async (req, res) => {
+    try {
+      // Extract filter, range, and sort parameters from the query
+      const filter = JSON.parse(req.query.filter || '{}');
+      const range = JSON.parse(req.query.range || '[0, 10]');
+      const sort = JSON.parse(req.query.sort || '["createdAt", "ASC"]');
+      
+      // Convert the sort array to an object for MongoDB
+      const sortObject = {};
+      sortObject[sort[0]] = sort[1] === 'DESC' ? -1 : 1;
+  
+      // Extract pagination parameters
+      const skip = range[0];
+      const limit = range[1] - range[0] + 1;
+  
+      // Build the query based on filter
+      const query = {};
+      if (filter) {
+        for (const key in filter) {
+          if (filter.hasOwnProperty(key)) {
+            // Check if the value is a number or a string
+            if (!isNaN(filter[key])) {
+              query[key] = filter[key]; // Direct match for numeric fields
+            } else {
+              query[key] = { $regex: new RegExp(filter[key], 'i') }; // Case-insensitive search for string fields
+            }
+          }
+        }
+      }
+  
+      console.log(query)
+      // Find orders based on the filter, sort, skip, and limit
+      const addresses = await Address.find(query).sort(sortObject).skip(skip).limit(limit);
+      const totalAddresses = await Address.countDocuments(query);
+  
+      
       const modifiedAddresses = addresses.map(address => {
         const addressObject = address.toObject(); // Convert Mongoose document to plain JavaScript object
         addressObject.id = addressObject._id;
         delete addressObject._id;
         return addressObject;
       });
+  
       res.set({
-        'X-Content-Header': 'application/json',
-        'X-Total-Count': modifiedAddresses.length,
+        'Content-Range': `orders ${range[0]}-${range[1]}/${totalAddresses}`,
+        'X-Total-Count': totalAddresses,
       });
-      console.log(modifiedAddresses)
   
       res.status(200).json(modifiedAddresses);
-  
-  
-  
-    }catch(error){
-      console.log(error)
-      res.status(500).json('Internal Server Error')
-  
+    } catch (error) {
+      console.log(error);
+      res.status(500).json('Internal Server Error');
     }
-
-
-  }
+  };

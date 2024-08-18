@@ -20,10 +20,21 @@ const ProductSchema= mongoose.Schema({
         type:String,
         trim: true
     },
-    productImage:{
-         type:String,
-         trim: true
-    },
+    productImage: {
+        medium: {
+          type: String,
+          trim: true,
+        },
+        large: {
+          type: String,
+          trim: true,
+        },
+        small:{
+            type: String,
+          trim: true,
+
+        }
+      },
     options:{
         type:String,
         trim: true
@@ -38,11 +49,12 @@ const ProductSchema= mongoose.Schema({
         set: v => v ? mongoose.Types.Decimal128.fromString(v) : undefined // Optional: Convert string to Decimal128
     },
     details:{
-        Description:String,
-        Warnings:String,
+        Description: { type: String, default: '' },
+        Warnings: { type: String, default: '' },
+        More: { type: String, default: '' },
         DietaryRestrictions: [String],
-        Certifications: [String],
-        More:String
+        Certifications: [String]
+        
 
     }},{
         toJSON: { getters: true }, // Ensure getters are used when converting to JSON

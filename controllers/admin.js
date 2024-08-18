@@ -8,6 +8,7 @@ import mongoose from "mongoose";
 import { generateAccessToken,generateAdminRefreshToken } from "../middlewares/auth.js";
 import { generateOtp,isOtpValid } from "../utils/otp.js";
 import { sendAdminOTPMail } from "../middlewares/nodemailer.js";
+import Brand from "../models/BrandModel.js";
 
 
 
@@ -106,10 +107,9 @@ export const AdminSearchQuery=async(req,res)=>{
               ]
             });
 
-           console.log(product)
+          const brand=await Brand.findById(product.brandId)
 
-
-            res.status(200).json({product})
+            res.status(200).json({product,brand})
 
       }
 

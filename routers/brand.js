@@ -9,7 +9,7 @@ import { modifiedBrandFile } from '../middlewares/fileModified.js';
 
 
 router.get('/',GetBrands)
-router.get('/:brandName',GetBrandProducts)
+router.get('/name/:brandName',GetBrandProducts)
 
 
 

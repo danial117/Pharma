@@ -5,9 +5,7 @@ on:
     branches:
       - server
 
-  pull_request:
-    branches:
-      - server
+  
 
 jobs:
   ssh-folder-management:
@@ -49,5 +47,8 @@ jobs:
             # Create the 'public' directory with 'brands', 'products', and 'news' subdirectories
             mkdir -p /home/infovit-api/htdocs/api.infovit.us/public/brands
             mkdir -p /home/infovit-api/htdocs/api.infovit.us/public/products
+            mkdir -p /home/infovit-api/htdocs/api.infovit.us/public/products/large
+            mkdir -p /home/infovit-api/htdocs/api.infovit.us/public/products/medium
+            mkdir -p /home/infovit-api/htdocs/api.infovit.us/public/products/small
             mkdir -p /home/infovit-api/htdocs/api.infovit.us/public/news
           EOF
