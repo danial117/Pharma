@@ -3,8 +3,62 @@
 import Footer from "./Footer";
 
 import NavBar from './NavBar'
+import { useState } from "react";
+
 
 const Contact=()=>{
+
+    // State hooks for form fields
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [message, setMessage] = useState('');
+
+  // State hooks for validation errors
+  const [errors, setErrors] = useState({ name: '', email: '', message: '' });
+
+  // Form submission handler
+  const handleSubmit = async (event) => {
+    event.preventDefault(); // Prevent the default form submission behavior
+
+    // Validate form fields
+    const validationErrors = {
+      name: name.trim() === '' ? 'Name is required' : '',
+      email: email.trim() === '' ? 'Email is required' : !/\S+@\S+\.\S+/.test(email) ? 'Email is invalid' : '',
+      message: message.trim() === '' ? 'Message is required' : ''
+    };
+
+    setErrors(validationErrors);
+
+    // If there are validation errors, stop form submission
+    if (Object.values(validationErrors).some(error => error !== '')) {
+      return;
+    }
+
+    // Create an object with form data
+    const formData = { name, email, message };
+
+    // Perform form submission (e.g., send data to an API)
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/contact/request`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+
+      if (response.status === 201) {
+        setName('');
+        setEmail('');
+        setMessage('');
+        alert('Thank you for contacting us!');
+      } else {
+        alert('There was an error submitting the form. Please try again later.');
+      }
+    } catch (error) {
+     
+      alert('There was an error submitting the form. Please try again later.');
+    }
+  };
+  
 
 
 
@@ -19,11 +73,33 @@ const Contact=()=>{
                     <div className="basis-[70%] xs:max-md:basis-[100%] xs:max-md:mx-auto xs:max-md:w-[80%] w-[50%] mx-auto flex flex-col gap-y-2">
                         <p className="font-Lexend text-[2.5rem]">Get in Touch</p>
                         <p className="font-Livvic text-[1.3rem]">Please fill out the form in order to make query.</p>
-                        <input type="text" placeholder="Name" className="focus:outline-none w-[70%] xs:max-md:w-full font-Poppins border-2 border-gray-300 p-2 rounded-md text-[20px]" />
-                        <input type="text" placeholder="Your Email Address" className="focus:outline-none w-[70%] xs:max-md:w-full font-Poppins border-2 border-gray-300 p-2 rounded-md text-[20px]" />
-                        
-                        <textarea placeholder="Message" className="focus:outline-none w-[70%] xs:max-md:w-full font-Poppins border-2 border-gray-300 p-2 rounded-md text-[20px]" rows={4} />
-                        <button className="bg-emerald-500 font-Poppins text-xl text-white py-2 rounded-md w-[30%]">Send</button>
+                        <input 
+                type="text" 
+                placeholder="Name" 
+                className={`focus:outline-none w-[70%] xs:max-md:w-full font-Poppins border-2 p-2 rounded-md text-[20px] ${errors.name ? 'border-red-500' : 'border-gray-300'}`} 
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+              {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
+              
+              <input 
+                type="email" 
+                placeholder="Your Email Address" 
+                className={`focus:outline-none w-[70%] xs:max-md:w-full font-Poppins border-2 p-2 rounded-md text-[20px] ${errors.email ? 'border-red-500' : 'border-gray-300'}`} 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
+              
+              <textarea 
+                placeholder="Message" 
+                className={`focus:outline-none w-[70%] xs:max-md:w-full font-Poppins border-2 p-2 rounded-md text-[20px] ${errors.message ? 'border-red-500' : 'border-gray-300'}`} 
+                rows={4}
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+              />
+              {errors.message && <p className="text-red-500 text-sm">{errors.message}</p>}
+                        <button onClick={handleSubmit} className="bg-emerald-500 font-Poppins text-xl text-white py-2 rounded-md w-[30%]">Send</button>
 
                     
                     </div>
