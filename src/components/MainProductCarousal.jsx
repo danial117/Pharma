@@ -142,7 +142,7 @@ const MainProductCarousal=()=>{
                     <div key={index} className="pl-4 xs:max-sm:pl-[2px]">
                     <div className="flex gap-y-2 h-[350px]  bg-white rounded-md flex-col">
                                     <div onClick={()=>{window.location.href=`/productPage/${data._id}`}} className="cursor-pointer w-[90%] h-[50%] mt-6  pb-2 border-gray-200  mx-auto">
-                                        <img className="w-[50%] h-[100%] mx-auto my-auto" src={`${process.env.REACT_APP_API_URL}/assets/products/${data.productImage}`}/>
+                                        <img className="w-[50%] h-[100%] mx-auto my-auto" src={`${process.env.REACT_APP_API_URL}/assets/products/md/${data.productImage.medium}`}/>
             
                                     </div>
                                     <div className="m-2 flex flex-col gap-y-auto h-full justify-between">

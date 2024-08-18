@@ -24,7 +24,7 @@ const BrandPage = () => {
 
     useEffect(()=>{
 
-        fetch(`${process.env.REACT_APP_API_URL}/brands/${brandName}`,{method:'GET'}).then((response)=>response.json()).then((data)=>{
+        fetch(`${process.env.REACT_APP_API_URL}/brands/name/${brandName}`,{method:'GET'}).then((response)=>response.json()).then((data)=>{
           setProducts(data)
         })
 
@@ -45,7 +45,7 @@ const BrandPage = () => {
               return (
                 <div key={index} className="flex gap-y-2 border-2 bg-white rounded-md border-emerald-500 flex-col">
                   <div onClick={() => { navigate(`/productPage/${data._id}`) }} className="w-[90%] cursor-pointer sm:max-md:w-[100%] xs:max-sm:w-[100%] mt-6 border-b-2 pb-2 border-gray-200 mx-auto">
-                    <img className="w-[50%] h-[100%] mx-auto my-auto" src={`${process.env.REACT_APP_API_URL}/assets/products/${data.productImage}`} alt={data.name} />
+                    <img className="w-[50%] h-[100%] mx-auto my-auto" src={`${process.env.REACT_APP_API_URL}/assets/products/md/${data.productImage.medium}`} alt={data.name} />
                   </div>
                   <div className="m-2 relative h-[180px] flex flex-col">
                     <p className="font-Abel text-[12px] xs:max-sm:text-[10px] font-bold text-emerald-400 my-[2px]">{data.brand}</p>

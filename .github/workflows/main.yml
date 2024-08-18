@@ -5,9 +5,7 @@ on:
     branches:
       - client
 
-  pull_request:
-    branches:
-      - client
+  
 
 jobs:
   ssh-folder-management:

@@ -110,7 +110,7 @@ if (foundItem) {
         : 
           <img
             className="w-[60%]  h-[350px] mx-auto my-auto"
-            src={`${process.env.REACT_APP_API_URL}/assets/products/${product.productImage}`}
+            src={`${process.env.REACT_APP_API_URL}/assets/products/lg/${product.productImage.large}`}
             alt={product.name}
           />
         }
@@ -256,7 +256,7 @@ if (foundItem) {
 
                         :
                         <div className="flex gap-y-2 w-full h-[auto] flex-col">
-                      {product.details.Description !== 'undefined' &&  <div onClick={()=>{setProductDescription('Description'); if(productDescription==='Description'){setProductDescription(false)}}} className="cursor-pointer border-b-2 py-2 border-gray-300 ">
+                      {product.details.Description !== '' &&  <div onClick={()=>{setProductDescription('Description'); if(productDescription==='Description'){setProductDescription(false)}}} className="cursor-pointer border-b-2 py-2 border-gray-300 ">
                         <div className="flex justify-between">
                         <button className="text-gray-800 text-[13px] font-Lexend">Description</button>
                         <div className="text-gray-400">
@@ -282,7 +282,7 @@ if (foundItem) {
 
 
 
-              {product.details.Warnings !== 'undefined' &&
+              {product.details.Warnings !== '' &&
                     <div onClick={()=>{setProductDescription('Warnings'); if(productDescription==='Warnings'){setProductDescription(false)}}} className="cursor-pointer border-b-2 py-2 border-gray-300 ">
                         <div className="flex justify-between">
                         <button className="text-gray-800 text-[13px] font-Lexend">Warnings</button>
@@ -310,7 +310,7 @@ if (foundItem) {
 
 
 
-{    product.details.Certifications[0] !== 'undefined' &&
+{  Array.isArray(product.details.Certifications) &&  product.details.Certifications.length > 0 &&
                     <div onClick={()=>{setProductDescription('Certificate'); if(productDescription==='Certificate'){setProductDescription(false)}}} className="cursor-pointer border-b-2 py-2 border-gray-300 ">
                         <div className="flex justify-between">
                         <button className="text-gray-800 text-[13px] font-Lexend">Certificate</button>
@@ -348,7 +348,7 @@ if (foundItem) {
 
 
 
-{product.details.DietaryRestrictions[0] !== 'undefined' &&
+{Array.isArray(product.details.DietaryRestrictions) &&  product.details.DietaryRestrictions.length > 0 &&
                     <div onClick={()=>{setProductDescription('DietaryRestrictions'); if(productDescription==='DietaryRestrictions'){setProductDescription(false)}}} className="cursor-pointer border-b-2 py-2 border-gray-300 ">
                         <div className="flex justify-between">
                         <button className="text-gray-800 text-[13px] font-Lexend">Dietary Restrictions</button>
@@ -390,7 +390,7 @@ if (foundItem) {
 
 
 
-                  { product.details.More !== 'undefined' && <div onClick={()=>{setProductDescription('More'); if(productDescription==='More'){setProductDescription(false)}}} className="cursor-pointer border-b-2 py-2 border-gray-300 ">
+                  { product.details.More !== '' && <div onClick={()=>{setProductDescription('More'); if(productDescription==='More'){setProductDescription(false)}}} className="cursor-pointer border-b-2 py-2 border-gray-300 ">
                         <div className="flex justify-between">
                         <button className="text-gray-800 text-[13px] font-Lexend">More</button>
                         <div className="text-gray-400">
