@@ -1,12 +1,11 @@
 
 import { KeyboardArrowDownRounded,ShoppingCartRounded,MenuRounded,CloseRounded,AccountCircle } from "@mui/icons-material";
 import { useEffect, useState,useContext } from "react";
-import LoginWidget from "../widget/LoginWidget";
 import Cart from "../widget/Cart";
 import { useMediaQuery } from "@mui/material";
 import { useSelector } from "react-redux";
 import { CartContext } from "../cartContext/cartContext";
-import { Menu, MenuItem, IconButton, Avatar } from '@mui/material';
+import { Menu, MenuItem } from '@mui/material';
 import { useDispatch } from "react-redux";
 import { setLogoutAsync } from "../state";
 import { TruncateText } from "../utility functions/TranctuateText";

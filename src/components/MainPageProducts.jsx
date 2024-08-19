@@ -177,7 +177,7 @@ const MainPageProducts=()=>{
 
        
        <div className="w-[80%] xs:max-lg:w-[85%] mx-auto">
-           <p className="font-Poppins text-cyan-900 text-[1.3rem] sm:max-lg:mt-14 sm:max-lg:text-[1rem] my-6">Product Category</p>
+           <p className="font-Poppins text-cyan-900 text-[1.3rem] sm:max-lg:mt-14 sm:max-lg:text-[1rem] my-6">All Products:</p>
 
            <div className="flex flex-row gap-x-12 w-[100%] mx-auto">
          

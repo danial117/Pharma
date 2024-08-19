@@ -33,6 +33,7 @@ const ProductPage=()=>{
      const [carted,setCarted] = useState(false);
 
 
+
      const fetchProduct=async ()=>{
        await fetch(`${process.env.REACT_APP_API_URL}/products/id/${productId}`,{
             method:'GET'
@@ -49,8 +50,9 @@ const ProductPage=()=>{
    
     
       const handleBrandClick = () => {
-       
-        window.location.href=`/brand/${product.brand}`;
+        const brand=encodeURIComponent(product.brand)
+        console.log(brand)
+        window.location.href=`/brand/${brand}`;
       };
 
  
@@ -110,7 +112,7 @@ if (foundItem) {
         : 
           <img
             className="w-[60%]  h-[350px] mx-auto my-auto"
-            src={`${process.env.REACT_APP_API_URL}/assets/products/lg/${product.productImage.large}`}
+            src={`${process.env.REACT_APP_API_URL}/assets/products/lg/${product.productImage?.large??'404.jpeg'}`}
             alt={product.name}
           />
         }
