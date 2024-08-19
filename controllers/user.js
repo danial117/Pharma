@@ -10,43 +10,53 @@ import {VerifyUserJWTToken} from '../middlewares/auth.js';
 
 
 
+export const Register = async (req, res, next) => {
+  try {
+    const { name, email, password, phone } = req.body;
 
+    // Check if a user with the same email already exists
+    const existingUser = await User.findOne({ email: email });
+    if (existingUser) {
+      return res.status(409).json({ message: 'User with this email already exists' });
+    }
 
-export const Register=async(req,res,next)=>{
-    try{
-
-    console.log(req)
-    const {name,email,password,phone}=req.body;
-    const user= await new User({
-     name:name, 
-     email:email, 
-     password:password,
-     phone:phone,
-     authenticationMethod:'local'    
+    // If user doesn't exist, proceed to create a new one
+    const user = new User({
+      name: name,
+      email: email,
+      password: password,
+      phone: phone,
+      authenticationMethod: 'local'
     });
-  const userSaved= await user.save()
-  const accessToken = generateAccessToken(userSaved._id);
-  const refreshToken = generateRefreshToken(userSaved._id);
 
-  res.cookie('refreshToken', refreshToken, {
-    httpOnly: true,
-    path: '/', // Adjust the path as needed
-    maxAge: 7 * 24 * 60 * 60 * 1000, // Example: 7 days expiry
-    secure: process.env.NODE_ENV === 'production', // Set to true in production
-    sameSite: '', // Adjust as per your CORS settings
-  });
-  req.userData = {
-    email: userSaved.email,
-    username:userSaved.name
-   
-  };
-  res.status(201).json({userData:userSaved,accessToken});
-  next()
-}
-catch(error){
-    console.log(error)
-}
- }
+    const userSaved = await user.save();
+
+    // Generate tokens
+    const accessToken = generateAccessToken(userSaved._id);
+    const refreshToken = generateRefreshToken(userSaved._id);
+
+    // Set refresh token as a cookie
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      path: '/', // Adjust the path as needed
+      maxAge: 7 * 24 * 60 * 60 * 1000, // Example: 7 days expiry
+      secure: process.env.NODE_ENV === 'production', // Set to true in production
+      sameSite: 'Strict', // Adjust as per your CORS settings
+    });
+
+    req.userData = {
+      email: userSaved.email,
+      username: userSaved.name
+    };
+
+    res.status(201).json({ userData: userSaved, accessToken });
+
+    next();
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
 
 
 

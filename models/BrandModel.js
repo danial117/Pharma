@@ -5,11 +5,13 @@ const brandSchema = new mongoose.Schema({
     name: {
         type: String,
         unique: true,
-        trim: true
+        trim: true,
+        required:true
     },
     brandLogoPath: {
         type: String,
-        trim: true
+        trim: true,
+        required:true
         
     }
 });

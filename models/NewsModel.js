@@ -6,11 +6,14 @@ const newsBlogSchema = new mongoose.Schema({
     title: {
         type: String,
         required: true,
-        trim: true
+        trim: true,
+        required: true
     },
     // The main content of the news blog post
     content: {
         type: String,
+        required: true,
+        trim:true,
         required: true
     },
     // The time when the post was created or published
@@ -20,6 +23,8 @@ const newsBlogSchema = new mongoose.Schema({
     },
     topic:{
         type: String,
+        required: true,
+        trim:true,
         required: true
     },
     // Optional: Tags or categories for the post
@@ -30,7 +35,8 @@ const newsBlogSchema = new mongoose.Schema({
     // Optional: A URL or path to an image associated with the post
     imageUrl: {
         type: String,
-        trim: true
+        trim: true,
+        required: true
     }
 });
 

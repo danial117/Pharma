@@ -868,7 +868,7 @@ const injectHTML= `
   <h1> HELLO User </h1>
 </div>
   <h2>WE WELCOME YOU TO <span>SOCIOPEDIA </span></h2>
-  <p> Please visit this <a href='http://localhost:3000/forget_password/${token}'> link  </a> for recovering your Password </p>
+  <p> Please visit this <a href='${process.env.NODE_ENV==='production'?'https://www.infovit.us':'http://localhost:3002'}/forget_password/${token}'> link  </a> for recovering your Password </p>
    
 
   

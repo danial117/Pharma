@@ -82,6 +82,15 @@ export const AdminCreateBrand=async(req,res)=>{
         
         const brandSaved=await brand.save()
 
+        if(brandSaved){
+
+        const updateProducts=await Product.updateMany({
+          $or: [
+            { brand: brandSaved.name },          // Condition 1: Check for brand name
+            { brandId: brandSaved._id }          // Condition 2: Check for brand ID
+          ]
+        },{$set:{brandId:brandSaved._id,brand:brandSaved.name}})
+}
         res.status(201).json({id:brandSaved._id})
 
 
@@ -137,11 +146,14 @@ export const GetBrandProducts=async(req,res)=>{
     try{
 
         const {brandName}=req.params;
-
-        const formattedBrandName = brandName.replace(/-/g, ' ');
+        console.log(brandName)
+        const page = parseInt(req.query.page) || 1; // Default to page 1 if not provided
+          const limit = parseInt(req.query.limit) || 10; // Default to 10 items per page if not provided
+          const formattedBrandName = brandName.replace(/-/g, ' ');
+          const skip = (page - 1) * limit;
 
         // Log the formatted brand name
-        console.log(formattedBrandName);
+        
     
         // Perform a case-insensitive search in the database
        const brand=await Brand.findOne({ 
@@ -150,13 +162,12 @@ export const GetBrandProducts=async(req,res)=>{
 
         })
        
-        console.log(brand)
       
 
 
        if(brand){
-        const products=await Product.find({brand:brand.name})
-
+        const products=await Product.find({brand:brand.name}).skip(skip).limit(limit);
+       
         res.status(200).json(products)
 }else{
     res.status(404).json('Not Found')
@@ -204,6 +215,15 @@ export const AdminModifyBrand=async(req,res)=>{
     
         // Save the updated product
         const updatedBrand = await brand.save();
+ console.log(updatedBrand)
+        if(updatedBrand){
+          const updateProducts=await Product.updateMany({
+            $or: [
+              { brand: brand.name },          // Condition 1: Check for brand name
+              { brandId: brand._id }          // Condition 2: Check for brand ID
+            ]
+          },{$set:{brandId:updatedBrand._id,brand:updatedBrand.name}})
+        }
 
 
     

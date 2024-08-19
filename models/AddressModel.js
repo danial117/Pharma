@@ -10,33 +10,42 @@ const addressSchema = new Schema({
   email: {
     type: String,
     required: true,
+    trim:true
   },
   firstName: {
     type: String,
     required: true,
+    trim:true
   },
   lastName: {
     type: String,
     required: true,
+    trim:true
   },
   streetAddress: {
     type: String,
     required: true,
+    trim:true
   },
   state: {
     type: String,
     required: true,
+    trim:true
   },
   stateCode:{
     type: String,
     required: true,
+    trim:true
   },
   city: {
     type: String,
     required: true,
+    trim:true
   },
   zip: {
     type: String, // Assuming zip code is a string; adjust data type as needed
+    trim:true,
+    required:true
    
   },
 });

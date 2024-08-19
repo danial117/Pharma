@@ -18,26 +18,32 @@ const ProductSchema= mongoose.Schema({
     },
     brand:{
         type:String,
-        trim: true
+        trim: true,
+        required:true
     },
     productImage: {
         medium: {
           type: String,
           trim: true,
+          required:true
         },
         large: {
           type: String,
           trim: true,
+          required:true
+          
         },
         small:{
             type: String,
           trim: true,
+          required:true
 
         }
       },
     options:{
         type:String,
-        trim: true
+        trim: true,
+        required:true
 
     },
      category:{ type:[String]}
@@ -49,9 +55,9 @@ const ProductSchema= mongoose.Schema({
         set: v => v ? mongoose.Types.Decimal128.fromString(v) : undefined // Optional: Convert string to Decimal128
     },
     details:{
-        Description: { type: String, default: '' },
-        Warnings: { type: String, default: '' },
-        More: { type: String, default: '' },
+        Description: { type: String, default: '',trim:true,required:true },
+        Warnings: { type: String, default: '',trim:true },
+        More: { type: String, default: '',trim:true },
         DietaryRestrictions: [String],
         Certifications: [String]
         

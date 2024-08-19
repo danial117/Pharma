@@ -234,7 +234,7 @@ export const AdminModifyProduct=async(req,res)=>{
     try{
 
         const data=req.body;
-      
+        console.log(data)
         const {productId} =req.params;
         
         
@@ -248,8 +248,24 @@ export const AdminModifyProduct=async(req,res)=>{
             medium:outputMediumFileName,
             small:outputSmallFileName
           };
+         
 
         }
+        
+        if (Array.isArray(data.category) && data.category.length>0) {
+        
+          data['category'] = data.category.map((value) => {
+            return value.replaceAll(' ', '-');
+          });
+        }else{
+          data['category']=[]
+
+        }
+
+
+
+
+
         
         const product = await Product.findById(productId);
         
@@ -311,9 +327,9 @@ export const AdminCreateProduct=async(req,res)=>{
         name:data.name,
         brandId:brand?brand._id:null,
         brand:data.brand,
-        price:Number(data.price).toFixed(2),
+        price:Number(data.price)?.toFixed(2),
         details:data.details,
-        category:data.category,
+        category:data.category?.replaceAll(' ','-'),
         options:data.options,
         productImage:{
           medium:outputMediumFileName,
@@ -328,10 +344,7 @@ export const AdminCreateProduct=async(req,res)=>{
         const updatedProduct = await product.save();
        
     
-        // Overwrite product fields with the fields from req.body
-     
-    
-        // Save the updated product
+      
        
        
        
@@ -353,6 +366,10 @@ export const SearchProductCategory = async (req, res) => {
   try {
     const { search } = req.params;
     const words = search.trim().toLowerCase().split(/\s+/);
+    const page = parseInt(req.query.page) || 1; // Default to page 1 if not provided
+    const limit = parseInt(req.query.limit) || 10; // Default to 10 items per page if not provided
+  
+    const skip = (page - 1) * limit;
 
     // Escape special characters for regex safety
     const escapedWords = words.map(word => word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
@@ -366,7 +383,7 @@ export const SearchProductCategory = async (req, res) => {
           $regex: pattern
         }
       }
-    });
+    }).skip(skip).limit(limit);
    console.log(results)
     res.status(200).json(results);
   } catch (error) {

@@ -40,7 +40,8 @@ app.use("/assets/brands", express.static(path.join(__dirname, "public/brands")))
 app.use("/assets/news", express.static(path.join(__dirname, "public/news")));
 
 
-const allowedOrigins=['https://www.infovit.us/','http://localhost:3000','http://localhost:5173']
+const allowedOrigins=process.env.ALLOWED_ORIGINS.split(',');
+
 
 app.use(cors({ origin: allowedOrigins, credentials: true }));
   app.use(helmet()); 
@@ -99,7 +100,7 @@ app.get('/oauth2/redirect/google',
         secure: process.env.NODE_ENV === 'production', // Ensure secure cookie in production
        
       });
-      res.redirect('http://localhost:3000/');
+      res.redirect(process.env.NODE_ENV==='production'?'https://www.infovit.us':'http://localhost:3000');
     })
     ;
 
