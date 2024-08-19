@@ -4,7 +4,7 @@ import Footer from "./Footer";
 
 import NavBar from './NavBar'
 import { useState } from "react";
-
+import SpinnerRotating from "../skeleton/spinner";
 
 const Contact=()=>{
 
@@ -12,6 +12,7 @@ const Contact=()=>{
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
+  const [loading,setLoading]=useState(false)
 
   // State hooks for validation errors
   const [errors, setErrors] = useState({ name: '', email: '', message: '' });
@@ -39,6 +40,7 @@ const Contact=()=>{
 
     // Perform form submission (e.g., send data to an API)
     try {
+      setLoading(true)
       const response = await fetch(`${process.env.REACT_APP_API_URL}/contact/request`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -54,8 +56,11 @@ const Contact=()=>{
         alert('There was an error submitting the form. Please try again later.');
       }
     } catch (error) {
-     
-      alert('There was an error submitting the form. Please try again later.');
+      
+      alert('An error has occured.');
+      setLoading(false)
+    }finally{
+      setLoading(false)
     }
   };
   
@@ -66,6 +71,7 @@ const Contact=()=>{
     return(
 
         <>
+        {loading && <SpinnerRotating />}
             <NavBar />
 
             <div className="bg-gray-100">

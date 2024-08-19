@@ -8,6 +8,9 @@ import '../styles/styles.css';
 import api from '../utils/api';
 import ReactGA from 'react-ga4'
 import { useNavigate } from 'react-router-dom';
+import SpinnerRotating from '../skeleton/spinner';
+
+
 
 const SignUp = () => {
   const dispatch = useDispatch();
@@ -16,6 +19,7 @@ const SignUp = () => {
   const accessToken = useSelector((state) => state.accessToken);
   const cartItems = useSelector((state) => state.cartItems);
   const cartItemIds = cartItems.map((item) => item._id);
+  const [loading,setLoading]=useState(false)
 
   const [formData, setFormData] = useState({
     name: '',
@@ -148,10 +152,15 @@ const SignUp = () => {
     e.preventDefault();
     if (validateForm()) {
      
+      try{
+          
+      setLoading(true)
       if (accessToken) {
         cartItemIds.forEach((id) => {
           dispatch(removeItemFromCart({ itemId: id }));
         });
+
+       
 
         fetch(`${process.env.REACT_APP_API_URL}/user/signup`, {
           method: 'POST',
@@ -159,7 +168,20 @@ const SignUp = () => {
           credentials: 'include',
           body: JSON.stringify(formData),
         })
-          .then((response) => response.json())
+          .then((response) =>{if(response.status===409){
+            alert('The user already exists.');
+            setFormData({
+              name: '',
+              email: '',
+              password: '',
+              phone: '',
+            })
+
+          }else
+         {
+           return response.json()
+          }
+          })
           .then((data) => {
             dispatch(setUser({ user: data.userData }));
             dispatch(setAccessToken({ accessToken: data.accessToken }));
@@ -200,9 +222,31 @@ const SignUp = () => {
                         console.error('Error dispatching actions:', error)                      
                     });     
                 }
+                if(response.status===409){
+                  alert('The user already exists.');
+                  setFormData({
+                    name: '',
+                    email: '',
+                    password: '',
+                    phone: '',
+                  })
+
+                }
           }
       }
-    }
+    
+  }catch (error) {
+    alert('An error occured during signup')
+    setLoading(false)
+    // Handle error if needed
+} finally {
+    setLoading(false);
+    window.location.href = '/';
+}
+
+  }
+
+    
   };
 
 
@@ -222,10 +266,15 @@ const SignUp = () => {
     e.preventDefault();
 
     if (validateForm()) {
+      setLoading(true)
+
+      try{
+
       if (accessToken) {
         cartItemIds.forEach((id) => {
           dispatch(removeItemFromCart({ itemId: id }));
         });
+        
 
        await fetch(`${process.env.REACT_APP_API_URL}/user/login`, {
           method: 'POST',
@@ -311,11 +360,25 @@ const SignUp = () => {
 
          
       }
+    }catch (error) {
+      alert('An error occured during login')
+      setLoading(false)
+      // Handle error if needed
+  } finally {
+      setLoading(false);
+      window.location.href = '/';
+  }
+
+
+
+
+
     }
   };
 
   return (
     <>
+    {loading && <SpinnerRotating />}
       <NavBar />
 
       <div

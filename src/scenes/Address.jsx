@@ -8,8 +8,7 @@ import { useEffect, useState } from "react";
 import { useSelector,useDispatch } from "react-redux";
 import { EditRounded } from "@mui/icons-material";
 import { removeItemFromCart } from "../state";
-
-
+import SpinnerRotating from "../skeleton/spinner";
 
 
 const states = [
@@ -152,10 +151,20 @@ const Address=()=>{
     const [showDropdown, setShowDropdown] = useState(false);
     const [cities, setCities] = useState([]);
     const [edit,setEdit]=useState(false);
+    const [loading,setLoading]=useState(false)
 
     useEffect(()=>{
+      try{
+        setLoading(true)
       api.get('/address/')
     .then((response)=>response.data).then((data)=>{setFormData(data);  });
+      }catch(error){
+        setLoading(false)
+
+      }finally{
+        setLoading(false)
+
+      }
     
      
   },[])
@@ -285,6 +294,10 @@ const Address=()=>{
           else{
             setErrors({})
           }
+        
+      try{
+
+      setLoading(true)
           
         // Process the form data (e.g., send it to the server)
        const response= await api.post('/address/create', JSON.stringify(formData), {
@@ -316,16 +329,19 @@ const Address=()=>{
                
               window.location.href='/order'
             }
-          })
-
-
-
-
-
-          
-        }else{
+          }) }else{
               window.location.href='/createAccount'
         }
+
+      }catch (error) {
+        alert('An error occured')
+        setLoading(false)
+        // Handle error if needed
+    } finally {
+        setLoading(false);
+        
+    }
+
  
       
 
@@ -361,6 +377,7 @@ const Address=()=>{
 
     return(
         <div>
+          {loading && <SpinnerRotating />}
             <NavBar />
 
             <div className="w-[80%] py-16 mx-auto">
