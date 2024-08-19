@@ -27,18 +27,34 @@ export const authProvider: AuthProvider = {
         
 },
 checkError: (error) => { /* ... */ },
-checkAuth: () => {
-    return localStorage.getItem('token') ? Promise.resolve() : Promise.reject();
+checkAuth:  () => {
+    const token = localStorage.getItem('token');
+
+    // Check if the token exists in localStorage
+    if (!token) {
+        
+        window.location.href='/login'
+        return Promise.reject()
+        
+    }else{
+        return Promise.resolve();
+
+    }
+
 },
 logout: () => {
+    fetch(`${apiUrl}/user/logout`, {
+        method: 'GET',
+        credentials:'include',
+      
+    });
     localStorage.removeItem('token');
     localStorage.removeItem('permissions');
     return Promise.resolve();
 },
 getIdentity: () => { /* ... */ },
 getPermissions: () => {
-    const role = localStorage.getItem('permissions');
-    return role ? Promise.resolve(role) : Promise.reject();
+   
 },
 };
 

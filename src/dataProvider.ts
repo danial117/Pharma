@@ -69,7 +69,7 @@ export const httpClient = async (url, options = {}) => {
         return response;
     } catch (error) {
         // Handle HTTP errors and log them
-        if (error.status === 401 ) {
+        if (error.status === 401  ) {
             try {
                
                 
@@ -84,7 +84,12 @@ export const httpClient = async (url, options = {}) => {
                 alert('Unauthorized: Please check your login credentials.');
                 throw refreshError;
             }
-        } else {
+        }
+        else if(error.status === 403){
+            window.location.href='/login'
+        }
+        
+        else {
             throw error;
         }
     }

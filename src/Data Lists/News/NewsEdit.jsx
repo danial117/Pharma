@@ -1,5 +1,5 @@
 
-import { Edit, SimpleForm, TextInput} from 'react-admin';
+import { Edit, SimpleForm, TextInput,Toolbar,SaveButton,DeleteButton} from 'react-admin';
 import {useRecordContext } from 'ra-core';
 import CustomImageUpload from '../../utils/CustomImageupload';
 import { useState } from 'react';
@@ -45,13 +45,19 @@ const transform = (data) => {
 };
 
 
-
+const NewsEditToolbar = () => (
+    <Toolbar sx={{display:'flex',justifyContent:'space-between'}}>
+        <SaveButton alwaysEnable />
+        <DeleteButton />
+       
+    </Toolbar>
+);
 
 
 
     return (
-        <Edit {...props} transform={transform}>
-            <SimpleForm className='w-full'>
+        <Edit {...props}  transform={transform}>
+            <SimpleForm toolbar={<NewsEditToolbar/>} className='w-full'>
                 <CustomImageUpload source='imageUrl' onChange={handleImageChange} />
                 <TextInput className='w-[50%]' source="title" />
                 <TextInput className='w-[50%]' source="content" />
