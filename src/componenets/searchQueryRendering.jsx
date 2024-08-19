@@ -192,7 +192,7 @@ const UserData = ({ user, order, cart, address,product,brand }) => {
 {product && (
   <div style={styles.productSection}>
     <h2 className='font-Abel text-[2rem] text-center'>Product Information</h2>
-    <img src={`${process.env.VITE_API_URL}/assets/products/${product.productImage || '404.jpeg'}`} alt={product.name || 'No name'} style={styles.productImage} />
+    <img src={`${process.env.VITE_API_URL}/assets/products/lg/${product.productImage.large || '404.jpeg'}`} alt={product.name || 'No name'} style={styles.productImage} />
     <p className='font-Lexend ml-2'><strong>Product ID:</strong> {product._id || 'N/A'}</p>
     <p className='font-Lexend ml-2'><strong>Name:</strong> {product.name || 'N/A'}</p>
     <p className='font-Lexend ml-2'><strong>Brand:</strong> {product.brand || 'N/A'}</p>

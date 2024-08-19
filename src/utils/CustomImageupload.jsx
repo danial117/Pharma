@@ -5,14 +5,23 @@ const CustomImageUpload = ({ source, onChange }) => {
     const record = useRecordContext();
     const resource = useResourceContext();
     const [image, setImage] = useState(null);
-    const [showImage, setShowImage] = useState(null);
+    const [src, setSrc] = useState(null);
+    const [showImage, setShowImage] = useState(record[source]);
     
-
+ 
     useEffect(() => {
         if (record && record[source]) {
             setShowImage(record[source]);
         }
     }, [record, source]);
+
+    useEffect(()=>{
+        if (resource ==='products'){
+            setSrc(`${process.env.VITE_API_URL}/assets/${resource}/md/${showImage.medium}`)
+        }else{
+            setSrc(`${process.env.VITE_API_URL}/assets/${resource}/${showImage}`)
+        }
+  },[])
 
     const handleFileChange = (event) => {
         const file = event.target.files[0];
@@ -32,7 +41,7 @@ const CustomImageUpload = ({ source, onChange }) => {
             {showImage && (
                 <div className="mb-2  flex w-full">
                     <img
-                        src={`${process.env.VITE_API_URL}/assets/${resource}/md/${showImage.medium}`}
+                        src={src}
                         alt="Product"
                         className="w-[50%] mx-auto h-auto object-cover border border-gray-300 rounded-md"
                     />

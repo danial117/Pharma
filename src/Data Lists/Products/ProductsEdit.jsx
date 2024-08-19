@@ -1,4 +1,4 @@
-import { Edit, SimpleForm, TextInput, NumberInput } from 'react-admin';
+import { Edit, SimpleForm, TextInput, NumberInput,SaveButton,Toolbar, DeleteButton} from 'react-admin';
 import CustomArrayInput from '../../utils/CustomArray';
 import { useState } from 'react';
 import CustomImageUpload from '../../utils/CustomImageupload';
@@ -21,6 +21,7 @@ const ProductEdit = (props) => {
 
     const handleCategoriesChange = (updatedArray) => {
         setCategories(updatedArray);
+       
     };
 
     const handleImageChange = (file) => {
@@ -44,10 +45,13 @@ const ProductEdit = (props) => {
         if (data.options) formData.append('options', data.options);
     
         // Append category if it exists and is not empty
-        if (data.category && data.category.length > 0) {
+        if (data.category && categories.length > 0 ) {
+        
            categories.forEach((cat, index) => {
                 formData.append(`category[${index}]`, cat);
             });
+        }else{
+            formData.append('category', JSON.stringify([]));
         }
     
         // Append Certifications if they exist
@@ -76,11 +80,19 @@ const ProductEdit = (props) => {
         return formData;
     };
 
+    const ProductEditToolbar = () => (
+        <Toolbar sx={{display:'flex',justifyContent:'space-between'}}>
+            <SaveButton alwaysEnable />
+            <DeleteButton />
+           
+        </Toolbar>
+    );
+    
 
 
     return (
         <Edit {...props} transform={transform}>
-            <SimpleForm className='w-full'>
+            <SimpleForm toolbar={<ProductEditToolbar/>} className='w-full'>
             <CustomImageUpload source="productImage" onChange={handleImageChange}/>
                 <TextInput className='w-[50%]' source="name" />
                 <TextInput className='w-[50%]' source="brand" />
@@ -94,6 +106,7 @@ const ProductEdit = (props) => {
                 <CustomArrayInput source="details.DietaryRestrictions" label="Dietary Restrictions" onChange={handleDietaryRestrictionsChange} />
                 <CustomArrayInput source="details.Certifications" label="Certificates" onChange={handleCertificationsChange} />
                 <CustomArrayInput source="category" label="Categories" onChange={handleCategoriesChange} />
+                
             </SimpleForm>
         </Edit>
     );

@@ -29,7 +29,7 @@ import { BrandShow } from "./Data Lists/Brands/BrandShow";
 import OtpPage from "./componenets/OTP_Validation";
 import ContactList from "./Data Lists/contact/ContactList";
 import { ContactShow } from "./Data Lists/contact/ContactShow";
-
+import ProtectedLayout from "./componenets/ProtectedLayout";
 
 
 
@@ -42,7 +42,7 @@ const AppContent = () => {
   return (
     <>
       {showSearchData && <SearchData />}
-     {!isFetching &&<div className={`${showSearchData && 'mt-28'} `}> <Admin  dataProvider={customDataProvider} loginPage={<MyLoginPage />} authProvider={authProvider}>
+     {!isFetching &&<div className={`${showSearchData && 'mt-28'} `}>  <Admin  dataProvider={customDataProvider} loginPage={<MyLoginPage />} authProvider={authProvider}>
         <Resource name="users" list={<CustomRecordList resource="user" />} />
         <Resource name="news" list={<NewsList/>} show={NewsShow} create={NewsCreate} edit={NewsEdit} hasCreate hasEdit hasShow/>
         <Resource name="address" list={<AddressList />} />
@@ -52,7 +52,9 @@ const AppContent = () => {
         <Resource name="brands" show={BrandShow} edit={BrandEdit} list={BrandsList} create={BrandsCreate} hasShow hasCreate />
         {/* <Resource name="content" list={DomList} show={DOM_Show} edit={DomEdit} hasEdit hasShow /> */}
         <Resource name="contact"  list={ContactList} show={ContactShow} hasEdit hasShow />
+        
       </Admin>
+      
       </div>
 
       }

@@ -9,9 +9,9 @@ export const ContactShow = (props) => (
  <SimpleShowLayout>
           
             <TextField label='ID:' source="id" />
-            <TextField label='News Title:' source="name" />
-            <TextField label='News Content:' source="email" />
-            <TextField label='News Main Tag' source="message" />
+            <TextField label='Brand Name:' source="name" />
+           
+            
                
         </SimpleShowLayout>
     </Show>
