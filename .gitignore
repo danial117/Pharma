@@ -1,0 +1,9 @@
+.env
+ecosystem.config.cjs
+public/
+node_modules/
+package-lock.json
+npm
+
+
+
