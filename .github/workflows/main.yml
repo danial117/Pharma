@@ -35,7 +35,7 @@ jobs:
 
            # If you need to ensure the directory is empty, but leave ecosystem.config.js
            cd /home/infovit-api/htdocs/api.infovit.us
-           rm -rf ./*
+           
 
             # Clone the specific branch of the GitHub repository into the Pharma directory
             git clone -b server https://github.com/danial117/Pharma.git /home/infovit-api/htdocs/api.infovit.us
