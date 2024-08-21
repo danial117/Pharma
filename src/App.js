@@ -9,7 +9,7 @@ import About from "./scenes/About";
 import Order from "./scenes/Order";
 import PayPalButtonComponent from "./components/PaypalButtonComponent";
 import { useEffect } from "react";
-import ProtectedRoute from "./components/ProtectedRoute";
+ import ProtectedRoute from "./components/ProtectedRoute";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { setAccessToken,setContent } from "./state";
