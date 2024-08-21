@@ -49,6 +49,7 @@ export const Register = async (req, res, next) => {
       username: userSaved.name
     };
 
+    
     res.status(201).json({ userData: userSaved, accessToken });
 
     next();

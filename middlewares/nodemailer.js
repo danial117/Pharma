@@ -353,8 +353,8 @@ console.log("Message sent: %s", info.messageId);
   // Function to send password recovery email
   export const sendPasswordRecoveryEmail = async (email, resetToken) => {
     // Define the recovery link (replace with your actual URL and token)
-    const recoveryLink = `http://localhost:3000/account-security/reset-password/${resetToken}`;
-  
+    
+    const recoveryLink = `${process.env.NODE_ENV === 'production' ? 'https://www.infovit.us' : 'http://localhost:3002'}/account-security/reset-password/${resetToken}`;
     // Define the email content
     const mailOptions = {
       from: '"Infovit" <danigondal117@gmail.com>', // Sender address
@@ -790,114 +790,6 @@ console.log("Message sent: %s", info.messageId);
 
 
 
-
-
-
-
-
-
-
-
-export const passwordMail=async(req,res,next)=>{
-  try{
-
-  const {email}=req.body
-
-  const token= jwt.sign({email:email},process.env.JWT_SECRET)
-
-
-
-
-
-
-
-
-
-
-         
-      
-const injectHTML= `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <style>
-      *{
-          padding: 0;
-          margin:0;
-      }
-
-      .title {
-          display: flex;
-          flex-direction: row;
-          justify-content: center;
-      }
-      .title h1{
-          margin: 1%;
-      }
-
-      h2{
-          margin-top: 5%;
-          margin-bottom: 1%;
-          text-align: center;
-          font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-      }
-
-      h2 span{
-          font-size: clamp(1rem,1.5rem,5rem);
-          color: #00D5FA;
-          font-weight: bold;
-      }
-
-      p{  
-          font-size: 1.3rem;
-          text-align: center;
-      }
-
-     .title img{
-          width: 5%;
-          height: 10vh;
-          border-radius: 100%;
-      }
-  </style>
- 
-</head>
-<body>
-  <div>
-      <div class="title">
-      
-  <h1> HELLO User </h1>
-</div>
-  <h2>WE WELCOME YOU TO <span>SOCIOPEDIA </span></h2>
-  <p> Please visit this <a href='${process.env.NODE_ENV==='production'?'https://www.infovit.us':'http://localhost:3002'}/forget_password/${token}'> link  </a> for recovering your Password </p>
-   
-
-  
-
- </div>
-
-
-
-  
-</body>
-</html>
-`;
-
-const info = await transporter.sendMail({
-  from: '"SOCIOPEDIA" <danigondal117@gmail.com>', // sender address
-  to: email, // list of receivers
-  html: injectHTML, // html body
-  subject:'Password Recovery' 
-                                      });
-  
-
-
-console.log("Message sent: %s", info.messageId);
-next()
-}catch(error){
-  console.log(error);
-}
-
-}
 
 
 

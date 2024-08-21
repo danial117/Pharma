@@ -169,8 +169,10 @@ export const GetBrandProducts=async(req,res)=>{
         const products=await Product.find({brand:brand.name}).skip(skip).limit(limit);
        
         res.status(200).json(products)
-}else{
-    res.status(404).json('Not Found')
+}
+
+else{
+    res.status(404).json([])
 }
       
 
