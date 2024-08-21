@@ -31,7 +31,7 @@ jobs:
            cd /home/infovit-api/htdocs
 
            # Find and delete all files and directories within api.infovit.us except for ecosystem.config.js
-           find api.infovit.us -mindepth 1 ! -name 'ecosystem.config.js' -exec rm -rf {} +
+           find api.infovit.us -mindepth 1 ! -name 'ecosystem.config.cjs' -exec rm -rf {} +
 
            # If you need to ensure the directory is empty, but leave ecosystem.config.js
            cd /home/infovit-api/htdocs/api.infovit.us
