@@ -36,7 +36,7 @@ jobs:
             
 
             # Clone the specific branch of the GitHub repository into a temporary directory
-            git clone -b server https://github.com/danial117/Pharma.git ./git
+            git clone -b server_dev_22 https://github.com/danial117/Pharma.git ./git
 
             # Move the contents of the temporary directory to the target directory
             mv ./git/* ./
