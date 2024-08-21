@@ -65,4 +65,6 @@ jobs:
             mkdir -p /home/infovit-api/htdocs/api.infovit.us/public/products/small
             mkdir -p /home/infovit-api/htdocs/api.infovit.us/public/news
 
+
           EOF
+
