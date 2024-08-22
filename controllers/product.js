@@ -229,12 +229,12 @@ export const AdminGetProduct=async(req,res)=>{
 
 
 
-export const AdminModifyProduct=async(req,res)=>{
+export const AdminModifyProduct=async(req,res,next)=>{
 
     try{
 
         const data=req.body;
-        console.log(data)
+        
         const {productId} =req.params;
         
         
@@ -251,11 +251,11 @@ export const AdminModifyProduct=async(req,res)=>{
          
 
         }
-        
+        throw new error
         if (Array.isArray(data.category) && data.category.length>0) {
         
           data['category'] = data.category.map((value) => {
-            return value.replaceAll(' ', '-');
+            return value?.replaceAll(' ', '-');
           });
         }else{
           data['category']=[]
@@ -269,7 +269,7 @@ export const AdminModifyProduct=async(req,res)=>{
         
         const product = await Product.findById(productId);
         
-        Number(data.price).toFixed(2)
+        Number(data.price)?.toFixed(2)
         delete data.id
       
         if (!product) {
@@ -287,7 +287,7 @@ export const AdminModifyProduct=async(req,res)=>{
 
 
     
-       const modifiedProduct = updatedProduct.toObject(); // Convert Mongoose document to plain JavaScript object
+       const modifiedProduct = updatedProduct?.toObject(); // Convert Mongoose document to plain JavaScript object
           modifiedProduct.id = modifiedProduct._id;
           delete modifiedProduct._id;
 
@@ -302,6 +302,7 @@ export const AdminModifyProduct=async(req,res)=>{
     }
 
     catch(error){
+      next(error)
         console.log(error)
         res.status(500).json('Internal Server Error')
     }
@@ -309,7 +310,7 @@ export const AdminModifyProduct=async(req,res)=>{
 
 
 
-export const AdminCreateProduct=async(req,res)=>{
+export const AdminCreateProduct=async(req,res,next)=>{
     try{
       
         const data = req.body;
@@ -354,7 +355,9 @@ export const AdminCreateProduct=async(req,res)=>{
 
     }catch(error){
       console.log(error)
+     
         res.status(500).json('Internal Server Error')
+        next(error)
     }
 }
 

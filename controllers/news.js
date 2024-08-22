@@ -38,6 +38,7 @@ export const AdminCreateNews=async(req,res)=>{
 
     }catch(error){
       console.log(error)
+      next(error)
         res.status(501).json('Internal Server Error')
     }
 }
@@ -134,6 +135,7 @@ export const AdminModifyNews=async(req,res)=>{
 
   catch(error){
       console.log(error)
+      next(error)
       res.status(500).json('Internal Server Error')
   }
 }

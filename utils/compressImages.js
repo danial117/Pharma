@@ -9,7 +9,7 @@ const __dirname = path.dirname(__filename);
 export const compressAndSaveProductImage = async (imageName) => {
     try {
       
-      console.log(imageName)
+      
       const baseDirectory = path.join(__dirname, '../public/products/large');
       const outputMediumDirectory = path.join(__dirname, '../public/products/medium');
       const outputSmallDirectory = path.join(__dirname, '../public/products/small');
