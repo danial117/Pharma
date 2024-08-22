@@ -111,7 +111,12 @@ export const Logout=async(req,res)=>{
            
             res.status(200).json({modifiedUser:user,accessToken})
            
+        }else{
+          res.status(401).json('Incorrect username or password')
         }
+
+
+
     }else{
         res.status(301)
     }
