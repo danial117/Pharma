@@ -280,9 +280,18 @@ const SignUp = () => {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
-          body: JSON.stringify(formData),
+          body: JSON.stringify({email:formData.email,password:formData.password}),
         })
-          .then((response) => response.json())
+          .then((response) =>
+          { 
+           if(response.status===401){
+            alert('Incorrect email or password')
+           }else{
+            response.json()
+           }
+            
+          }
+          )
           .then((data) => {
             dispatch(setUser({ user: data.modifiedUser }));
             dispatch(setAccessToken({ accessToken: data.accessToken }));
@@ -297,7 +306,14 @@ const SignUp = () => {
           credentials: 'include',
           body: JSON.stringify(formData),
         })
-          .then((response) => response.json())
+          .then((response) =>  { 
+            if(response.status===401){
+             alert('Incorrect email or password')
+            }else{
+             response.json()
+            }
+             
+           })
           .then((data) => {
             UserSignedInEvent()
             dispatch(setUser({ user: data.modifiedUser }));
@@ -334,10 +350,7 @@ const SignUp = () => {
                         // After all dispatches are performed, change location
                         window.location.href = '/';
                     })
-                    .catch((error) => {
-                        console.error('Error dispatching actions:', error);
-                        // Handle error if needed
-                    });
+                    
                 
         
         
@@ -361,7 +374,7 @@ const SignUp = () => {
          
       }
     }catch (error) {
-      alert('An error occured during login')
+      
       setLoading(false)
       // Handle error if needed
   } finally {

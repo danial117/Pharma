@@ -562,9 +562,7 @@ const NavBar=()=>{
   </p>
 </div>
 
-<div className="flex flex-col gap-y-2">
-  <p className="text-emerald-600 font-bold">Protein powders</p>
-</div>
+
 
 <div className="flex flex-col gap-y-2">
   <p className="text-emerald-600 font-bold">Healthy lifestyle</p>
