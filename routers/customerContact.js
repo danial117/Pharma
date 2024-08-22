@@ -11,7 +11,7 @@ router.post('/request',CustomerContact)
 
 
 //admin routes
-router.get('/show',AdminGetUserContacts)
+router.get('/show',adminAuthenticateJwt,AdminGetUserContacts)
 router.get('/show/:contactId',adminAuthenticateJwt,AdminGetContact)
 router.delete('/:contactId',adminAuthenticateJwt,AdminDeleteContact)
 
