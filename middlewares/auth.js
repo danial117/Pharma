@@ -171,9 +171,13 @@ export const verifyAccessToken = (req, res, next) => {
         if (!user || !user.isAdmin) {
             return res.status(403).json({ message: 'Access denied' });
         }
-       
-        req.user = user;
+        else{
+          req.user = user;
         next();
+
+        }
+       
+        
     } catch (err) {
       console.log(err)
         res.status(401).json({ message: 'Invalid token' });
