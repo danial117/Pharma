@@ -4,7 +4,7 @@ import NewsBlog from "../models/NewsModel.js";
 
 
 
-export const AdminCreateNews=async(req,res)=>{
+export const AdminCreateNews=async(req,res,next)=>{
     try{
        
         const data = req.body;
@@ -89,7 +89,7 @@ export const AdminGetNewsBlog=async(req,res)=>{
 
 
 
-export const AdminModifyNews=async(req,res)=>{
+export const AdminModifyNews=async(req,res,next)=>{
 
   try{
 

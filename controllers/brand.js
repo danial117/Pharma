@@ -69,7 +69,7 @@ export const GetAdminBrands = async (req, res) => {
 
 
 
-export const AdminCreateBrand=async(req,res)=>{
+export const AdminCreateBrand=async(req,res,next)=>{
 
     try{
 
@@ -190,7 +190,7 @@ export const GetBrandProducts=async(req,res)=>{
 
 
 
-export const AdminModifyBrand=async(req,res)=>{
+export const AdminModifyBrand=async(req,res,next)=>{
 
     try{
 

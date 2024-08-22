@@ -251,7 +251,7 @@ export const AdminModifyProduct=async(req,res,next)=>{
          
 
         }
-        throw new error
+       
         if (Array.isArray(data.category) && data.category.length>0) {
         
           data['category'] = data.category.map((value) => {
@@ -321,6 +321,7 @@ export const AdminCreateProduct=async(req,res,next)=>{
         const brand=await Brand.findOne({name:data.brand})
 
        const {outputMediumFileName,outputSmallFileName}= await compressAndSaveProductImage(file.filename)
+      
       
         // Find the product by ID
        
