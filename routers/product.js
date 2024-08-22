@@ -3,7 +3,7 @@ import { GetProducts,GetProduct,AdminGetUserProducts,AdminDeleteProduct,AdminGet
 import { upload} from '../middlewares/multerConfig.js';
 import { adminAuthenticateJwt } from '../middlewares/auth.js';
 import { modifiedProductFile } from '../middlewares/fileModified.js';
-
+import { deleteFileOnError } from '../middlewares/DeleteFilesOnError.js';
 
 
 const router = express.Router();
@@ -21,8 +21,8 @@ router.get('/category/:search',SearchProductCategory)
 
 router.get('/show',adminAuthenticateJwt,AdminGetUserProducts)
 router.get('/show/:productId',adminAuthenticateJwt,AdminGetProduct)
-router.put('/id/:productId',adminAuthenticateJwt,upload.single('file'),modifiedProductFile,AdminModifyProduct)
-router.post('/create',adminAuthenticateJwt,upload.single('file'),AdminCreateProduct)
+router.put('/id/:productId',adminAuthenticateJwt,upload.single('file'),modifiedProductFile,AdminModifyProduct,deleteFileOnError)
+router.post('/create',adminAuthenticateJwt,upload.single('file'),AdminCreateProduct,deleteFileOnError)
 router.delete('/:productId',adminAuthenticateJwt,AdminDeleteProduct)
 
 
