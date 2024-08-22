@@ -51,7 +51,7 @@ const BrandPage = () => {
 
 
     const FetchBrands=async()=>{
-      const brand=encodeURIComponent(brandName)
+      const brand=encodeURIComponent(brandName.replace('/','-'))
       await  fetch(`${process.env.REACT_APP_API_URL}/brands/name/${brand}?page=${page}&limit=6`,{
           method:'GET'
          }).then((response)=>response.json()).then((result)=>{products.push(...result);  setPage(page+1)})
