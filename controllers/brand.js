@@ -146,10 +146,11 @@ export const GetBrandProducts=async(req,res)=>{
     try{
 
         const {brandName}=req.params;
-        console.log(brandName)
+        console.log(brandName);
         const page = parseInt(req.query.page) || 1; // Default to page 1 if not provided
           const limit = parseInt(req.query.limit) || 10; // Default to 10 items per page if not provided
-          const formattedBrandName = brandName.replace(/-/g, ' ');
+          const formattedBrandName = brandName?.replaceAll('-','/');
+          
           const skip = (page - 1) * limit;
 
         // Log the formatted brand name
@@ -169,9 +170,7 @@ export const GetBrandProducts=async(req,res)=>{
         const products=await Product.find({brand:brand.name}).skip(skip).limit(limit);
        
         res.status(200).json(products)
-}
-
-else{
+}else{
     res.status(404).json([])
 }
       
@@ -196,15 +195,19 @@ export const AdminModifyBrand=async(req,res)=>{
 
         const data=req.body;
         const {brandId} =req.params;
+
         console.log(data)
+
         if(req.file){
           const file=req.file
          
           data['brandLogoPath']=file.filename
    
         }
+        data['name']=data.name
 
         const brand = await Brand.findById(brandId);
+
 
         if (!brand) {
           return res.status(404).json({ error: 'Brand not found' });
@@ -231,6 +234,7 @@ export const AdminModifyBrand=async(req,res)=>{
     
        const modifiedBrand = updatedBrand.toObject(); // Convert Mongoose document to plain JavaScript object
           modifiedBrand.id = modifiedBrand._id;
+          modifiedBrand.name=modifiedBrand.name
           delete modifiedBrand._id;
 
 
@@ -266,6 +270,7 @@ export const AdminGetBrand=async(req,res)=>{
         const brand=await Brand.findById(brandId);
         const modifiedBrand = brand.toObject(); // Convert Mongoose document to plain JavaScript object
           modifiedBrand.id = modifiedBrand._id;
+          modifiedBrand.name=modifiedBrand.name
           delete modifiedBrand._id;
   
             console.log(modifiedBrand)
