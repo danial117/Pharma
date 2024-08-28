@@ -488,7 +488,7 @@ const Order=()=>{
                    maxLength={15}
                     className="font-Poppins text-xs underline text-emerald-500"
               />
-                            <p className='text-Livvic text-[14px] text-gray-700'>{data.options}</p>
+                            <p className='text-Livvic text-[14px] text-gray-700'>{data.option}</p>
                         </div>
 
                     </div>

@@ -16,7 +16,7 @@ const initialState = {
     const state = getState();
 
     if (state.accessToken) {
-       api.get(`/cart/create/${product._id}/${quantity?quantity:1}`)
+       api.get(`/cart/create/${product._id}/${quantity?quantity:1}?option=${product.option.id}`)
       .then((response)=>{
         if (response.status === 201) {
        
