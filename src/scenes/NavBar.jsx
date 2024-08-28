@@ -298,10 +298,10 @@ const NavBar=()=>{
 <div className="flex flex-col gap-y-2">
   <p className="text-emerald-600 font-bold">Children's Health</p>
   <p onClick={()=>window.location.href='/category/Children-vitamins'} className="font-Livvic cursor-pointer hover:underline text-sm">Children's Multivitamins</p>
-  <p onClick={()=>window.location.href='/category/Childern-supplements'} className="font-Livvic cursor-pointer hover:underline text-sm">Children's Supplements</p>
+  <p onClick={()=>window.location.href='/category/Children-supplements'} className="font-Livvic cursor-pointer hover:underline text-sm">Children's Supplements</p>
   <p onClick={()=>window.location.href='/category/Children-digestive-supplements'} className="font-Livvic cursor-pointer hover:underline text-sm">Children's Digestive Support</p>
   <p onClick={()=>window.location.href='/category/Children-immune-supplements'} className="font-Livvic cursor-pointer hover:underline text-sm">Children's Immune Support</p>
-  <p onClick={()=>window.location.href='/category/Childern-supplements'} className="font-Livvic cursor-pointer hover:underline text-sm">Shop All</p>
+  <p onClick={()=>window.location.href='/category/Children-supplements'} className="font-Livvic cursor-pointer hover:underline text-sm">Shop All</p>
 </div>
 
 
@@ -337,7 +337,7 @@ const NavBar=()=>{
   <p className="text-emerald-600 font-bold">Probiotics</p>
   <p onClick={()=>window.location.href='/category/Women-probiotics'} className="font-Livvic cursor-pointer hover:underline text-sm">Women's Probiotics</p>
   <p onClick={()=>window.location.href='/category/Men-probiotics'} className="font-Livvic cursor-pointer hover:underline text-sm">Men's Probiotics</p>
-  <p onClick={()=>window.location.href='/category/Childern-probiotics'} className="font-Livvic cursor-pointer hover:underline text-sm">Children's Probiotics</p>
+  <p onClick={()=>window.location.href='/category/Children-probiotics'} className="font-Livvic cursor-pointer hover:underline text-sm">Children's Probiotics</p>
   <p onClick={()=>window.location.href='/category/Probiotics'} className="font-Livvic cursor-pointer hover:underline text-sm">Shop All</p>
 </div>
 

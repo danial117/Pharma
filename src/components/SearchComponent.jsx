@@ -150,7 +150,7 @@ const SearchComponent = ({ isMobile }) => {
                     className="my-auto font-Abel cursor-pointer"
                   />
                 </div>
-                <p className="my-auto font-bold font-Abel">${data.price}</p>
+                <p className="my-auto font-bold font-Abel">${data.options[0].price}</p>
               </div>
             </div>
           ))}

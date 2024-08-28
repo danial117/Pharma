@@ -62,9 +62,9 @@ const SimiliarProducts=()=>{
                                           
                                            className="font-Lexend xs:max-sm:text-[10px] cursor-pointer text-gray-800"
                                      />
-                                <p className="font-Poppins xs:max-sm:text-[13px] text-gray-600">{data.options}</p>
+                                <p className="font-Poppins xs:max-sm:text-[13px] text-gray-600">{data.options[0].options}</p>
                                
-                                    <div className="bg-gray-200 font-Abel py-2 xs:max-sm:py-[4px] xs:max-sm:text-[13px] text-[20px] rounded-md text-center">${data.price}</div>
+                                    <div className="bg-gray-200 font-Abel py-2 xs:max-sm:py-[4px] xs:max-sm:text-[13px] text-[20px] rounded-md text-center">${data.options[0].price}</div>
                                     
                                
                                 </div>

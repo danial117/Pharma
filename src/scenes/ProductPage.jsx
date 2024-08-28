@@ -30,6 +30,7 @@ const ProductPage=()=>{
      const [quantity,setQuantity]=useState(1)
      const cartItems=useSelector((state)=>state.cartItems)
      const {productId}=useParams();
+     const [selectedOption,setSelectedOption]=useState(null)
      const [carted,setCarted] = useState(false);
 
 
@@ -37,7 +38,10 @@ const ProductPage=()=>{
      const fetchProduct=async ()=>{
        await fetch(`${process.env.REACT_APP_API_URL}/products/id/${productId}`,{
             method:'GET'
-        }).then((response)=>response.json()).then((data)=>{setProduct(data); })
+        }).then((response)=>response.json()).then((data)=>{setProduct(data);
+            setSelectedOption({id:0,...data.options[0]})
+
+         })
     }
        
 
@@ -63,7 +67,7 @@ const ProductPage=()=>{
     const handleAddToCart = () => {
         const productToDispatch = {
           name: product.name,
-          price: product.price,
+          option:selectedOption,
           productImage: product.productImage,
           _id: product._id,
         };
@@ -103,7 +107,7 @@ if (foundItem) {
             <div className="flex flex-row xs:max-md:grid xs:max-md:grid-cols-1">
                 <div className="basis-[40%]">
 
-                    <div className="border-2 w-[80%] flex mx-auto h-[500px] border-gray-300 rounded-md">
+                    <div className="border-2 w-[80%] flex mx-auto xs:max-md:h-[450px] h-[500px] border-gray-300 rounded-md">
                         
                     {isLoading ? 
         <div className="w-full h-full">
@@ -111,7 +115,7 @@ if (foundItem) {
           </div>
         : 
           <img
-            className="w-[60%]  h-[350px] mx-auto my-auto"
+            className="w-[60%] xs:max-md:h-[300px] h-[350px] mx-auto my-auto"
             src={`${process.env.REACT_APP_API_URL}/assets/products/lg/${product.productImage?.large??'404.jpeg'}`}
             alt={product.name}
           />
@@ -189,9 +193,17 @@ if (foundItem) {
                 </div>
                 
                 :
-                <div className="px-4 py-2 border-2 border-black md:max-lg:w-[40%] sm:max-md:w-[30%] xs:max-sm:w-[40%] w-[30%] rounded-full bg-gray-100">
-                <p className="font-Abel  ">{product.options}</p>
+                <div className="flex flex-row gap-x-4">
+                {
+                  Array.isArray(product.options)&&  product.options.map((data,index)=>(
+                    <div onClick={()=>{setSelectedOption({id:index,...product.options[index]})}} className={`px-4  cursor-pointer py-2 border-2 border-black w-auto rounded-full ${Number(selectedOption.price)===Number(data.price)?'bg-gray-100':'bg-white'}`}>
+                    <p className="font-Abel  ">{data.option}</p>  
+                    </div>  
+                  ))
+                }
                 </div>
+                
+                
                 
                  }
 
@@ -213,7 +225,7 @@ if (foundItem) {
                     </div>
                     :
                    
-                   <div  className="my-auto  font-Lexend text-lg font-bold"> <p> ${product.price} </p> </div>
+                   <div  className="my-auto  font-Lexend text-lg font-bold"> <p> ${selectedOption.price} </p> </div>
                    }
 
 

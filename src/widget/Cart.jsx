@@ -53,10 +53,10 @@ const Cart=()=>{
 
     useEffect(() => {
    
-    
+     console.log(cartItems)
         // Calculate individual total prices when the cart changes
         const individualTotals = cartItems.map((item) => {
-          const individualTotal = item.price * item.quantity;
+          const individualTotal = item?.option?.price * item.quantity;
           return individualTotal;
         });
         
@@ -147,7 +147,7 @@ const Cart=()=>{
                     className="font-Poppins text-xs underline text-emerald-500"
               />
 
-                            <p className='text-Livvic text-[14px] text-gray-700'>{data.options}</p>
+                            <p className='text-Livvic text-[14px] text-gray-700'>{data?.option?.option}</p>
                         </div>
 
                     </div>
@@ -168,7 +168,7 @@ const Cart=()=>{
                         </div>
 
                         <div>
-                            <p className='font-Abel text-end'>${data.price}</p>
+                            <p className='font-Abel text-end'>${data?.option?.price}</p>
                         </div>
 
                     </div>
