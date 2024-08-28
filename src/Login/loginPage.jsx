@@ -4,20 +4,27 @@ import BackgroundImage from '../assets/form.jpg'
 import {LockRounded} from '@mui/icons-material'
 import { useMediaQuery } from '@mui/material';
 import OtpPage from '../componenets/OTP_Validation';
+import SpinnerRotating from '../skeletons/spinner';
+
+
 
 const MyLoginPage = ({  }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [otp,setOtp]=useState(false)
     const apiUrl=process.env.VITE_API_URL
-    
+    const [pending,setPending]=useState(false)
+
     const login = useLogin();
     const notify = useNotify();
     const md = useMediaQuery('(max-width:768px)');
     const lg = useMediaQuery('(max-width:1400px)');
+    
+
 
     const handleSubmit = e => {
         e.preventDefault();
+        setPending(true)
         fetch(`${apiUrl}/admin/login`,{
             method:'POST',
             headers:{'Content-Type':'application/json'},
@@ -32,7 +39,10 @@ const MyLoginPage = ({  }) => {
             }
         }).catch(() =>
             notify('Invalid email or password')
-        );
+        ).finally(()=>{
+                setPending(false)
+        })
+        ;
     };
 
        
@@ -53,7 +63,7 @@ const MyLoginPage = ({  }) => {
           <OtpPage />)
         :
       (  <div style={{width:'100%',height:'100vh',backgroundImage: `linear-gradient(to right,rgba(0,0,0,0.5), rgba(0,0,0,0.1)), url(${BackgroundImage})`,backgroundPosition:'center',backgroundSize:'cover',display:'flex'}}>
-
+         {pending && <SpinnerRotating />}
        
         <form style={{background:'white', width:md?'60%':'40%',display:'flex',flexDirection:'column',gap:'20px',margin:'auto',padding:'2rem' }} onSubmit={handleSubmit}>
            

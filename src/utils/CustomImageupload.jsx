@@ -17,7 +17,7 @@ const CustomImageUpload = ({ source, onChange }) => {
 
     useEffect(()=>{
         if (resource ==='products'){
-            setSrc(`${process.env.VITE_API_URL}/assets/${resource}/md/${showImage.medium}`)
+            setSrc(`${process.env.VITE_API_URL}/assets/${resource}/md/${showImage?.medium}`)
         }else{
             setSrc(`${process.env.VITE_API_URL}/assets/${resource}/${showImage}`)
         }
