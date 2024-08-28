@@ -9,10 +9,15 @@ import { generateAccessToken,generateAdminRefreshToken } from "../middlewares/au
 import { generateOtp,isOtpValid } from "../utils/otp.js";
 import { sendAdminOTPMail } from "../middlewares/nodemailer.js";
 import Brand from "../models/BrandModel.js";
+import csvParser from 'csv-parser';
+import fs from 'fs'
+import path from 'path'
+import { fileURLToPath } from 'url';
+import { compressAndSaveProductImage } from "../utils/compressImages.js";
 
-
-
-
+// Get current file directory
+const __filename = fileURLToPath(import.meta.url); 
+const __dirname = path.dirname(__filename);
 
 
 
@@ -215,4 +220,159 @@ export const VerifyOTP=async(req,res)=>{
     console.log(error)
     res.status(500).json({ error: 'Error verifying OTP' });
   }
+}
+
+
+
+
+
+
+
+export const AdminCsvFileHandling = (req, res) => {
+  const results = [];
+
+  if (!req.file) {
+    return res.status(400).send('No file uploaded.');
+  }
+
+  // Read and parse the uploaded CSV file
+  fs.createReadStream(req.file.path)
+    .pipe(csvParser())
+    .on('data', (row) => {
+      // Preprocess the row to remove quotes and trim whitespace
+      const cleanedRow = {};
+      for (let key in row) {
+        // Remove any leading/trailing whitespace and extraneous quotes
+        cleanedRow[key.trim()] = row[key].trim().replace(/^"|"$/g, '');
+      }
+      // Push the cleaned row into the results array
+      results.push(cleanedRow);
+    })
+    .on('end', async () => {
+      try {
+        for (const data of results) {
+            try {
+              console.log(data);
+              const options = data.option.split(',').reduce((acc, opt, index) => {
+                const price = data.price.split(',')[index];
+                if (price) {
+                  acc.push({
+                    option: opt.trim(),
+                    price: price.trim(),
+                  });
+                }
+                return acc;
+              }, []);
+                // Create a new product based on the CSV data
+                const product = new Product({
+                    name: data.name,
+                    brand: data.brand,
+                    brandId: data.brandId, // Adjust based on CSV structure
+                    productImage: data.productImage,
+                    category: data.category ? data.category.split(',') : [],
+                    options: options,
+                    details: {
+                        Description: data.Description,
+                        Warnings: data.Warnings,
+                        More: data.More,
+                        DietaryRestrictions: data.DietaryRestrictions ? data.DietaryRestrictions.split(',') : [],
+                        Certifications: data.Certifications ? data.Certifications.split(',') : [],
+                    },
+                });
+
+                // Save the product to the database
+                await product.save();
+                console.log(`Product ${data.name} saved successfully.`);
+            } catch (error) {
+                console.error(`Error saving product ${data.name}: ${error.message}`);
+                // Optionally, you could store failed items in a separate array or log them for further inspection
+            }
+        }
+
+
+        res.status(200).send('CSV file processed and data saved successfully.');
+      } catch (error) {
+        console.error('Error saving data:', error);
+        res.status(500).send('Error processing CSV file.');
+      } finally {
+       
+        fs.unlinkSync(req.file.path);
+      }
+    });
+};
+
+
+
+
+
+
+export const AdminUploadImagesFolder=async (req,res)=>{
+
+  try {
+    const files = req.files;
+    const matchedFiles = [];
+    const productsDir = path.join(__dirname, '../public/products/large');
+ 
+    // Iterate over the uploaded files
+    for (let file of files) {
+      
+        const product = await Product.findOne({ productImage: file.originalname });
+
+        if (product) {
+          const newFilename = `${Date.now()}-${file.originalname.replace(/ /g, '_').replace('.png', '_large.png')}`;
+
+                const newPath = path.join(productsDir, newFilename);
+                  console.log(newPath)
+
+
+                // Move the file to the new location with the new name
+                fs.rename(file.path, newPath, async(err) => {
+                  if (err) {
+                    console.error(`Failed to rename and move file: ${err.message}`);
+                } else {
+                    console.log('fix')
+                    const {outputMediumFileName,outputSmallFileName}=await compressAndSaveProductImage(newFilename)
+                  product.productImage={
+                    large:newFilename,
+                    medium:outputMediumFileName,
+                    small:outputSmallFileName
+                  }
+                  
+                 await product.save()
+                   
+
+
+
+
+
+                }
+                });
+
+
+                matchedFiles.push({ ...file, newFilename });
+            
+        } else {
+            // If no match, delete the file
+            fs.unlinkSync(file.path);
+        }
+    }
+
+    // If no files matched, send a response indicating no files were saved
+    if (matchedFiles.length === 0) {
+        return res.status(400).json({ message: 'No files matched with any product images.' });
+    }else{
+      for (let file of matchedFiles){
+        console.log(matchedFiles)
+        fs.unlinkSync(file.path);
+      }
+       
+    }
+
+    // Pass the matched files to the next middleware/controller
+    
+
+} catch (error) {
+  console.log(error)
+    return res.status(500).json({ error: error.message });
+}
 }
