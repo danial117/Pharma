@@ -2,11 +2,12 @@ import { Edit, SimpleForm, TextInput, NumberInput,SaveButton,Toolbar, DeleteButt
 import CustomArrayInput from '../../utils/CustomArray';
 import { useState } from 'react';
 import CustomImageUpload from '../../utils/CustomImageupload';
-
+import CustomObjectArrayInput from '../../utils/CustomObjectArray';
 const ProductEdit = (props) => {
     const [dietaryRestrictions, setDietaryRestrictions] = useState([]);
     const [certifications, setCertifications] = useState([]);
     const [categories, setCategories] = useState([]);
+    const [options, setOptions] = useState([]);
     const [imageFile, setImageFile] = useState(null);
 
 
@@ -17,6 +18,10 @@ const ProductEdit = (props) => {
 
     const handleCertificationsChange = (updatedArray) => {
         setCertifications(updatedArray);
+    };
+
+    const handleOptionsChange = (updatedArray) => {
+        setOptions(updatedArray);
     };
 
     const handleCategoriesChange = (updatedArray) => {
@@ -42,7 +47,30 @@ const ProductEdit = (props) => {
         if (data.name) formData.append('name', data.name);
         if (data.brand) formData.append('brand', data.brand);
         if (data.price) formData.append('price', Number(data.price).toFixed(2));
-        if (data.options) formData.append('options', data.options);
+        
+        if (Array.isArray(options) && options.length > 0) {
+            options.forEach((option, index) => {
+                // Append each property of the option object with a unique key
+                formData.append(`options[${index}][option]`, option.option);
+                formData.append(`options[${index}][price]`, option.price);
+                
+
+
+
+
+
+
+
+
+            });
+        }
+
+
+
+
+
+
+        
     
         // Append category if it exists and is not empty
         if (data.category && categories.length > 0 ) {
@@ -97,15 +125,17 @@ const ProductEdit = (props) => {
                 <TextInput className='w-[50%]' source="name" />
                 <TextInput className='w-[50%]' source="brand" />
                 <NumberInput className='w-[50%]' source="price" />
-                <TextInput className='w-[50%]' source="options" />
-              
+                
+               
                 <TextInput multiline className='w-[50%]' source="details.Description" />
                 <TextInput multiline className='w-[50%]' source="details.Warnings" />
                 <TextInput multiline className='w-[50%]' source="details.More" />
-
+                
+                <CustomObjectArrayInput source="options" label="Options" onChange={handleOptionsChange} />
                 <CustomArrayInput source="details.DietaryRestrictions" label="Dietary Restrictions" onChange={handleDietaryRestrictionsChange} />
                 <CustomArrayInput source="details.Certifications" label="Certificates" onChange={handleCertificationsChange} />
                 <CustomArrayInput source="category" label="Categories" onChange={handleCategoriesChange} />
+               
                 
             </SimpleForm>
         </Edit>

@@ -1,0 +1,42 @@
+/* Spinner Overlay */
+.spinner-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.8); /* Semi-transparent background */
+    z-index: 9999; /* Highest possible to cover everything */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: auto; /* Ensure the overlay catches all events */
+}
+
+/* Spinner Circle */
+.spinner-circle {
+    width: 60px;
+    height: 60px;
+    border: 8px solid rgba(0, 0, 0, 0.1);
+    border-top-color: #3498db; /* Customize the color */
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+/* Spin Animation */
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Disable Scrolling */
+body.no-scroll {
+    overflow: hidden; /* Prevent scrolling */
+    height: 100%; /* Fix height to prevent scrolling */
+    position: fixed; /* Lock the content in place */
+    width: 100%; /* Ensure full width */
+}

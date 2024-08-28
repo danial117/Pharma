@@ -1,7 +1,7 @@
 
-import { Create, SimpleForm, TextInput, NumberInput,ImageInput, ImageField, useRecordContext } from 'react-admin';
+import { Create, SimpleForm, TextInput,ImageInput, ImageField } from 'react-admin';
 import { useState } from 'react';
-
+import CustomObjectArrayInput from '../../utils/CustomObjectArray';
 
 
 
@@ -12,7 +12,14 @@ const ProductCreate = (props) =>
 
     const [dietaryRestrictions, setDietaryRestrictions] = useState([]);
     const [dietaryRestrictionInput, setDietaryRestrictionInput] = useState('');
-    
+    const [options, setOptions] = useState([]);
+
+    const handleOptionsChange = (updatedArray) => {
+        
+        setOptions(updatedArray);
+    };
+
+   
 
     const handleDietaryRestrictionsInputChange = (event) => {
         setDietaryRestrictionInput(event.target.value);
@@ -72,10 +79,21 @@ const ProductCreate = (props) =>
         if (data.name) formData.append('name', data.name);
         if (data.productImage) formData.append('file', data.productImage.rawFile);
         if (data.brand) formData.append('brand', data.brand);
-        if (data.price) formData.append('price', Number(data.price).toFixed(2));
-        if (data.options) formData.append('options', data.options);
+        
+        if (options && options.length > 0) {
+            console.log(options)
+            options.forEach((option, index) => {
+                console.log(option)
+                formData.append(`options[${index}][option]`, option.option);
+                formData.append(`options[${index}][price]`, option.price.toString());
+            });
+        }
     
         // Append category if it exists and is not empty
+
+       
+
+         
         if (data.category && data.category.length > 0) {
            categories.forEach((cat, index) => {
                 formData.append(`category[${index}]`, cat);
@@ -120,8 +138,9 @@ return(
             <div className=' flex flex-col'>
             <TextInput  source="name" label="Name" />
             <TextInput  source="brand" label="Brand" />
+            <CustomObjectArrayInput onChange={handleOptionsChange} source='options' />
 
-            <NumberInput className='' source="price" label="Price" />
+           
             <div className=''>
             <ImageInput  source="productImage" label="Upload Image">
               <ImageField source="src" title="title" />
@@ -131,10 +150,16 @@ return(
             <TextInput multiline className='' source="details.Warnings" label="Warnings" />
             <TextInput multiline className='' source="details.More" label="More" />
            
-            <TextInput  source="options" label="Options" />
+           
             </div>
 
             <div className='w-full'>
+
+               
+
+           
+
+
 
                 <div>
                 <TextInput  multiline className='w-full'  value={categoriesInput} source="category" onChange={handleCategoriesInputChange}  label="Categories" />

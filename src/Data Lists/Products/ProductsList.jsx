@@ -7,14 +7,17 @@ import { List, Datagrid, TextField, useRecordContext, useResourceContext,CreateB
     TopToolbar,
     SearchInput,
     ShowButton,FilterForm,TextInput } from 'react-admin';
-
+    import { UploadFileRounded, AddPhotoAlternateRounded } from '@mui/icons-material';
+    import { useState } from 'react';
      import { Stack } from '@mui/material';
+     import CsvMenu from '../../utils/CSVFileHandling';
+     import FolderUploadMenu from '../../utils/uploadImagesFolder';
 
     const ImageField = ({ source }) => {
         const record = useRecordContext();
         
         if (!record ) return null;
-        return <img src={`${process.env.VITE_API_URL}/assets/products/sm/${record.productImage.small}`} alt="" style={{ maxWidth: '200px', height: '100px' }} />;
+        return <img src={`${process.env.VITE_API_URL}/assets/products/sm/${record.productImage?.small}`} alt="" style={{ maxWidth: '200px', height: '100px' }} />;
     };
 
 
@@ -22,35 +25,61 @@ import { List, Datagrid, TextField, useRecordContext, useResourceContext,CreateB
    
         <TextInput label="Product Name" source="name" defaultValue="" />,
         <TextInput label="Product Brand" source="brand" defaultValue="" />,
-        <TextInput label="Product Price" source="price" defaultValue="" />,
-        <TextInput label="Product Options" source="option" defaultValue="" />
-        
        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+  
     ];
+
+
     
-    const ListToolbar = () => (
-        <Stack direction="column"  >
+    
+    const ListToolbar = () => {
+ 
+        const [anchorEl, setAnchorEl] = useState(null);
+        const [anchorE2, setAnchorE2] = useState(null);
+
+        const handleClick = (event) => {
+            setAnchorEl(event.currentTarget);
+        };
+
+    
+        const handleClose = () => {
+            setAnchorEl(null);
+        };
+
+        const FolderMenuClick = (event) => {
+            setAnchorE2(event.currentTarget);
+        };
+        
+    
+        const FolderMenuClose = () => {
+            setAnchorE2(null);
+        };
+    
+    
+       return( <Stack direction="column"  >
             <FilterForm filters={postFilters} />
             <div >
                 <FilterButton filters={postFilters} />
                 <ExportButton/>
                 <CreateButton />
+             
+                <UploadFileRounded
+                    style={{ margin: '4px', color: 'blue', cursor: 'pointer',fontSize:35 }}
+                    onClick={handleClick}
+                />
+                 <CsvMenu anchorEl={anchorEl} handleClose={handleClose} />
+                 <AddPhotoAlternateRounded
+                  style={{ margin: '4px', color: 'blue', cursor: 'pointer',fontSize:35 }}
+                  onClick={FolderMenuClick}
+                 />
+                 <FolderUploadMenu anchorE2={anchorE2} handleClose={FolderMenuClose}  />
+               
               
               
             </div>
         </Stack>
     )
+}
 
   
 
@@ -64,7 +93,7 @@ const ProductsList = (props) =>{
             <ImageField />
             <TextField source="name" />
             <TextField source="brand" />
-            <TextField source="price" />
+          
             <ShowButton />
 
             
