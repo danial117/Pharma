@@ -168,7 +168,10 @@ export const GetBrandProducts=async(req,res)=>{
 
 
        if(brand){
-        const products=await Product.find({brand:brand.name}).skip(skip).limit(limit);
+        const products=await Product.find({brand:brand.name,$nor: [
+          { productImage: { $type: "string" } },
+          { productImage: "" }
+        ]}).skip(skip).limit(limit);
        
         res.status(200).json(products)
 }else{

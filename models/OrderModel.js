@@ -10,6 +10,7 @@ const orderSchema = new Schema({
     product: { type: Schema.Types.ObjectId,ref:'Product', required: true },
     quantity: { type: Number, required: true },
     price: { type: Number, required: true },
+    option: { type: Number, required: true }
   }],
   tax:{ type: Number, required: true },
   paymentMethod: { type: String, default: 'Unknown' },

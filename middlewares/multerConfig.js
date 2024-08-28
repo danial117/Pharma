@@ -12,10 +12,14 @@ const __dirname = path.dirname(__filename);
 const newsDir = path.join(__dirname, '../public/news');
 const productsDir = path.join(__dirname, '../public/products/large');
 const brandsDir = path.join(__dirname, '../public/brands');
+const AdminDir = path.join(__dirname, '../admin/files');
 
 // Create directories if they don't exist
 if (!fs.existsSync(newsDir)) {
   fs.mkdirSync(newsDir, { recursive: true });
+}
+if (!fs.existsSync(AdminDir)) {
+  fs.mkdirSync(AdminDir, { recursive: true });
 }
 
 if (!fs.existsSync(productsDir)) {
@@ -31,7 +35,9 @@ const getDestinationFolder = (req) => {
     return productsDir;
   }else if (req.originalUrl.startsWith('/brands/')) {
     return brandsDir;
-  } else {
+  } else if(req.originalUrl.startsWith('/admin')){
+    return AdminDir;
+  } {
     throw new Error('Invalid route for file upload');
   }
 };
@@ -49,8 +55,13 @@ const storage = multer.diskStorage({
     }
   },
   filename: (req, file, cb) => {
-  
-    cb(null, `${Date.now()}-${file.originalname.replace(/ /g, '_').replace('.png','_large.png')}`);
+    if(req.originalUrl.startsWith('/admin')){
+      cb(null, `${Date.now()}-${file.originalname}`);
+    }
+    else{
+      cb(null, `${Date.now()}-${file.originalname.replace(/ /g, '_').replace('.png','_large.png')}`);
+    }
+   
   },
 });
 
@@ -60,11 +71,20 @@ const fileFilter = (req, file, cb) => {
    
     const allowedTypes = /jpeg|jpg|png/;
     const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    const csvAllowedTypes=/csv/;
+    const CsvExtname = csvAllowedTypes.test(path.extname(file.originalname).toLowerCase());
     const mimetype = allowedTypes.test(file.mimetype);
+    const CSVmimetype = csvAllowedTypes.test(file.mimetype);
 
     if (extname && mimetype) {
       return cb(null, true);
-    } else {
+    }
+    else if (CsvExtname && CSVmimetype) {
+      return cb(null, true);
+    }
+
+    
+    else {
       cb(new Error('Only images are allowed'));
     }
   } catch (error) {

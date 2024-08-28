@@ -10,6 +10,8 @@ import Brand from "../models/BrandModel.js";
 const __filename = fileURLToPath(import.meta.url); 
 const __dirname = path.dirname(__filename);
 
+
+
 export const modifiedProductFile = async (req, res,next) => {
     try {
        

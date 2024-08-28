@@ -2,8 +2,12 @@
 import Brand from "../models/BrandModel.js";
 import Product from "../models/ProductModel.js";
 import { compressAndSaveProductImage } from "../utils/compressImages.js";
-
-
+import path from 'path'
+import { fileURLToPath } from 'url';
+import fs from 'fs'
+// Get current file directory
+const __filename = fileURLToPath(import.meta.url); 
+const __dirname = path.dirname(__filename);
 
 
 
@@ -25,8 +29,12 @@ try{
     if (type) {
       let query = {};
       // If type parameter is provided, use regex to match products containing the type in their name
-      query = { name: { $regex: type, $options: 'i' } }; // 'i' option for case-insensitive search
+      query = { name: { $regex: type, $options: 'i' },$nor: [
+        { productImage: { $type: "string" } },
+        { productImage: "" }
+      ]}; // 'i' option for case-insensitive search
       const products = await Product.find(query).skip(skip).limit(limit);
+      console.log(products)
      
       res.status(200).json(products);
     
@@ -36,7 +44,10 @@ try{
     // Calculate the number of documents to skip
     
 
-    const products=await Product.find().skip(skip).limit(limit);
+    const products=await Product.find({ $nor: [
+      { productImage: { $type: "string" } },
+      { productImage: "" }
+    ] }).skip(skip).limit(limit);
   
    
 
@@ -55,9 +66,54 @@ catch(error){
 
 
 
-export const SearchProduct=async(req,res)=>{
 
+
+
+export const SearchProductCategory = async (req, res) => {
+  try {
+    const { search } = req.params;
+    const words = search.trim().toLowerCase().split(/\s+/);
+    const page = parseInt(req.query.page) || 1; // Default to page 1 if not provided
+    const limit = parseInt(req.query.limit) || 10; // Default to 10 items per page if not provided
+  
+    const skip = (page - 1) * limit;
+
+    // Escape special characters for regex safety
+    const escapedWords = words.map(word => word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+
+    // Create a regex pattern to match the exact phrases or words
+    const pattern = new RegExp(`\\b${escapedWords.join('\\b.*?\\b')}\\b`, 'i'); // 'i' for case-insensitive
     
+    const results = await Product.find({
+      $nor: [
+        { productImage: { $type: "string" } },
+        { productImage: "" }
+      ],
+      category: {
+        $elemMatch: {
+          $regex: pattern
+        }
+      }
+    }).skip(skip).limit(limit);
+   console.log(results)
+    res.status(200).json(results);
+  } catch (error) {
+    console.error('Error searching products:', error);
+    res.status(500).json({ error: 'An error occurred while searching for products.' });
+  }
+};
+
+
+
+
+
+
+
+
+
+
+
+export const SearchProduct=async(req,res)=>{
         try {
           // Parse query parameters
           const { product,  page = 1, limit = 10 } = req.query;
@@ -75,7 +131,10 @@ export const SearchProduct=async(req,res)=>{
           const skip = (parseInt(page) - 1) * parseInt(limit);
       
           // Retrieve products from the database with pagination and search
-          const products = await Product.find(query).skip(skip).limit(parseInt(limit));
+          const products = await Product.find({...query,$nor: [
+            { productImage: { $type: "string" } },
+            { productImage: "" }
+          ]}).skip(skip).limit(parseInt(limit));
       
           // Get the total number of matching products to calculate total pages
           const totalProducts = await Product.countDocuments(query);
@@ -105,8 +164,14 @@ export const GetProduct=async(req,res)=>{
     const {productId}=req.params
     const product=await Product.findById(productId)
     
-
-     res.status(200).json(product)
+  
+    if(product && typeof product.productImage !=='string')
+    {
+       res.status(200).json(product)
+      }
+      else{
+        res.status(404).json('Not Found')
+      }
   }
   catch(err){
     console.log(err)
@@ -213,7 +278,7 @@ export const AdminGetProduct=async(req,res)=>{
           modifiedProduct.id = modifiedProduct._id;
           delete modifiedProduct._id;
 
-
+     console.log(modifiedProduct)
           res.status(200).json(modifiedProduct)
 
 
@@ -234,6 +299,7 @@ export const AdminModifyProduct=async(req,res,next)=>{
     try{
 
         const data=req.body;
+        console.log(data)
         
         const {productId} =req.params;
         
@@ -257,7 +323,9 @@ export const AdminModifyProduct=async(req,res,next)=>{
           data['category'] = data.category.map((value) => {
             return value?.replaceAll(' ', '-');
           });
-        }else{
+        }
+        else
+        {
           data['category']=[]
 
         }
@@ -269,7 +337,7 @@ export const AdminModifyProduct=async(req,res,next)=>{
         
         const product = await Product.findById(productId);
         
-        Number(data.price)?.toFixed(2)
+       
         delete data.id
       
         if (!product) {
@@ -304,7 +372,7 @@ export const AdminModifyProduct=async(req,res,next)=>{
     catch(error){
       next(error)
         console.log(error)
-        res.status(500).json('Internal Server Error')
+        
     }
 }
 
@@ -319,9 +387,16 @@ export const AdminCreateProduct=async(req,res,next)=>{
         
         
         const brand=await Brand.findOne({name:data.brand})
+        
+     const imagesPath={};
 
+
+        if(file){
        const {outputMediumFileName,outputSmallFileName}= await compressAndSaveProductImage(file.filename)
-      
+       imagesPath['medium']=outputMediumFileName
+       imagesPath['small']=outputSmallFileName
+       
+      }
       
         // Find the product by ID
        
@@ -329,15 +404,14 @@ export const AdminCreateProduct=async(req,res,next)=>{
         name:data.name,
         brandId:brand?brand._id:null,
         brand:data.brand,
-        price:Number(data.price)?.toFixed(2),
         details:data.details,
         category:data.category?.replaceAll(' ','-'),
         options:data.options,
-        productImage:{
-          medium:outputMediumFileName,
-          large:file.filename,
-          small:outputSmallFileName
-        }
+       productImage:file  && {
+        medium: imagesPath.medium ,
+        large: file.filename,
+        small: imagesPath.small 
+      } 
       })
 
         if (!product) {
@@ -366,40 +440,14 @@ export const AdminCreateProduct=async(req,res,next)=>{
 
 
 
-export const SearchProductCategory = async (req, res) => {
-  try {
-    const { search } = req.params;
-    const words = search.trim().toLowerCase().split(/\s+/);
-    const page = parseInt(req.query.page) || 1; // Default to page 1 if not provided
-    const limit = parseInt(req.query.limit) || 10; // Default to 10 items per page if not provided
-  
-    const skip = (page - 1) * limit;
-
-    // Escape special characters for regex safety
-    const escapedWords = words.map(word => word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
-
-    // Create a regex pattern to match the exact phrases or words
-    const pattern = new RegExp(`\\b${escapedWords.join('\\b.*?\\b')}\\b`, 'i'); // 'i' for case-insensitive
-    console.log(pattern)
-    const results = await Product.find({
-      category: {
-        $elemMatch: {
-          $regex: pattern
-        }
-      }
-    }).skip(skip).limit(limit);
-   console.log(results)
-    res.status(200).json(results);
-  } catch (error) {
-    console.error('Error searching products:', error);
-    res.status(500).json({ error: 'An error occurred while searching for products.' });
-  }
-};
-
-
 
 export const AdminDeleteProduct=async(req,res)=>{
   try {
+
+
+    const largeDir = path.join(__dirname, '../public/products/large');
+    const mediumDir = path.join(__dirname, '../public/products/medium');
+    const smallDir = path.join(__dirname, '../public/products/small');
     // Assuming req.user is populated with user data by authMiddleware
     const { productId } = req.params;
    
@@ -408,7 +456,30 @@ export const AdminDeleteProduct=async(req,res)=>{
     
 
     // Delete the address associated with the userId
+    const product=await Product.findById(productId)
+     
+    if(typeof product.productImage === 'object'){
+      
+      fs.unlinkSync(path.join(largeDir,product.productImage.large))
+      fs.unlinkSync(path.join(mediumDir,product.productImage.medium))
+      fs.unlinkSync(path.join(smallDir,product.productImage.small))
+
+
+    }
+   
+
+
+
+
+
+
+
+
+
     const deletedProduct = await Product.findOneAndDelete({ _id: productId });
+     
+
+
 
     if (!deletedProduct) {
       return res.status(404).json({ error: 'Address not found for deletion' });

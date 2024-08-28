@@ -8,6 +8,7 @@ import Product from "../models/ProductModel.js";
 export const AddToCart = async (req, res) => {
   const { productId,quantity } = req.params;
   const {userId} =req.user;
+  const optionId = JSON.parse(req.query.option);
 
   
 
@@ -36,7 +37,7 @@ export const AddToCart = async (req, res) => {
       return res.status(404).json({ error: 'Product not found' });
     }
 
-    cart.items.push({ product: productId, quantity: quantity });
+    cart.items.push({ product: productId, quantity: quantity,option:optionId });
     await cart.save();
 
     res.status(201).json(cart);

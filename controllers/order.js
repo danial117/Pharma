@@ -119,10 +119,14 @@ export const CreateUserOrder = async (req, res) => {
     if(cart.items.length !== 0){
     const itemsWithPrices = await Promise.all(cart.items.map(async (item) => {
       const product = await Product.findById(item.product);
+     
+      const selectedOption = product.options.find(option => option.id === item.option);
+    
       return {
         product: item.product,
         quantity: item.quantity,
-        price: product.price, // Get price from product model
+        option:item.option,
+        price: selectedOption ? selectedOption.price : 0, // Get price from product model
       };
     }));
 
@@ -264,29 +268,77 @@ function generateOrderNumber() {
 
 
 
-
-
   export const getUserOrder = async (req, res) => {
     try {
       // Assuming req.user is populated with user data by authMiddleware
       const { userId } = req.user;
   
       // Find the user's order
-      const order = await Order.findOne({ user: userId, orderStatus: 'Pending',  orderStatus: {
-        $ne: 'Completed' // Not equal to 'completed'
-    },paymentMethod: 'Unknown'  }).populate('items.product');
-      console.log(order)
+      const order = await Order.findOne({
+        user: userId,
+        orderStatus: { $ne: 'Completed' }, // Exclude completed orders
+        paymentMethod: 'Unknown',
+      }).populate('items.product');
+  
       if (!order) {
         return res.status(404).json({ error: 'Order not found for user' });
       }
   
-      res.status(200).json(order);
+      // Extract only price and option for each item
+      const items = order.items.map((item) => {
+        // Find the matching option in the product's options array
+        const selectedOption = item.product.options.find(select => select.id === item.option);
+      
+        // If a matching option is found, return the object with the desired fields
+        if (selectedOption) {
+          return {
+            product:{
+            price: selectedOption.price,
+            option: selectedOption.option,
+            productImage: item.product.productImage,
+            name:item.product.name,
+            brand:item.product.brand,
+            _id:item.product._id,
+  
+            }
+          };
+        }
+      
+        // If no matching option is found, you can decide what to return, for example:
+     
+      });
+      
+   console.log(items)
+      // Construct the response with only the necessary fields
+      const response = {
+        orderNumber: order.orderNumber,
+        user: order.user,
+        items, // Only price and option fields are included
+        tax: order.tax,
+        paymentMethod: order.paymentMethod,
+        paymentStatus: order.paymentStatus,
+        orderStatus: order.orderStatus,
+        totalAmount: order.totalAmount,
+        itemsAmount: order.itemsAmount,
+        createdAt: order.createdAt,
+        updatedAt: order.updatedAt,
+      };
+      console.log(response)
+  
+      res.status(200).json(response);
     } catch (error) {
       console.error('Error retrieving order:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   };
 
+
+
+
+
+
+
+  
 
 
 
