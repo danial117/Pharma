@@ -41,11 +41,12 @@ import CustomError from "../utils/ErrorClass.js";
     const order = await Order.findOne({ user: userId, orderStatus: 'Pending',  orderStatus: {
       $ne: 'Completed' // Not equal to 'completed'
   },paymentMethod: 'Unknown'  })
+  
  
    if(order){ 
-    const Tax=order.itemsAmount*taxRate.total_rate;
-    const totalAmount=order.itemsAmount+Tax;
-    console.log(Tax,totalAmount)
+    const Tax=Number(order.itemsAmount)*Number(taxRate.total_rate);
+    const totalAmount=Number(order.itemsAmount)+Tax;
+    console.log('t',Tax,totalAmount)
       order.totalAmount = totalAmount;
       order.tax= Tax;
       order.updatedAt = new Date(); 
@@ -106,7 +107,7 @@ export const CreateUserOrder = async (req, res,next) => {
   try {
    
     const { userId } = req.user; 
-    console.log(userId)
+   
     const cart = await Cart.findOne({ user: userId }).select('items');
     const address=await Address.findOne({user:userId}).select('stateCode')
     
@@ -117,11 +118,11 @@ export const CreateUserOrder = async (req, res,next) => {
     
     if(cart.items.length !== 0){
     const itemsWithPrices = await Promise.all(cart.items.map(async (item) => {
-      console.log(item)
+      
       const product = await Product.findById(item.product).select('options');
      console.log('a',product)
       const selectedOption = product.options.find(option => option.id === item.option);
-    
+      console.log(selectedOption.price)
       return {
         product: item.product,
         quantity: item.quantity,
@@ -145,11 +146,12 @@ export const CreateUserOrder = async (req, res,next) => {
    
 
 
-
+       
       
        const Tax=itemsAmount*taxRate.total_rate;
+       
        const totalAmount=itemsAmount+Tax;
-    
+     
 
       
      
@@ -286,11 +288,11 @@ function generateOrderNumber() {
         paymentMethod: 'Unknown',
       }).populate({path: 'items.product',  
         select: 'options productImage name brand'});
-     console.log(order)
+     
       if (!order) {
         return res.status(404).json({ error: 'Order not found for user' });
       }
-     console.log(order)
+    
       // Extract only price and option for each item
       const items = order.items.map((item) => {
         // Find the matching option in the product's options array
