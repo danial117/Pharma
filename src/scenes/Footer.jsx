@@ -6,7 +6,7 @@ import Upwork from "../assets/svg/upwork"
 import Fiveer from "../assets/svg/fiveer"
 
 import {LocalPhoneRounded,EmailRounded} from '@mui/icons-material'
-
+import { useCMS } from '../cartContext/CmsContext'
 
 
 
@@ -19,7 +19,7 @@ import {LocalPhoneRounded,EmailRounded} from '@mui/icons-material'
 
 
 const Footer=()=>{
-
+    const cmsData = useCMS();
 
     return(
         <>
@@ -56,31 +56,31 @@ const Footer=()=>{
         <div className="flex flex-col gap-y-2">
 
             <p className="font-bold text-white text-lg font-Lexend">Contact</p>
-            <div className="flex flex-row gap-x-2">
-                <div className="text-white">
-                    <LocalPhoneRounded />
-                </div>
-
-                <p className="text-white font-Abel">123 456 7890</p>
-
-            </div>
+          
 
             <div className="flex flex-row gap-x-2">
                 <div className="text-white">
                     <EmailRounded />
                 </div>
 
-                <p className="text-white font-Abel">abc@gmail.com</p>
+                <p className="text-white font-Abel">{cmsData.FooterContent?.email}</p>
 
             </div>
 
             <p className="my-2 text-white -mb-2 text-lg font-Lexend">Follow Us</p>
             <div className="flex flex-row gap-x-2">
-                <Facebook />
-                <Upwork />
-                <Linkedin/>
-                <Fiveer />
-
+                <a className="cursor-pointer" href={cmsData?.FooterContent?.facebookLink} target="_blank" rel="noopener noreferrer">
+        <Facebook />
+      </a>
+      <a className="cursor-pointer" href={cmsData?.FooterContent?.twitterLink} target="_blank" rel="noopener noreferrer">
+        <Upwork />
+      </a>
+      <a className="cursor-pointer" href={cmsData?.FooterContent?.youtubeLink} target="_blank" rel="noopener noreferrer">
+        <Linkedin />
+      </a>
+      <a className="cursor-pointer" href={cmsData?.FooterContent?.instagramLink} target="_blank" rel="noopener noreferrer">
+        <Fiveer />
+      </a>
             </div>
 
            

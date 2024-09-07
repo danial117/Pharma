@@ -11,7 +11,7 @@ import { TruncateText } from "../utility functions/TranctuateText";
 import { useNavigate } from "react-router-dom";
 import { removeItemFromCart } from "../state";
 import ReactGA from 'react-ga4';
-
+import SpinnerRotating from "../skeleton/spinner";
 
 
 
@@ -29,8 +29,8 @@ const Order=()=>{
     const cartItems=useSelector((state)=>state.cartItems);
     const [order,setOrder]=useState(false)
     const cartItemIds = cartItems.map(item => item._id);
-     
-     console.log(cartItemIds)
+    const [loading,setLoading]=useState(false);
+    
      
 
 
@@ -72,6 +72,7 @@ const Order=()=>{
 
         const fetchOrder = async () => {
           try {
+            setLoading(true)
             const response = await api.get('/order/createOrder');
             
             if (response.status === 201) {
@@ -95,8 +96,10 @@ const Order=()=>{
                 setOrder(data);
                 setProducts(items);
                 setTotalPrice(data.totalAmount);
+                setLoading(false)
               }
             } catch (error) {
+              setLoading(false)
               console.error('Error fetching order:', error);
             }
           }
@@ -115,6 +118,7 @@ const Order=()=>{
 
 
       useEffect(()=>{
+
           api.get('/address/')
         .then((response)=>response.data).then((data)=>setAddress(data));
         
@@ -223,7 +227,7 @@ const Order=()=>{
 
     <NavBar />
     
-
+   {loading && <SpinnerRotating />}
 
     <div className=" w-[100%] p-8">
 

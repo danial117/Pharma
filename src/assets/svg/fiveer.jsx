@@ -2,29 +2,57 @@
 
 const Fiveer = () => {
 
-  const OpenUpwork = () => {
-    // Replace the URL with the desired link
-    const url = 'https://www.upwork.com/freelancers/~01c3695e7102934612';
-    // Open the URL in a new tab
-    window.open(url, '_blank');
-  };
 
   return (
     <svg
-    onClick={OpenUpwork}
-    className="cursor-pointer" 
-      xmlns="http://www.w3.org/2000/svg"
-      xmlnsXlink="http://www.w3.org/1999/xlink"
-      viewBox="0 0 256 256"
-      width="50px"
-      height="50px"
-    >
-      <g fill="#ffffff" fillRule="nonzero">
-        <g transform="scale(5.12,5.12)">
-          <path d="M25,2c-12.69071,0 -23,10.3093 -23,23c0,12.6907 10.30929,23 23,23c12.69071,0 23,-10.3093 23,-23c0,-12.6907 -10.30929,-23 -23,-23zM25,4c11.60983,0 21,9.39017 21,21c0,11.60983 -9.39017,21 -21,21c-11.60983,0 -21,-9.39017 -21,-21c0,-11.60982 9.39017,-21 21,-21zM26.5,11c-4.921,0 -8.09089,3.037 -8.46289,8h-4.03711v6h4v11h6v-11h4v11h6v-17h-9.93359c0.294,-1.999 1.51259,-2 2.43359,-2h2.53125v-6z"></path>
+    xmlns="http://www.w3.org/2000/svg"
+    xmlnsXlink="http://www.w3.org/1999/xlink"
+    viewBox="0 0 255.98958 255.98958"
+    width="55px"
+    height="55px"
+    fillRule="nonzero"
+  >
+    <g transform="translate(66.55729,66.55729) scale(0.48)">
+      <g
+        fill="none"
+        fillRule="nonzero"
+        stroke="#ffffff"
+        strokeWidth="25.36"
+        strokeLinecap="butt"
+        strokeLinejoin="miter"
+        strokeMiterlimit="10"
+        strokeDasharray=""
+        strokeDashoffset="0"
+        fontFamily="none"
+        fontWeight="none"
+        fontSize="none"
+        textAnchor="none"
+        style={{ mixBlendMode: 'normal' }}
+      >
+        <path d="M127.99479,339.41507c-116.7642,0 -211.42028,-94.65608 -211.42028,-211.42028v0c0,-116.7642 94.65608,-211.42028 211.42028,-211.42028v0c116.7642,0 211.42028,94.65608 211.42028,211.42028v0c0,116.7642 -94.65608,211.42028 -211.42028,211.42028z" id="shape"></path>
+      </g>
+      <g
+        fill="#ffffff"
+        fillRule="nonzero"
+        stroke="none"
+        strokeWidth="1"
+        strokeLinecap="butt"
+        strokeLinejoin="miter"
+        strokeMiterlimit="10"
+        strokeDasharray=""
+        strokeDashoffset="0"
+        fontFamily="none"
+        fontWeight="none"
+        fontSize="none"
+        textAnchor="none"
+        style={{ mixBlendMode: 'normal' }}
+      >
+        <g transform="scale(5.12)">
+          <path d="M16,3c-7.17,0 -13,5.83 -13,13v18c0,7.17 5.83,13 13,13h18c7.17,0 13,-5.83 13,-13v-18c0,-7.17 -5.83,-13 -13,-13zM37,11c1.1,0 2,0.9 2,2c0,1.1 -0.9,2 -2,2c-1.1,0 -2,-0.9 -2,-2c0,-1.1 0.9,-2 2,-2zM25,14c6.07,0 11,4.93 11,11c0,6.07 -4.93,11 -11,11c-6.07,0 -11,-4.93 -11,-11c0,-6.07 4.93,-11 11,-11zM25,16c-4.96,0 -9,4.04 -9,9c0,4.96 4.04,9 9,9c4.96,0 9,-4.04 9,-9c0,-4.96 -4.04,-9 -9,-9z"></path>
         </g>
       </g>
-    </svg>
+    </g>
+  </svg>
   );
 };
 
