@@ -3,7 +3,30 @@
 
 import mongoose from "mongoose";
 import { Schema } from "mongoose";
-const { Decimal128 } = mongoose.Types;
+
+
+const SchemaTypes = mongoose.Schema.Types;
+
+
+
+
+
+function getCosts(value) {
+  if (value && typeof value.toString === 'function') {
+    // Convert Decimal128 to string and return it
+    console.log(value.toString())
+    return value.toString();
+  }
+  return value; // Return value as-is if it's undefined or null
+}
+
+
+
+// Define the toFixedTwo function to return Decimal128-compatible values
+const toFixedTwo = (num) => {
+  // Return Decimal128 with two decimal places
+  return mongoose.Types.Decimal128.fromString((Math.round(num * 100) / 100).toFixed(2));
+};
 
 const productImageSchema = new Schema({
   medium: {
@@ -46,21 +69,10 @@ const optionSchema = new mongoose.Schema({
     trim: true,
   },
   price: {
-    type: Number,
+    type: SchemaTypes.Decimal128,
     required: true,
-    get: v =>{
-      
-      return v ? Number(v).toFixed(2) : v;
-
-      
-      },
-    set: v => {
-      console.log(v)
-      // Convert the value to a number, fix it to 2 decimal places, and then convert it to a string for Decimal128
-      const formattedValue = Number(v).toFixed(2);
-      
-      return mongoose.Types.Decimal128.fromString(formattedValue);
-    }
+    get:getCosts,
+    set: toFixedTwo
   }
   
 }, { _id: false, toJSON: { getters: true }, toObject: { getters: true }  });

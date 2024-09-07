@@ -1,8 +1,9 @@
 import jwt from "jsonwebtoken";
 import User from '../models/UserModel.js';
+import CustomError from "../utils/ErrorClass.js";
 // Generate Access Token
 export const generateAccessToken = (userId) => {
-  return jwt.sign({ userId }, process.env.JWT_ACCESS_SECRET, { expiresIn: '15m' });
+  return jwt.sign({ userId }, process.env.JWT_ACCESS_SECRET, { expiresIn: '60m' });
 };
 
 // Generate Refresh Token
@@ -28,18 +29,33 @@ export const verifyAccessToken = (req, res, next) => {
   
     jwt.verify(token, process.env.JWT_ACCESS_SECRET, (err, decoded) => {
       if (err) {
-        console.error('Access token verification error:', err);
-        return res.status(403).json({ error: 'Access token invalid' });
+        console.log(err)
+        return res.status(401).json({ error: 'Unauthorized' });
       }
-      req.user = decoded; // Attach decoded user information to the request object
+       console.log(decoded)
+        req.user = decoded; // Attach decoded user information to the request object
       
-      next();
+        next();
+
+      
+     
     });
   }
   catch(error){
     res.status(501).json('Internal Server Error')
   }
   };
+
+
+
+
+
+
+
+
+
+
+
   
   // Verify Refresh Token
   export const verifyRefreshToken = (token) => {
@@ -49,17 +65,19 @@ export const verifyAccessToken = (req, res, next) => {
    
     return new Promise((resolve, reject) => {
       if (!token) {
-        console.log('No token');
+        
         return reject(new Error('No token provided'));
       }
   
       jwt.verify(token, process.env.JWT_REFRESH_SECRET, (err, decoded) => {
         if (err) {
-          console.error('Refresh token verification error:', err);
+        
           return reject(err);
+        }else{
+          resolve(decoded);
         }
        
-        resolve(decoded);
+        
       });
     });
   }
@@ -87,13 +105,15 @@ export const verifyAccessToken = (req, res, next) => {
   
       jwt.verify(token, process.env.JWT_SECRET, async (err, user) => {
         if (err) {
-          return res.sendStatus(403);
-        }
-        req.user = user;
+          return res.sendStatus(401).json('Unauthorized Access');
+        }else{
+          req.user = user;
         next();
+        }
+        
       });
     } else {
-      res.sendStatus(401);
+      res.sendStatus(401).json('Unauthorized Access');
     }
   };
   
@@ -124,7 +144,7 @@ export const verifyAccessToken = (req, res, next) => {
       req.user = user;
       next();
     } catch (error) {
-      console.error('Error refreshing token:', error);
+     
       res.sendStatus(500);
     }
   };
@@ -140,8 +160,7 @@ export const verifyAccessToken = (req, res, next) => {
   console.log(token)
   const data= jwt.verify(token, process.env.JWT_REFRESH_SECRET, (err, decoded) => {
     if (err) {
-      console.error('Access token verification error:', err);
-      
+           throw new Error
     }
     
     return decoded.userId
@@ -178,7 +197,7 @@ export const verifyAccessToken = (req, res, next) => {
        
         
     } catch (err) {
-      console.log(err)
+    
         res.status(401).json({ message: 'Invalid token' });
     }
 };

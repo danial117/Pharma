@@ -1,6 +1,6 @@
 
 import NewsBlog from "../models/NewsModel.js";
-
+import CustomError from "../utils/ErrorClass.js";
 
 
 
@@ -10,11 +10,11 @@ export const AdminCreateNews=async(req,res,next)=>{
         const data = req.body;
         
         const file=req.file
-        console.log(file)
+       
        
        
     
-        // Find the product by ID
+       
        
       const news=new NewsBlog({
         title:data.newsTitle,
@@ -36,10 +36,8 @@ export const AdminCreateNews=async(req,res,next)=>{
 
 
 
-    }catch(error){
-      console.log(error)
-      next(error)
-        res.status(501).json('Internal Server Error')
+    }catch(err){
+      next(new CustomError(err.message, 500));
     }
 }
 
@@ -57,7 +55,7 @@ export const AdminCreateNews=async(req,res,next)=>{
 
 
 
-export const AdminGetNewsBlog=async(req,res)=>{
+export const AdminGetNewsBlog=async(req,res,next)=>{
 
   try{
 
@@ -76,13 +74,12 @@ export const AdminGetNewsBlog=async(req,res)=>{
 
 
 
-  }catch(error){
-      console.log(error)
-      res.status(500).json('Internal Server error')
-  }
+  }catch(err){
+      
+    next(new CustomError(err.message, 500));
 }
 
-
+}
 
 
 
@@ -133,10 +130,9 @@ export const AdminModifyNews=async(req,res,next)=>{
 
   }
 
-  catch(error){
-      console.log(error)
-      next(error)
-      res.status(500).json('Internal Server Error')
+  catch(err){
+  
+    next(new CustomError(err.message, 500));
   }
 }
 
@@ -154,7 +150,7 @@ export const AdminModifyNews=async(req,res,next)=>{
 
 
 
-export const AdminGetAllNewsBlogs = async (req, res) => {
+export const AdminGetAllNewsBlogs = async (req, res,next) => {
   try {
     // Extract filter, range, and sort parameters from the query
     const filter = JSON.parse(req.query.filter || '{}');
@@ -184,7 +180,7 @@ export const AdminGetAllNewsBlogs = async (req, res) => {
       }
     }
 
-    console.log(query)
+    
     // Find orders based on the filter, sort, skip, and limit
     const newsBlogs = await NewsBlog.find(query).sort(sortObject).skip(skip).limit(limit);
     const totalNews = await NewsBlog.countDocuments(query);
@@ -203,9 +199,9 @@ export const AdminGetAllNewsBlogs = async (req, res) => {
     });
 
     res.status(200).json(modifiedNews);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json('Internal Server Error');
+  } catch (err) {
+   
+    next(new CustomError(err.message, 500));
   }
 };
 
@@ -231,7 +227,7 @@ export const AdminGetAllNewsBlogs = async (req, res) => {
 
 
 
-export const AdminDeleteNews=async(req,res)=>{
+export const AdminDeleteNews=async(req,res,next)=>{
   try {
     // Assuming req.user is populated with user data by authMiddleware
     const { newsId } = req.params;
@@ -248,9 +244,8 @@ export const AdminDeleteNews=async(req,res)=>{
     }
 
     res.status(200).json({ message: 'News deleted successfully' });
-  } catch (error) {
-    console.error('Error deleting News:', error);
-    res.status(500).json({ error: 'Internal server error' });
+  } catch (err) {
+    next(new CustomError(err.message, 500));
   }
 
 
@@ -263,7 +258,7 @@ export const AdminDeleteNews=async(req,res)=>{
 
 
 
-export const GetNews=async(req,res)=>{
+export const GetNews=async(req,res,next)=>{
 
 
   try{
@@ -278,7 +273,7 @@ export const GetNews=async(req,res)=>{
       
       
    
-      const products=await NewsBlog.find().skip(skip).limit(limit);
+      const products=await NewsBlog.find({imageUrl:{$ne:''}}).select('title topic timestamp content imageUrl').skip(skip).limit(limit);
     
      
     setTimeout(()=>{
@@ -290,9 +285,9 @@ export const GetNews=async(req,res)=>{
   
   
   }
-  catch(error){
-      console.log(error);
-      res.status(501).json('Internal Server Error')
+  catch(err){
+     
+    next(new CustomError(err.message, 500));
   }
   
   
@@ -304,7 +299,7 @@ export const GetNews=async(req,res)=>{
 
 
 
-  export const GetNewsById=async(req,res)=>{
+  export const GetNewsById=async(req,res,next)=>{
 
     try{
 
@@ -313,23 +308,22 @@ export const GetNews=async(req,res)=>{
         
     
         // Perform a case-insensitive search in the database
-       const news=await NewsBlog.findById(newsId)
+       const news=await NewsBlog.findById(newsId).select('title topic timestamp content imageUrl')
        
-        console.log(news)
+        
       
 
 
-       
-
+       if(news && news.imageUrl !=='' && news.imageUrl.length !==0)
+      {
         res.status(200).json(news)
-
-      
+      }
 
 
 
     }catch(err){
-        res.status(500).json('Internal Server Error')
-        console.log(err)
+      next(new CustomError(err.message, 500));
+      
     }
 }
 

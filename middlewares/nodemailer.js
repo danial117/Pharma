@@ -3,7 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import jwt from 'jsonwebtoken';
  import dotenv from 'dotenv'
-
+import CustomError from '../utils/ErrorClass.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const publicDir=path.resolve(__dirname,'..');
@@ -27,7 +27,7 @@ export const welcomeMail = async (req,res,next) => {
 
 
        const {email,username}=req.userData;
-       console.log(username,email)
+     
 
        newUserMail(username,email)
      
@@ -35,8 +35,8 @@ export const welcomeMail = async (req,res,next) => {
         
      
 
-}catch(error){
-    console.log(error)
+}catch(err){
+    next(new CustomError(err.message,500))
 }
 }
 
@@ -269,9 +269,9 @@ export async function newUserMail(username,email) {
           ],
       });
     
-      console.log("Message sent: %s", info.messageId);
+      
     }catch(error){
-        console.log(error)
+       
     }
     
 }
@@ -304,8 +304,8 @@ const info = await transporter.sendMail({
 
 console.log("Message sent: %s", info.messageId);
 
-}catch(error){
-    console.log(error);
+}catch(err){
+  (new CustomError(err.msg, 500));
 }
 
   }
@@ -373,9 +373,9 @@ console.log("Message sent: %s", info.messageId);
     try {
       // Send the email
       const info = await transporter.sendMail(mailOptions);
-      console.log('Password recovery email sent:', info.response);
-    } catch (error) {
-      console.error('Error sending password recovery email:', error);
+      
+    } catch (err) {
+      (new CustomError(err.message, 500));
     }
   };
   
@@ -750,9 +750,10 @@ console.log("Message sent: %s", info.messageId);
         subject:'Order Successfull'
       });
     
-      console.log("Message sent: %s", info.messageId);
-    }catch(error){
-        console.log(error)
+    
+    }catch(err){
+      (new CustomError(err.message, 500));
+        
     }
     
 }

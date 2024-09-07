@@ -4,7 +4,7 @@ import fs from 'fs';
 import { fileURLToPath } from "url";
 import NewsBlog from "../models/NewsModel.js";
 import Brand from "../models/BrandModel.js";
-
+import CustomError from "../utils/ErrorClass.js";
 
 
 const __filename = fileURLToPath(import.meta.url); 
@@ -31,16 +31,16 @@ export const modifiedProductFile = async (req, res,next) => {
         if (productImageFileName) {
             const imageSizes = ['large', 'medium', 'small']; // Array of directory names corresponding to image sizes
             const imageBaseName = productImageFileName.replace(/(_large|_medium|_small)/, '').replace('.png',''); // Remove size suffix
-            console.log(imageBaseName)
+          
             imageSizes.forEach((size) => {
                 const imagePath = path.join(__dirname, `../public/products/${size}`, `${imageBaseName}_${size}.png`);
                 
                 // Remove the image file if it exists
                 if (fs.existsSync(imagePath)) {
                     fs.unlinkSync(imagePath);
-                    console.log('Deleted:', imagePath);
+                    
                 } else {
-                    console.log('File not found:', imagePath);
+                   
                 }
             }
             )
@@ -53,7 +53,7 @@ export const modifiedProductFile = async (req, res,next) => {
             if (fs.existsSync(imagePath)) {
                 fs.unlinkSync(imagePath);
             } else {
-                console.log('File not found:', imagePath);
+               
             }
         }
 }
@@ -63,8 +63,8 @@ export const modifiedProductFile = async (req, res,next) => {
 
        
     } catch (error) {
-        console.error(error);
-        res.status(500).json('Internal Server Error');
+       
+        next(new CustomError(err.message, 500));
     }
 };
 
@@ -104,8 +104,7 @@ export const modifiedNewsFile = async (req, res,next) => {
 
        
     } catch (error) {
-        console.error(error);
-        res.status(500).json('Internal Server Error');
+        next(new CustomError(err.message, 500));
     }
 };
 
@@ -146,8 +145,7 @@ export const modifiedBrandFile = async (req, res,next) => {
 
        
     } catch (error) {
-        console.error(error);
-        res.status(500).json('Internal Server Error');
+        next(new CustomError(err.message, 500));
     }
 };
 

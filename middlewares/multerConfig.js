@@ -3,7 +3,7 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
-
+import CustomError from '../utils/ErrorClass.js';
 // Get current file directory
 const __filename = fileURLToPath(import.meta.url); 
 const __dirname = path.dirname(__filename);
@@ -38,7 +38,7 @@ const getDestinationFolder = (req) => {
   } else if(req.originalUrl.startsWith('/admin')){
     return AdminDir;
   } {
-    throw new Error('Invalid route for file upload');
+    (new CustomError('Invalid Router for multer file processing', 500))
   }
 };
 
@@ -50,8 +50,8 @@ const storage = multer.diskStorage({
      
       const destinationFolder = getDestinationFolder(req);
       cb(null, destinationFolder);
-    } catch (error) {
-      cb(error);
+    } catch (err) {
+      cb(new CustomError(err.message, 500));
     }
   },
   filename: (req, file, cb) => {
@@ -85,11 +85,11 @@ const fileFilter = (req, file, cb) => {
 
     
     else {
-      cb(new Error('Only images are allowed'));
+      cb(new CustomError('Extension unallowed', 500));
     }
-  } catch (error) {
+  } catch (err) {
     
-    cb(new Error('Error processing file'));
+    cb(new CustomError(err.message, 500));
   }
 };
 

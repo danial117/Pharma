@@ -3,10 +3,10 @@ import { generateAccessToken, JWTUserPasswordRecovery } from '../middlewares/aut
 import { generateRefreshToken,generateAdminRefreshToken } from "../middlewares/auth.js";
 import { sendPasswordRecoveryEmail } from "../middlewares/nodemailer.js";
 import {VerifyUserJWTToken} from '../middlewares/auth.js';
+import bcrypt from 'bcrypt'
 
 
-
-
+const saltRounds = 10;
 
 
 
@@ -20,42 +20,56 @@ export const Register = async (req, res, next) => {
       return res.status(409).json({ message: 'User with this email already exists' });
     }
 
-    // If user doesn't exist, proceed to create a new one
-    const user = new User({
-      name: name,
-      email: email,
-      password: password,
-      phone: phone,
-      authenticationMethod: 'local'
-    });
-
-    const userSaved = await user.save();
-
-    // Generate tokens
-    const accessToken = generateAccessToken(userSaved._id);
-    const refreshToken = generateRefreshToken(userSaved._id);
-
-    // Set refresh token as a cookie
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      path: '/', // Adjust the path as needed
-      maxAge: 7 * 24 * 60 * 60 * 1000, // Example: 7 days expiry
-      secure: process.env.NODE_ENV === 'production', // Set to true in production
-      sameSite: 'Strict', // Adjust as per your CORS settings
-    });
-
-    req.userData = {
-      email: userSaved.email,
-      username: userSaved.name
-    };
-
+   bcrypt.hash(password, saltRounds, async(err, hashedPassword) => {
+      if (err) throw err;
+      console.log(hashedPassword)
+      // If user doesn't exist, proceed to create a new one
+      const user = new User({
+        name: name,
+        email: email,
+        password: hashedPassword,
+        phone: phone,
+        authenticationMethod: 'local'
+      });
+  
+      const userSaved = await user.save();
+  
+      // Generate tokens
+      const accessToken = generateAccessToken(userSaved._id);
+      const refreshToken = generateRefreshToken(userSaved._id);
+  
+      // Set refresh token as a cookie
+      res.cookie('refreshToken', refreshToken, {
+        httpOnly: true,
+        path: '/', // Adjust the path as needed
+        maxAge: 7 * 24 * 60 * 60 * 1000, // Example: 7 days expiry
+        secure: process.env.NODE_ENV === 'production', // Set to true in production
+        sameSite: 'Strict', // Adjust as per your CORS settings
+      });
+  
+      req.userData = {
+        email: userSaved.email,
+        username: userSaved.name
+      };
+  
+     const userResponse={
+        email: userSaved.email,
+        username: userSaved.name
+      }
+  
     
-    res.status(201).json({ userData: userSaved, accessToken });
-
-    next();
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error' });
+  
+      
+      res.status(201).json({ userData: userResponse, accessToken });
+  
+      next();
+  });
+ 
+  } catch (err) {
+   
+   
+      next(new CustomError(err.message, 500));
+    
   }
 };
 
@@ -79,8 +93,10 @@ export const Logout=async(req,res)=>{
     res.status(200).json({ message: 'Logout successful' });
 
   }
-  catch(error){
-    res.status(501).json('Internal Server Error')
+  catch(err){
+  
+      next(new CustomError(err.message, 500));
+    
   }
 }
 
@@ -88,38 +104,104 @@ export const Logout=async(req,res)=>{
 
 
 
+
+
+
+
+
+
+
+
+
+
+
  
+export const Login = async (req, res) => {
+  try {
+      const { email, password } = req.body;
 
- export const Login=async(req,res)=>{
-    try{
-      const {email,password} =req.body;
+      
+      const user = await User.findOne({ email: email,authenticationMethod:{$ne:'google' }})
+          .select('name email password');
 
-    console.log(req.body)
-    const user=await User.findOne({email:email});
+      if (user) {
+          const isMatch = await bcrypt.compare(password, user.password);
+          if (isMatch) {
+              const accessToken = generateAccessToken(user._id);
+              const refreshToken = generateRefreshToken(user._id);
+            
 
-    if(user ){
-        if(user.password === password){
-            const accessToken = generateAccessToken(user._id);
-            const refreshToken = generateRefreshToken(user._id);
-          console.log(refreshToken)
-            res.cookie('refreshToken', refreshToken, {
-              httpOnly: true,
-              path: '/', // Adjust the path as needed
-              maxAge: 7 * 24 * 60 * 60 * 1000, // Example: 7 days expiry
-              secure: process.env.NODE_ENV === 'production', // Set to true in production
-              sameSite: '', // Adjust as per your CORS settings
-            });
-           
-            res.status(200).json({modifiedUser:user,accessToken})
-           
-        }
-    }else{
-        res.status(301)
-    }
-    }catch(error){
-        console.log(error);
-    }
+              res.cookie('refreshToken', refreshToken, {
+                  httpOnly: true,
+                  path: '/', // Adjust the path as needed
+                  maxAge: 7 * 24 * 60 * 60 * 1000, // Example: 7 days expiry
+                  secure: process.env.NODE_ENV === 'production', // Set to true in production
+                  sameSite: '', // Adjust as per your CORS settings
+              });
+
+              const userResponse = {
+                  name: user.name,
+                  email: user.email,
+              };
+
+              res.status(200).json({ modifiedUser: userResponse, accessToken });
+          } else {
+              res.status(401).json('Invalid password');
+          }
+      } else {
+          res.status(404).json('User not found');
+      }
+  } catch (err) {
+   
+      next(new CustomError(err.message, 500));
+    
+     
+  }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+export const AdminGetUser=async(req,res)=>{
+
+  try{
+
+      const {userId}=req.params;
+      
+      const user=await User.findById(userId);
+      
+      const modifiedUser = user.toObject(); // Convert Mongoose document to plain JavaScript object
+        modifiedUser.id = modifiedUser._id;
+        delete modifiedUser._id;
+
+
+        res.status(200).json(modifiedUser)
+
+
+
+
+
+  }catch(err){
+      
+
+      next(new CustomError(err.message, 500));
+    
+  }
 }
+
+
+
+
+
 
 
 
@@ -134,7 +216,40 @@ export const AdminGetAllUsers=async(req,res)=>{
 
   try{
 
-    const users=await User.find({});
+    const filter = JSON.parse(req.query.filter || '{}');
+    const range = JSON.parse(req.query.range || '[0, 10]');
+    const sort = JSON.parse(req.query.sort || '["createdAt", "ASC"]');
+    
+    // Convert the sort array to an object for MongoDB
+    const sortObject = {};
+    sortObject[sort[0]] = sort[1] === 'DESC' ? -1 : 1;
+
+    // Extract pagination parameters
+    const skip = range[0];
+    const limit = range[1] - range[0] + 1;
+
+    // Build the query based on filter
+    const query = {};
+    if (filter) {
+      for (const key in filter) {
+        if (filter.hasOwnProperty(key)) {
+          // Check if the value is a number or a string
+          if (!isNaN(filter[key])) {
+            query[key] = filter[key]; // Direct match for numeric fields
+          } else {
+            query[key] = { $regex: new RegExp(filter[key], 'i') }; // Case-insensitive search for string fields
+          }
+        }
+      }
+    }
+
+
+   
+    const users=await User.find(query).sort(sortObject).skip(skip).limit(limit);
+    const totalUsers = await User.countDocuments(query);
+
+
+
     const modifiedUsers = users.map(user => {
       const userObject = user.toObject(); // Convert Mongoose document to plain JavaScript object
       userObject.id = userObject._id;
@@ -142,8 +257,8 @@ export const AdminGetAllUsers=async(req,res)=>{
       return userObject;
     });
     res.set({
-      'X-Content-Header': 'application/json',
-      'X-Total-Count': modifiedUsers.length,
+     'Content-Range': `news ${range[0]}-${range[1]}/${totalUsers}`,
+      'X-Total-Count': totalUsers,
     });
     
 
@@ -151,12 +266,29 @@ export const AdminGetAllUsers=async(req,res)=>{
 
 
 
-  }catch(error){
-    console.log(error)
-    res.status(500).json('Internal Server Error')
+  }catch(err){
+  
+      next(new CustomError(err.message, 500));
+    
 
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -185,11 +317,38 @@ export const UserForgotPasswoard=async(req,res)=>{
 
   res.status(200).json({ message: 'Reset link sent' });
 }
-catch(error){
-  console.log(error)
-  res.status(501).json('Internal Server Error')
+catch(err){
+ 
+ 
+    next(new CustomError(err.message, 500));
+  
 }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -201,7 +360,7 @@ export const UserResetPassword=async(req,res)=>{
 
   try{
   const { token, password } = req.body;
-   console.log(req,password)
+  
    const userId=await VerifyUserJWTToken(token)
    const user=await User.findById(userId)
 
@@ -215,9 +374,11 @@ export const UserResetPassword=async(req,res)=>{
 
   res.status(200).json({ message: 'Password has been reset.' });
 }
- catch(error){
-  res.status(501).json('Internal Server Error')
-  console.log(error)
+ catch(err){
+  
+    next(new CustomError(err.message, 500));
+  
+ 
  }
 }
 
