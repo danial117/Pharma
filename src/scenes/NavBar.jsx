@@ -38,6 +38,12 @@ const NavBar=()=>{
   const [profilePicture,setProfilePicture]=useState(false)
 
   const [anchorEl, setAnchorEl] = useState(null);
+  
+
+
+
+
+
 
   const handleClick = (event) => {
     
@@ -69,29 +75,34 @@ const NavBar=()=>{
                  <p onClick={()=>{window.location.href='/'}}   className="text-[2rem] ml-4 cursor-pointer md:max-lg:text-center md:max-lg:my-2 md:max-lg:text-[1.6rem]">Info<span>vit</span></p>
 
             </div>
-           {isMobile && <div className="flex text-center my-auto justify-center   className='font-Abel text-lg' mx-auto gap-x-16 md:max-lg:gap-x-4 basis-[70%] md:max-lg:basis-[80%] mx-auto flex-row">
+        {
+
+          isMobile && <div className="flex text-center my-auto justify-center   className='font-Abel text-lg' mx-auto gap-x-16 md:max-lg:gap-x-4 basis-[70%] md:max-lg:basis-[80%] mx-auto flex-row">
                 <p onClick={()=>{window.location.href='/'}} className='font-Lexend cursor-pointer md:max-lg:text-[14px] text-lg'>Home <span><KeyboardArrowDownRounded/></span></p>
                 <p onClick={()=>{window.location.href='/about'}} className='font-Lexend cursor-pointer md:max-lg:text-[14px] text-lg'>About <span><KeyboardArrowDownRounded/></span></p>
                 <p onClick={()=>{window.location.href='/news'}} className='font-Lexend cursor-pointer md:max-lg:text-[14px] text-lg'>News <span><KeyboardArrowDownRounded/></span></p>
                 <p  onClick={()=>{window.location.href='/contact'}} className='font-Lexend cursor-pointer md:max-lg:text-[14px] text-lg'>Contact Us <span><KeyboardArrowDownRounded/></span></p>
                {!isMobileCategories && <p  onClick={()=>{window.location.href='/categories'}} className='font-Lexend cursor-pointer md:max-lg:text-[14px] text-lg'>Categories<span><KeyboardArrowDownRounded/></span></p> }
-            </div>}
+            </div>  
 
-          {isMobile &&  <div className="basis-[20%] md:max-lg:basis-[30%] md:max-lg:justify-end md:max-lg:gap-x-6  w-full gap-x-8 flex flex-row py-2 ml-auto mr-[4px]">
+        }
+
+          {isMobile &&  <div className="basis-[20%] md:max-lg:basis-[30%] md:max-lg:justify-end justify-end md:max-lg:gap-x-6  w-full gap-x-8 flex flex-row py-2 ml-auto mr-[4px]">
                 <ShoppingCartRounded onClick={toggleCart} style={{cursor:'pointer',fontSize:30,margin:'auto 0'}}/>
-                <button onClick={()=>{window.location.href='/createAccount'}}  className="px-4  md:max-lg:text-[12px] md:max-lg:px-2   text-emerald-600 border-2 border-emerald-300  rounded-md text-sm  font-Poppins">
+               {!accessToken && <button onClick={()=>{window.location.href='/createAccount'}}  className="px-4  md:max-lg:text-[12px] md:max-lg:px-2   text-emerald-600 border-2 border-emerald-300  rounded-md text-sm  font-Poppins">
                     Sign Up
-                </button>
-                <div className="flex flex-col justify-center">
+                </button>}
+                {accessToken && <div className="flex flex-col justify-center">
              {user && user.profilePicture ?     
              
               <img onClick={handleClick} src={user.profilePicture} className="w-[30px] cursor-pointer rounded-full mx-auto h-auto"  />
 
              
 
-             :
-                <AccountCircle onClick={handleClick} style={{fontSize:30,cursor:'pointer',margin:'auto'}}/>}
-              {user &&  
+             :(accessToken &&
+                <AccountCircle onClick={handleClick} style={{fontSize:30,cursor:'pointer',margin:'auto'}}/>)}
+             
+              {user &&accessToken &&  
               <TruncateText
               text={user.name}
               maxLength={8}
@@ -109,15 +120,24 @@ const NavBar=()=>{
         <MenuItem onClick={()=>{ dispatch(setLogoutAsync({}));   handleClose()}}>Logout</MenuItem>
       </Menu> 
                 </div>
+                }
 
 
-            </div>}
+            </div>
+            
+            }
+            
 
             { !isMobile &&
             <div className="my-auto">
               <div className="flex mr-2 flex-row gap-x-4">
            
                  <ShoppingCartRounded onClick={toggleCart} style={{cursor:'pointer'}}/>
+              {!accessToken &&
+                 <button onClick={()=>{window.location.href='/createAccount'}}  className="px-4  md:max-lg:text-[12px] md:max-lg:px-2   text-emerald-600 border-2 border-emerald-300 py-[4px]  rounded-md text-sm  font-Poppins">
+                    Sign Up
+                </button>
+                }
                  <MenuRounded onClick={()=>{setToggleMenu(!toggleMenu)}}  style={{cursor:'pointer'}}/>
                  <div className="flex flex-col justify-center">
             <div className="flex flex-row gap-y-2">
@@ -127,8 +147,11 @@ const NavBar=()=>{
 
              
 
-             :
-                <AccountCircle onClick={handleClick} style={{fontSize:30,cursor:'pointer',margin:'auto'}}/>}
+             :(accessToken &&
+                <AccountCircle onClick={handleClick} style={{fontSize:30,cursor:'pointer',margin:'auto'}}/>
+             )
+                
+                }
               {user && 
               <TruncateText
               text={user.name}
@@ -215,7 +238,7 @@ const NavBar=()=>{
         <div onClick={()=>setCategories(5)} className={`w-full  ${categories===5 && 'relative'}`}>  <p className={`text-center  ml:max-lg:text-sm  ${categories ===5 && ' bg-white border-t-8  border-l-[1px] border-l-black border-r-[1px] border-r-black absolute z-[12]  border-emerald-500'} font-Abel font-bold cursor-pointer w-[80%] text-lg text-emerald-900 ml:max-lg:pb-[20px] pb-[28px]`}>Oral Health</p></div>
         <div onClick={()=>setCategories(6)} className={`w-full  ${categories===6 && 'relative'}`}>  <p className={`text-center  ml:max-lg:text-sm  ${categories ===6 && ' bg-white border-t-8  border-l-[1px] border-l-black border-r-[1px] border-r-black absolute z-[12]  border-emerald-500'} font-Abel font-bold cursor-pointer w-[80%] text-lg text-emerald-900 ml:max-lg:pb-[20px] pb-[28px]`}>Brands</p></div>
         <div onClick={()=>setCategories(7)} className={`w-full  ${categories===7 && 'relative'}`}>  <p className={`text-center  ml:max-lg:text-sm  ${categories ===7 && ' bg-white border-t-8  border-l-[1px] border-l-black border-r-[1px] border-r-black absolute z-[12]  border-emerald-500'} font-Abel font-bold cursor-pointer w-[80%] text-lg text-emerald-900 ml:max-lg:pb-[20px] pb-[28px]`}>Skin Healthcare</p></div>
-        <div  className='w-full '>  <p className={`text-center bg-emerald-500   font-Abel font-bold cursor-pointer w-[80%] text-lg text-white p-4 ml:max-lg:text-sm rounded-bl-xl rounded-tr-xl`}>Best Sellers</p></div>
+        <div onClick={()=>{window.location.href='/category/best-sellers'}}  className='w-full '>  <p className={`text-center bg-emerald-500   font-Abel font-bold cursor-pointer w-[80%] text-lg text-white p-4 ml:max-lg:text-sm rounded-bl-xl rounded-tr-xl`}>Best Sellers</p></div>
 
 
         </div>

@@ -20,12 +20,13 @@ import MainProductCarousal from "../components/MainProductCarousal";
 import api from "../utils/api";
 import UAParser from 'ua-parser-js';
 import AD_1 from '../assets/AD.png'
-
+import { useCMS } from '../cartContext/CmsContext'
 
 
 
 
 const HomePage=()=>{
+  const cmsData = useCMS();
 
     const isMobile = useMediaQuery('(max-width:1024px)');
     const xs = useMediaQuery('(min-width:576px)');
@@ -159,16 +160,16 @@ const HomePage=()=>{
     
 
 
-    <section style={{backgroundImage: `linear-gradient(to right,rgba(0,0,0,0.5), rgba(0,0,0,0.1)), url(${require('../assets/Poster1.jpeg')})`}} className="w-[100%] bg-cover bg-center xs:max-sm:h-[400px] h-[500px] relative ">
+    <section style={{backgroundImage: `linear-gradient(to right,rgba(0,0,0,0.5), rgba(0,0,0,0.1)), url(${`${process.env.REACT_APP_API_URL}/assets/CMS/${cmsData?.HomePageMainBanner}`})`}} className="w-[100%] bg-cover bg-center xs:max-sm:h-[400px] h-[500px] relative ">
         
 
         
 
         <div className="w-[50%] xs:max-sm:w-[100%] xs:max-sm:py-24 xs:max-sm:px-2 sm:max-md:w-[100%] md:max-lg:w-[80%] py-32 px-12">
-            <p className="font-Lexend xs:max-sm:text-[1.6rem] text-white text-[2rem]">Pharma Products</p>
+            <p className="font-Lexend xs:max-sm:text-[1.6rem] text-white text-[2rem]">{cmsData.HomePageMainBannerText?.text1}</p>
 
             <div className="border-l-4 mt-4 mb-6 xs:max-sm:w-[80%] w-[60%] pl-4 border-emerald-600 ">
-                <p className="text-white xs:max-sm:text-xs text-md font-Livvic">We have plenty of medical products here available for everyone. We care for customers</p>
+                <p className="text-white xs:max-sm:text-xs text-md font-Livvic">{cmsData.HomePageMainBannerText?.text2}</p>
                 
 
             </div>

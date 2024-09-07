@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { AccessTimeRounded } from "@mui/icons-material";
-
+import SpinnerRotating from "../skeleton/spinner";
 export const NewsPage = () => {
     const { newsId } = useParams();
     const [news, setNews] = useState(null); // Changed to null to indicate loading state
@@ -23,7 +23,7 @@ export const NewsPage = () => {
     }, [newsId]);
 
     if (!news) {
-        return <p>Loading...</p>; // Simple loading state
+        return <SpinnerRotating/>; // Simple loading state
     }
 
     return (

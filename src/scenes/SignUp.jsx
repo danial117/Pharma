@@ -243,8 +243,7 @@ const SignUp = () => {
     setLoading(false);
     window.location.href = '/';
 }
-
-  }
+ }
 
     
   };
@@ -293,10 +292,14 @@ const SignUp = () => {
           }
           )
           .then((data) => {
-            dispatch(setUser({ user: data.modifiedUser }));
-            dispatch(setAccessToken({ accessToken: data.accessToken }));
-            UserSignedInEvent()
-            window.location.href = '/';
+            Promise.all([
+              dispatch(setUser({ user: data.modifiedUser })),
+              dispatch(setAccessToken({ accessToken: data.accessToken })),
+          ])
+              .then(() => {
+                  UserSignedInEvent();
+                  window.location.href = '/';
+              })
 
           });
       } else {
@@ -349,45 +352,27 @@ const SignUp = () => {
                     .then(() => {
                         // After all dispatches are performed, change location
                         window.location.href = '/';
-                    })
-                    
-                
-        
-        
-                }
-            }
-            )
-
-
+                     })
+                  }
+              }
+             )
           }
-
-
-
-
-
-
-
-
-
-
-
-         
-      }
+        }
     }catch (error) {
       
       setLoading(false)
       // Handle error if needed
   } finally {
+    window.location.href='/'
       setLoading(false);
-      window.location.href = '/';
+     
   }
-
-
-
-
-
     }
   };
+
+
+
+
 
   return (
     <>

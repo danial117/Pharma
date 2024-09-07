@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import ReactGA from 'react-ga4';
-
+import api from '../utils/api';
 
 
 
@@ -47,23 +47,16 @@ const PayPalPaymentEvent = () => {
             },
             async createOrder() {
               try {
-                const response = await fetch(`${process.env.REACT_APP_API_URL}/order/api/`, {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                    'Authorization': `Bearer ${accessToken}`
-                  },
-                  body: JSON.stringify({
-                    cart: [
-                      {
-                        id: "034324dfjf2399423rf",
-                        quantity: 2,
-                      },
-                    ],
-                  }),
+                const response = await api.post('/order/api/', {
+                  cart: [
+                    {
+                      id: '034324dfjf2399423rf',
+                      quantity: 2,
+                    },
+                  ],
                 });
 
-                const orderData = await response.json();
+                const orderData = response.data;
 
                 if (orderData.id) {
                   return orderData.id;
@@ -82,15 +75,9 @@ const PayPalPaymentEvent = () => {
             },
             async onApprove(data, actions) {
               try {
-                const response = await fetch(`${process.env.REACT_APP_API_URL}/order/api/${data.orderID}/capture`, {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                    'Authorization': `Bearer ${accessToken}`
-                  },
-                });
+                const response = await api.post(`/order/api/${data.orderID}/capture`);
 
-                const orderData = await response.json();
+                const orderData = response.data;
                 const errorDetail = orderData?.details?.[0];
 
                 if (errorDetail?.issue === "INSTRUMENT_DECLINED") {
