@@ -20,7 +20,7 @@ router.post('/create',adminAuthenticateJwt,upload.single('file'),AdminCreateBran
 router.get('/show',adminAuthenticateJwt,GetAdminBrands)
 router.get('/show/:brandId',adminAuthenticateJwt,AdminGetBrand)
 router.put('/id/:brandId',adminAuthenticateJwt,upload.single('file'),modifiedBrandFile,AdminModifyBrand,deleteFileOnError)
-router.delete('/:brandId,',adminAuthenticateJwt,AdminDeleteBrand)
+router.delete('/:brandId',adminAuthenticateJwt,AdminDeleteBrand)
 
 
 

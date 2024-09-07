@@ -1,5 +1,5 @@
 import express from 'express';
-import { Register,Logout,Login,AdminGetAllUsers, UserForgotPasswoard, UserResetPassword } from '../controllers/user.js';
+import { Register,Logout,Login,AdminGetAllUsers, UserForgotPasswoard, UserResetPassword,AdminGetUser } from '../controllers/user.js';
 import { verifyRefreshToken,generateAccessToken,adminAuthenticateJwt } from '../middlewares/auth.js';
 import User from '../models/UserModel.js';
 import { welcomeMail } from '../middlewares/nodemailer.js';
@@ -17,7 +17,7 @@ router.post('/reset-password',UserResetPassword)
 
 
 
-router.get('/',async (req, res) => {
+router.get('/',async (req, res,next) => {
     try {
         // Extract refresh token from cookie
         const refreshToken = req.cookies.refreshToken;
@@ -43,9 +43,9 @@ router.get('/',async (req, res) => {
     
         // If refresh token is valid, generate a new access token
         
-      } catch (error) {
-        console.error('Error refreshing token:', error);
-        res.status(500).json({ error: 'Internal server error' });
+      } catch (err) {
+        next(new CustomError(err.message, 500));
+
       }
    
        
@@ -58,6 +58,7 @@ router.get('/',async (req, res) => {
 
 //admin routes
 router.get('/show',adminAuthenticateJwt,AdminGetAllUsers)
+router.get('/show/:userId',adminAuthenticateJwt,AdminGetUser)
 
 
 

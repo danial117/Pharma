@@ -4,6 +4,7 @@ import GoogleStrategy from 'passport-google-oauth20';
 import User from '../models/UserModel.js';
 import dotenv from 'dotenv'
 import { newUserMail } from './nodemailer.js';
+import CustomError from '../utils/ErrorClass.js';
 
 dotenv.config()
 
@@ -24,7 +25,7 @@ async function(request, accessToken, refreshToken, profile, done) {
 
     // If the user already exists, return that user
     if (existingUser) {
-      console.log(existingUser)
+     
       existingUser.accessToken = accessToken;
       if (refreshToken) {
         existingUser.refreshToken = refreshToken;
@@ -49,12 +50,13 @@ async function(request, accessToken, refreshToken, profile, done) {
       return done(null, newUser);
     }
   } catch (err) { 
-    return done(err); 
+    done(new CustomError(err.message, 500));
+ 
   }
 }));
 
 passport.serializeUser((user, done) => {
-  console.log(user);
+ 
   done(null, user.id);
 });
 
@@ -67,7 +69,8 @@ passport.deserializeUser(async (id, done) => {
       done(new Error('User not found'));
     }
   } catch (err) {
-    done(err);
+    (new CustomError(err.message, 500));
+
   }
 });
 

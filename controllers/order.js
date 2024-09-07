@@ -6,6 +6,7 @@ import Product from "../models/ProductModel.js";
 import StateTax from "../models/TaxModel.js";
 import User from "../models/UserModel.js";
 import { orderCreatedMail } from "../middlewares/nodemailer.js";
+import CustomError from "../utils/ErrorClass.js";
 
 
 
@@ -27,17 +28,15 @@ import { orderCreatedMail } from "../middlewares/nodemailer.js";
 
 
 
-
-
- export const OrderTaxRate=async (req,res) =>{
+ export const OrderTaxRate=async (req,res,next) =>{
 
   try{
 
     const { userId } = req.user; 
-    const address=await Address.findOne({user:userId})
+    const address=await Address.findOne({user:userId}).select('stateCode')
 
-   console.log(address)
-    const taxRate=await StateTax.findOne({state:address.stateCode})
+  
+    const taxRate=await StateTax.findOne({state:address.stateCode}).select('total_rate')
 
     const order = await Order.findOne({ user: userId, orderStatus: 'Pending',  orderStatus: {
       $ne: 'Completed' // Not equal to 'completed'
@@ -46,12 +45,12 @@ import { orderCreatedMail } from "../middlewares/nodemailer.js";
    if(order){ 
     const Tax=order.itemsAmount*taxRate.total_rate;
     const totalAmount=order.itemsAmount+Tax;
-   
-      order.totalAmount = totalAmount.toFixed(2);
-      order.tax= Tax.toFixed(2);
+    console.log(Tax,totalAmount)
+      order.totalAmount = totalAmount;
+      order.tax= Tax;
       order.updatedAt = new Date(); 
     const savedOrder=  await order.save();
-    console.log(savedOrder)
+  
 
       res.status(200).json('Order found')
    }
@@ -65,10 +64,10 @@ import { orderCreatedMail } from "../middlewares/nodemailer.js";
 
 
 
-  }catch(error){
-    console.log(error)
-    res.status(501).json('Internal Server Error')
-  }
+  }catch(err){
+    
+    next(new CustomError(err.message,500))
+}
 
 
  }
@@ -103,13 +102,13 @@ import { orderCreatedMail } from "../middlewares/nodemailer.js";
 
 const base = "https://api-m.sandbox.paypal.com";
 
-export const CreateUserOrder = async (req, res) => {
+export const CreateUserOrder = async (req, res,next) => {
   try {
    
     const { userId } = req.user; 
     console.log(userId)
-    const cart = await Cart.findOne({ user: userId });
-    const address=await Address.findOne({user:userId})
+    const cart = await Cart.findOne({ user: userId }).select('items');
+    const address=await Address.findOne({user:userId}).select('stateCode')
     
     if (cart.items.length === 0) {
       return res.status(404).json({ error: 'Cart not found for user' });
@@ -118,8 +117,9 @@ export const CreateUserOrder = async (req, res) => {
     
     if(cart.items.length !== 0){
     const itemsWithPrices = await Promise.all(cart.items.map(async (item) => {
-      const product = await Product.findById(item.product);
-     
+      console.log(item)
+      const product = await Product.findById(item.product).select('options');
+     console.log('a',product)
       const selectedOption = product.options.find(option => option.id === item.option);
     
       return {
@@ -139,17 +139,17 @@ export const CreateUserOrder = async (req, res) => {
 
 
    const taxRate=await StateTax.findOne({state:address.stateCode})
-   
+  
    
     const itemsAmount = calculateTotalAmount(itemsWithPrices);
-    console.log(itemsAmount);
+   
 
 
 
       
        const Tax=itemsAmount*taxRate.total_rate;
        const totalAmount=itemsAmount+Tax;
-        console.log(Tax,totalAmount)
+    
 
       
      
@@ -174,14 +174,14 @@ export const CreateUserOrder = async (req, res) => {
     
     const existingOrder = await Order.findOne({ user: userId, orderStatus: 'Pending',  orderStatus: {
       $ne: 'Completed' 
-  },paymentMethod: 'Unknown'  });
+  },paymentMethod: 'Unknown'  }).select('items totalAmount itemsAmount tax updateAt');
 
     if (existingOrder) {
       
       existingOrder.items = itemsWithPrices;
-      existingOrder.totalAmount = totalAmount.toFixed(2);
-      existingOrder.itemsAmount=itemsAmount.toFixed(2);
-      existingOrder.tax= Tax.toFixed(2);
+      existingOrder.totalAmount = totalAmount;
+      existingOrder.itemsAmount=itemsAmount;
+      existingOrder.tax= Tax;
       existingOrder.updatedAt = new Date(); 
       await existingOrder.save();
 
@@ -197,28 +197,34 @@ export const CreateUserOrder = async (req, res) => {
       orderNumber: generateOrderNumber(), // Function to generate a unique order number
       user: userId,
       items: itemsWithPrices,
-      itemsAmount:itemsAmount.toFixed(2),
-      tax:Tax.toFixed(2),
+      itemsAmount:itemsAmount,
+      tax:Tax,
       paymentMethod: 'Unknown',
       paymentStatus: 'Pending',
       orderStatus: 'Pending',
-      totalAmount: totalAmount.toFixed(2) ,
+      totalAmount: totalAmount ,
     };
 
     // Create new order
     const newOrder = new Order(orderData);
     const savedOrder = await newOrder.save();
-
+    
+    const orderResponse={
+      items:savedOrder.items,
+      totalAmount:savedOrder.totalAmount,
+      itemsAmount:savedOrder.itemsAmount,
+      tax:savedOrder.Tax
+    }
     // Clear the user's cart after creating the order
     cart.items = [];
     await cart.save();
     res.status(201).json(savedOrder);
 }
    
-  } catch (error) {
-    console.error('Error creating order:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
+  } catch(err){
+    
+    next(new CustomError(err.message,500))
+}
 };
 
 
@@ -268,7 +274,7 @@ function generateOrderNumber() {
 
 
 
-  export const getUserOrder = async (req, res) => {
+  export const getUserOrder = async (req, res,next) => {
     try {
       // Assuming req.user is populated with user data by authMiddleware
       const { userId } = req.user;
@@ -278,17 +284,19 @@ function generateOrderNumber() {
         user: userId,
         orderStatus: { $ne: 'Completed' }, // Exclude completed orders
         paymentMethod: 'Unknown',
-      }).populate('items.product');
-  
+      }).populate({path: 'items.product',  
+        select: 'options productImage name brand'});
+     console.log(order)
       if (!order) {
         return res.status(404).json({ error: 'Order not found for user' });
       }
-  
+     console.log(order)
       // Extract only price and option for each item
       const items = order.items.map((item) => {
         // Find the matching option in the product's options array
+       
         const selectedOption = item.product.options.find(select => select.id === item.option);
-      
+       
         // If a matching option is found, return the object with the desired fields
         if (selectedOption) {
           return {
@@ -308,7 +316,7 @@ function generateOrderNumber() {
      
       });
       
-   console.log(items)
+  
       // Construct the response with only the necessary fields
       const response = {
         orderNumber: order.orderNumber,
@@ -323,13 +331,13 @@ function generateOrderNumber() {
         createdAt: order.createdAt,
         updatedAt: order.updatedAt,
       };
-      console.log(response)
+     
   
       res.status(200).json(response);
-    } catch (error) {
-      console.error('Error retrieving order:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    }
+    } catch(err){
+    
+      next(new CustomError(err.message,500))
+  }
   };
 
 
@@ -343,9 +351,10 @@ function generateOrderNumber() {
 
 
 
-  export const CreatePaypalOrder = async (req, res) => {
+  export const CreatePaypalOrder = async (req,res,next) => {
     try {
       const { userId } = req.user; // Assuming userId is available in req.user after authentication
+      
       const order = await Order.findOne({ user: userId, orderStatus: 'Pending',  orderStatus: {
         $ne: 'Completed' // Not equal to 'completed'
     },paymentMethod: 'Unknown'  }).populate('items.product');
@@ -356,17 +365,17 @@ function generateOrderNumber() {
   
       const { jsonResponse, httpStatusCode } = await createOrder(userId);
       res.status(httpStatusCode).json(jsonResponse);
-    } catch (error) {
-      console.error("Failed to create PayPal order:", error);
-      res.status(500).json({ error: "Failed to create PayPal order." });
-    }
+    } catch(err){
+    
+      next(new CustomError(err.message,500))
+  }
   };
   
   const createOrder = async (userId) => {
     try {
       const order=await Order.findOne({ user: userId, orderStatus: 'Pending',  orderStatus: {
         $ne: 'Completed' // Not equal to 'completed'
-    },paymentMethod: 'Unknown'  });
+    },paymentMethod: 'Unknown'  }).select('totalAmount');
       
       const accessToken = await generateAccessToken();
       const url = `${base}/v2/checkout/orders`;
@@ -376,7 +385,7 @@ function generateOrderNumber() {
           {
             amount: {
               currency_code: "USD",
-              value: order.totalAmount.toFixed(2), // Use totalAmount from the order retrieved from database
+              value: order.totalAmount, // Use totalAmount from the order retrieved from database
             },
           },
         ],
@@ -393,8 +402,7 @@ function generateOrderNumber() {
   
       const { jsonResponse, httpStatusCode } = await handleResponse(response);
      
-      console.log(jsonResponse)
-      // Update order status in your database based on PayPal API response
+      
       if (httpStatusCode === 201) {
         await Order.findOneAndUpdate({ user: userId, orderStatus: 'Pending',  orderStatus: {
           $ne: 'Completed' // Not equal to 'completed'
@@ -409,10 +417,10 @@ function generateOrderNumber() {
       }
   
       return { jsonResponse, httpStatusCode };
-    } catch (error) {
-      console.error("Failed to create PayPal order:", error);
-      throw error;
-    }
+    } catch(err){
+    
+      (new CustomError(err.message,500))
+  }
   };
 
    const handleResponse = async (response) => {
@@ -422,23 +430,25 @@ function generateOrderNumber() {
         jsonResponse,
         httpStatusCode: response.status,
       };
-    } catch (err) {
-      const errorMessage = await response.text();
-      throw new Error(errorMessage);
-    }
+    } catch(err){
+    
+      (new CustomError(err.message,500))
+  }
   };
 
 
 
 
 
-  export const CapturePaypalOrder = async (req, res) => {
+  export const CapturePaypalOrder = async (req, res,next) => {
     try {
+
+
+
       const { orderId } = req.params;
       const {userId}=req.user
       const { jsonResponse, httpStatusCode } = await captureOrder(orderId);
-      console.log(jsonResponse,httpStatusCode)
-      // Update order status in your database based on PayPal API response
+      
       if (httpStatusCode === 201) {
       const order=  await Order.findOneAndUpdate({ user: userId, orderStatus: 'Pending',  orderStatus: {
           $ne: 'Completed' // Not equal to 'completed'
@@ -457,10 +467,10 @@ function generateOrderNumber() {
       }
   
       res.status(httpStatusCode).json(jsonResponse);
-    } catch (error) {
-      console.error("Failed to capture PayPal order:", error);
-      res.status(500).json({ error: "Failed to capture PayPal order." });
-    }
+    } catch(err){
+    
+      next(new CustomError(err.message,500))
+  }
   };
 
 
@@ -472,7 +482,7 @@ function generateOrderNumber() {
     
     const accessToken = await generateAccessToken();
     const url = `${base}/v2/checkout/orders/${orderID}/capture`;
-     console.log(accessToken,' ',orderID)
+    
     const response = await fetch(url, {
       method: "POST",
       headers: {
@@ -491,9 +501,10 @@ function generateOrderNumber() {
 
    return {httpStatusCode,jsonResponse}
   }
-  catch(error){
-    res.status(501).json('Internal Server Error')
-  }
+  catch(err){
+    
+    next(new CustomError(err.message,500))
+}
   
 
   
@@ -532,17 +543,17 @@ function generateOrderNumber() {
   
       const data = await response.json();
       return data.access_token;
-    } catch (error) {
-      console.error("Failed to generate Access Token:", error);
-      throw error;
-    }
+    } catch(err){
+    
+      next(new CustomError(err.message,500))
+  }
   };
 
 
 
 
 
-  export const AdminGetUserOrders = async (req, res) => {
+  export const AdminGetUserOrders = async (req, res,next) => {
     try {
       // Extract filter, range, and sort parameters from the query
       const filter = JSON.parse(req.query.filter || '{}');
@@ -550,7 +561,7 @@ function generateOrderNumber() {
       const sort = JSON.parse(req.query.sort || '["createdAt", "ASC"]');
       
       // Convert the sort array to an object for MongoDB
-      const sortObject = {};
+      const sortObject = { };
       sortObject[sort[0]] = sort[1] === 'DESC' ? -1 : 1;
   
       // Extract pagination parameters
@@ -572,14 +583,14 @@ function generateOrderNumber() {
         }
       }
   
-      console.log(query)
-      // Find orders based on the filter, sort, skip, and limit
+
+    
       const orders = await Order.find(query).sort(sortObject).skip(skip).limit(limit);
       const totalOrders = await Order.countDocuments(query);
   
       
       const modifiedOrders = orders.map(order => {
-        const orderObject = order.toObject(); // Convert Mongoose document to plain JavaScript object
+        const orderObject = order.toObject(); 
         orderObject.id = orderObject._id;
         delete orderObject._id;
         return orderObject;
@@ -591,10 +602,10 @@ function generateOrderNumber() {
       });
   
       res.status(200).json(modifiedOrders);
-    } catch (error) {
-      console.log(error);
-      res.status(500).json('Internal Server Error');
-    }
+    } catch(err){
+    
+      next(new CustomError(err.message,500))
+  }
   };
 
 
@@ -604,11 +615,11 @@ function generateOrderNumber() {
 
 
 
-  export const getUserOrders = async (req, res) => {
+  export const getUserOrders = async (req, res,next) => {
     try {
         const {userId} = req.user; // Assuming userId is passed as a route parameter
         const orders = await Order.find({ user:userId }); // Query orders for the specific user
-
+        console.log(orders)
         const userOrders = orders.map(order => {
             const orderObject = order.toObject(); // Convert Mongoose document to plain JavaScript object
             orderObject.id = orderObject._id;
@@ -626,10 +637,10 @@ function generateOrderNumber() {
 
         res.status(200).json(userOrders);
 
-    } catch (error) {
-        console.error(error);
-        res.status(500).json('Internal Server Error');
-    }
+    } catch(err){
+    
+      next(new CustomError(err.message,500))
+  }
 };
 
 
@@ -652,7 +663,7 @@ function generateOrderNumber() {
 
 
 
-export const AdminGetOrder=async(req,res)=>{
+export const AdminGetOrder=async(req,res,next)=>{
 
   try{
 
@@ -670,10 +681,10 @@ export const AdminGetOrder=async(req,res)=>{
 
 
 
-  }catch(error){
-      console.log(error)
-      res.status(500).json('Internal Server error')
-  }
+  }catch(err){
+    
+    next(new CustomError(err.message,500))
+}
 }
 
 
@@ -690,7 +701,7 @@ export const AdminGetOrder=async(req,res)=>{
 
 
 
-export const AdminModifyOrders=async(req,res)=>{
+export const AdminModifyOrders=async(req,res,next)=>{
 
   try{
 
@@ -727,9 +738,9 @@ export const AdminModifyOrders=async(req,res)=>{
 
   }
 
-  catch(error){
-      console.log(error)
-      res.status(500).json('Internal Server Error')
+  catch(err){
+    
+      next(new CustomError(err.message,500))
   }
 }
 

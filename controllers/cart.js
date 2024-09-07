@@ -1,11 +1,11 @@
 import Cart from "../models/CartModel.js";
 import Product from "../models/ProductModel.js";
-
+import CustomError from "../utils/ErrorClass.js";
 
 
 // controllers/cartController.js
 
-export const AddToCart = async (req, res) => {
+export const AddToCart = async (req, res,next) => {
   const { productId,quantity } = req.params;
   const {userId} =req.user;
   const optionId = JSON.parse(req.query.option);
@@ -14,7 +14,7 @@ export const AddToCart = async (req, res) => {
 
   try {
     // Check if the user has an existing cart
-    let cart = await Cart.findOne({ user: userId });
+    let cart = await Cart.findOne({ user: userId }).select('items');
 
     if (!cart) {
       // If no cart exists, create a new one
@@ -41,27 +41,48 @@ export const AddToCart = async (req, res) => {
     await cart.save();
 
     res.status(201).json(cart);
-  } catch (error) {
-    console.error('Error adding product to cart:', error);
-    res.status(500).json({ error: 'Internal server error' });
+  } catch (err) {
+  
+    next(new CustomError(err.message, 500));
   }
 };
 
 
 
-export const GetUserCart=async(req,res)=>{
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+export const GetUserCart=async(req,res,next)=>{
 
   try{
 
     const {userId}=req.user;
 
-    const cart=await Cart.findOne({user:userId}).populate('items.product')
+    const cart=await Cart.findOne({user:userId}).select('items').populate('items.product')
 
     res.status(200).json(cart)
 
 
-  }catch(error){
-    console.log(error)
+  }
+  catch(err)
+  {
+    next(new CustomError(err.message, 500));
   }
 }
 
@@ -73,7 +94,7 @@ export const DeleteCartItem=async(req,res)=>{
 
     try {
       const cart = await Cart.findOne({ user: userId });
-      console.log(cart)
+    
   
       if (!cart) {
         return res.status(404).json({ error: 'Cart not found for this user' });
@@ -81,17 +102,16 @@ export const DeleteCartItem=async(req,res)=>{
   
       // Remove the item from cart.items based on productId
       const updatedItems = cart.items.filter(item => item.product.toString() !== req.params.productId);
-     console.log(updatedItems)
-      // Update cart.items with the filtered items array
+  
       cart.items = updatedItems;
   
       // Save the updated cart
       await cart.save();
   
       res.status(200).json({ message: 'Item deleted successfully', cart: cart.items });
-    } catch (error) {
-      console.error('Error deleting item from cart:', error);
-      res.status(500).json({ error: 'Internal server error' });
+    } catch (err) {
+    
+      next(new CustomError(err.message, 500));
     }
 }
 
@@ -108,7 +128,7 @@ export const DeleteCartItem=async(req,res)=>{
 
 
 
-export const AdminGetUserCarts = async (req, res) => {
+export const AdminGetUserCarts = async (req, res,next) => {
   try {
     // Extract filter, range, and sort parameters from the query
     const filter = JSON.parse(req.query.filter || '{}');
@@ -138,9 +158,9 @@ export const AdminGetUserCarts = async (req, res) => {
       }
     }
 
-    console.log(query)
+   
     // Find orders based on the filter, sort, skip, and limit
-    const carts = await Cart.find(query).sort(sortObject).skip(skip).limit(limit);
+    const carts = await Cart.find(query).sort(sortObject).skip(skip).limit(limit).populate({ path: 'user',select: 'name email'});
     const totalCarts = await Cart.countDocuments(query);
 
     
@@ -157,9 +177,8 @@ export const AdminGetUserCarts = async (req, res) => {
     });
 
     res.status(200).json(modifiedCarts);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json('Internal Server Error');
+  } catch (err) {
+    next(new CustomError(err.message, 500));
   }
 };
 
@@ -170,14 +189,14 @@ export const AdminGetUserCarts = async (req, res) => {
 
 
 
-export const incrementDecrementCartItem = async (req, res) => {
+export const incrementDecrementCartItem = async (req, res,next) => {
   try {
     const { userId } = req.user; // Assuming req.user is populated with user data by authMiddleware
     const { productId } = req.params;
     const { action } = req.body; // action should be either 'increment' or 'decrement'
-   console.log(userId)
+  
     // Find the user's cart
-    const cart = await Cart.findOne({ user: userId });
+    const cart = await Cart.findOne({ user: userId }).select('items');
        
     if (!cart) {
       return res.status(404).json({ error: 'Cart not found for this user' });
@@ -207,8 +226,8 @@ export const incrementDecrementCartItem = async (req, res) => {
     await cart.save();
 
     res.status(200).json(cart);
-  } catch (error) {
-    console.error('Error updating cart item quantity:', error);
-    res.status(500).json({ error: 'Internal server error' });
+  } catch (err) {
+   
+    next(new CustomError(err.message, 500));
   }
 };

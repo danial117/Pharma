@@ -2,7 +2,7 @@ import sharp from "sharp";
 import fs from 'fs';
 import path from "path";
 import { fileURLToPath } from "url";
-
+import CustomError from "./ErrorClass.js";
 const __filename = fileURLToPath(import.meta.url); 
 const __dirname = path.dirname(__filename);
 
@@ -42,7 +42,8 @@ export const compressAndSaveProductImage = async (imageName) => {
 
       return {outputMediumFileName,outputSmallFileName}
     } catch (error) {
-      console.error('Error processing image:', error);
+      
+      (new CustomError(err.message, 500));
     }
   };
   

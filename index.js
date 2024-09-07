@@ -10,7 +10,6 @@ import CartRouter from './routers/cart.js'
 import path from "path";
 import OrderRouter from './routers/order.js'
 import { fileURLToPath } from 'url';
-import ContentRouter from './routers/content.js'
 import AddressRouter from './routers/address.js'
 import session from 'express-session'
 import User from './models/UserModel.js';
@@ -22,9 +21,8 @@ import passport from './middlewares/passport.js';
 import BrandRouter from './routers/brand.js'
 import NewsRouter from './routers/news.js'
 import ContactRouter from './routers/customerContact.js'
-
-
-
+import CMSRouter from './routers/CMS.js'
+import CustomError from './utils/ErrorClass.js';
 
 dotenv.config()
 const app=express();
@@ -38,6 +36,7 @@ app.use("/assets/products/md", express.static(path.join(__dirname, "public/produ
 app.use("/assets/products/sm", express.static(path.join(__dirname, "public/products/small")));
 app.use("/assets/brands", express.static(path.join(__dirname, "public/brands")));
 app.use("/assets/news", express.static(path.join(__dirname, "public/news")));
+app.use("/assets/CMS", express.static(path.join(__dirname, "public/CMS")));
 
 
 const allowedOrigins=process.env.ALLOWED_ORIGINS.split(',');
@@ -113,7 +112,7 @@ app.get('/oauth2/redirect/google',
       try {
         // Extract refresh token from cookie
         const refreshToken = req.cookies.refreshToken;
-      console.log(refreshToken)
+     
         if (!refreshToken) {
           return res.status(401).json({ error: 'Refresh token not found' });
         }
@@ -135,25 +134,43 @@ app.get('/oauth2/redirect/google',
         // If refresh token is valid, generate a new access token
         
       } catch (error) {
-        console.error('Error refreshing token:', error);
+       
         res.status(500).json({ error: 'Internal server error' });
       }
     });
 
 
-
+  
 
 app.use('/user',UserRouter);
 app.use('/products',ProductRouter);
 app.use('/cart',CartRouter)
 app.use('/order',OrderRouter)
 app.use('/address',AddressRouter)
-app.use('/content',ContentRouter)
+
 app.use('/brands',BrandRouter)
 app.use('/admin',AdminRouter)
+app.use('/Cms',CMSRouter)
 app.use('/news',NewsRouter)
 app.use('/contact',ContactRouter)
 
+app.use((err, req, res, next) => {
+  try{
+    res.status(err.statusCode || 500).json(
+      'Internal Server Error'
+      
+    )
+  }catch(err){
+    try{
+     new CustomError(err.message,500)
+
+    }catch(err){
+      console.log(err)
+    }
+   
+  }
+ 
+});
 
 
 const PORT = process.env.PORT 
@@ -161,18 +178,13 @@ const MONGO_URI=process.env.MONGO_URI
 mongoose 
   .connect(MONGO_URI)
   .then(() => {
-    console.log('connected to MONGO DB')
+   
     app.listen(PORT, () => console.log(`Server Port: ${PORT}`));
 
     /* ADD DATA ONE TIME */
     // User.insertMany(users);  
     // Post.insertMany(posts);
   })
-  .catch((error) => console.log(`${error} did not connect`));
+  .catch((error) => {});
 
 
-
-// InsertProduct()
-
-
-User.deleteMany({})

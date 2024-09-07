@@ -1,7 +1,8 @@
 import Address from '../models/AddressModel.js';
+import CustomError from '../utils/ErrorClass.js';
 
 // Controller function to create a new address
-export const createAddress = async (req, res) => {
+export const createAddress = async (req, res,next) => {
   try {
     // Assuming req.user is populated with user data by authMiddleware
     const { userId } = req.user;
@@ -12,7 +13,7 @@ export const createAddress = async (req, res) => {
     }
 
     // Check if the user already has an address
-    let address = await Address.findOne({ user: userId });
+    let address = await Address.findOne({ user: userId }).select('email firstname lastname streetAddress state stateCode city zip');
 
     if (address) {
       // Update existing address
@@ -42,11 +43,17 @@ export const createAddress = async (req, res) => {
     }
 
     const savedAddress = await address.save();
+    const addressObject = savedAddress.toObject();
+      // Delete the 'user' property
+      delete addressObject.user;
 
-    res.status(201).json(savedAddress);
-  } catch (error) {
-    console.error('Error creating or updating address:', error);
-    res.status(500).json({ error: 'Internal server error' });
+
+    res.status(201).json(addressObject);
+  } catch (err) {
+   
+   
+      next(new CustomError(err.message, 500));
+    
   }
 };
 
@@ -54,7 +61,7 @@ export const createAddress = async (req, res) => {
    
 
 // Controller function to delete a user's address
-export const deleteAddress = async (req, res) => {
+export const deleteAddress = async (req, res,next) => {
   try {
     // Assuming req.user is populated with user data by authMiddleware
     const { userId } = req.user;
@@ -73,9 +80,10 @@ export const deleteAddress = async (req, res) => {
     }
 
     res.status(200).json({ message: 'Address deleted successfully' });
-  } catch (error) {
-    console.error('Error deleting address:', error);
-    res.status(500).json({ error: 'Internal server error' });
+  } catch (err) {
+    
+      next(new CustomError(err.message, 500));
+    
   }
 };
 
@@ -84,22 +92,24 @@ export const deleteAddress = async (req, res) => {
 
 
 
-  export const getUserAddresses = async (req, res) => {
+  export const getUserAddresses = async (req, res,next) => {
     try {
       // Assuming req.user is populated with user data by authMiddleware
       const { userId } = req.user;
   
       // Find all addresses for the user
-      const addresses = await Address.findOne({ user: userId });
-       console.log(userId, addresses)
+      const addresses = await Address.findOne({ user: userId }).select('email firstName lastName streetAddress state stateCode city zip');
+      
       if (!addresses || addresses.length === 0) {
         return res.status(404).json({ error: 'No addresses found for user' });
       }
   
       res.status(200).json(addresses);
-    } catch (error) {
-      console.error('Error retrieving addresses:', error);
-      res.status(500).json({ error: 'Internal server error' });
+    } catch (err) {
+     
+      
+        next(new CustomError(err.message, 500));
+      
     }
   };
 
@@ -112,7 +122,7 @@ export const deleteAddress = async (req, res) => {
 
 
   
-  export const GetAdminUserAddresses = async (req, res) => {
+  export const GetAdminUserAddresses = async (req, res,next) => {
     try {
       // Extract filter, range, and sort parameters from the query
       const filter = JSON.parse(req.query.filter || '{}');
@@ -142,8 +152,7 @@ export const deleteAddress = async (req, res) => {
         }
       }
   
-      console.log(query)
-      // Find orders based on the filter, sort, skip, and limit
+      
       const addresses = await Address.find(query).sort(sortObject).skip(skip).limit(limit);
       const totalAddresses = await Address.countDocuments(query);
   
@@ -161,8 +170,10 @@ export const deleteAddress = async (req, res) => {
       });
   
       res.status(200).json(modifiedAddresses);
-    } catch (error) {
-      console.log(error);
-      res.status(500).json('Internal Server Error');
+    } catch (err) {
+     
+    
+        next(new CustomError(err.message, 500));
+      
     }
   };

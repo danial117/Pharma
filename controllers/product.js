@@ -5,6 +5,7 @@ import { compressAndSaveProductImage } from "../utils/compressImages.js";
 import path from 'path'
 import { fileURLToPath } from 'url';
 import fs from 'fs'
+import CustomError from '../utils/ErrorClass.js';
 // Get current file directory
 const __filename = fileURLToPath(import.meta.url); 
 const __dirname = path.dirname(__filename);
@@ -16,16 +17,16 @@ const __dirname = path.dirname(__filename);
 
 
 
-export const GetProducts=async(req,res)=>{
+export const GetProducts=async(req,res,next)=>{
 
 
 try{
     const page = parseInt(req.query.page) || 1; // Default to page 1 if not provided
     const limit = parseInt(req.query.limit) || 10; // Default to 10 items per page if not provided
     const type = req.query.type;
-    console.log(type)
+    
     const skip = (page - 1) * limit;
-
+    
     if (type) {
       let query = {};
       // If type parameter is provided, use regex to match products containing the type in their name
@@ -33,13 +34,17 @@ try{
         { productImage: { $type: "string" } },
         { productImage: "" }
       ]}; // 'i' option for case-insensitive search
-      const products = await Product.find(query).skip(skip).limit(limit);
-      console.log(products)
+      const products = await Product.find(query)
+      .select('productImage name brand options ')
+      .skip(skip).limit(limit);
+    
      
       res.status(200).json(products);
-    
+     
   
-    }else
+}
+    
+    else
 {
     // Calculate the number of documents to skip
     
@@ -47,18 +52,26 @@ try{
     const products=await Product.find({ $nor: [
       { productImage: { $type: "string" } },
       { productImage: "" }
-    ] }).skip(skip).limit(limit);
+    ] })
+    .select('productImage name brand options ')
+    .skip(skip).limit(limit);
   
    
 
       res.status(200).json(products)
-   
+      
     
 }
 
 }
-catch(error){
-    console.log(error)
+catch(err){
+  
+
+    next(new CustomError(err.message, 500));
+  
+
+    
+
 }
 
 
@@ -69,7 +82,7 @@ catch(error){
 
 
 
-export const SearchProductCategory = async (req, res) => {
+export const SearchProductCategory = async (req, res,next) => {
   try {
     const { search } = req.params;
     const words = search.trim().toLowerCase().split(/\s+/);
@@ -94,12 +107,16 @@ export const SearchProductCategory = async (req, res) => {
           $regex: pattern
         }
       }
-    }).skip(skip).limit(limit);
-   console.log(results)
+    })
+    .select('productImage name brand options ')
+    .skip(skip).limit(limit);
+   
     res.status(200).json(results);
-  } catch (error) {
-    console.error('Error searching products:', error);
-    res.status(500).json({ error: 'An error occurred while searching for products.' });
+  } catch (err) {
+   
+   
+      next(new CustomError(err.message, 500));
+    
   }
 };
 
@@ -113,7 +130,7 @@ export const SearchProductCategory = async (req, res) => {
 
 
 
-export const SearchProduct=async(req,res)=>{
+export const SearchProduct=async(req,res,next)=>{
         try {
           // Parse query parameters
           const { product,  page = 1, limit = 10 } = req.query;
@@ -134,7 +151,9 @@ export const SearchProduct=async(req,res)=>{
           const products = await Product.find({...query,$nor: [
             { productImage: { $type: "string" } },
             { productImage: "" }
-          ]}).skip(skip).limit(parseInt(limit));
+          ]})
+          .select('productImage name brand options ')
+          .skip(skip).limit(parseInt(limit));
       
           // Get the total number of matching products to calculate total pages
           const totalProducts = await Product.countDocuments(query);
@@ -147,13 +166,18 @@ export const SearchProduct=async(req,res)=>{
 
           
           
-        } catch (error) {
-          console.log(error);
-          res.status(500).json({ error: 'Internal server error' });
+        } catch (err) {
+         
+            next(new CustomError(err.message, 500));
+          
         }
       };
 
 
+
+
+
+      
 
 
 
@@ -162,7 +186,7 @@ export const GetProduct=async(req,res)=>{
     
   try{
     const {productId}=req.params
-    const product=await Product.findById(productId)
+    const product=await Product.findById(productId).select('productImage category details name brand options ')
     
   
     if(product && typeof product.productImage !=='string')
@@ -174,8 +198,10 @@ export const GetProduct=async(req,res)=>{
       }
   }
   catch(err){
-    console.log(err)
-    res.status(501)
+    
+  
+      next(new CustomError(err.message, 500));
+    
   }
 }
 
@@ -191,7 +217,7 @@ export const GetProduct=async(req,res)=>{
 
 
 
-  export const AdminGetUserProducts = async (req, res) => {
+  export const AdminGetUserProducts = async (req, res,next) => {
     try {
       // Extract filter, range, and sort parameters from the query
       const filter = JSON.parse(req.query.filter || '{}');
@@ -240,9 +266,11 @@ export const GetProduct=async(req,res)=>{
       });
   
       res.status(200).json(modifiedProducts);
-    } catch (error) {
-      console.log(error);
-      res.status(500).json('Internal Server Error');
+    } catch (err) {
+     
+     
+        next(new CustomError(err.message, 500));
+      
     }
   };
 
@@ -267,7 +295,7 @@ export const GetProduct=async(req,res)=>{
 
 
 
-export const AdminGetProduct=async(req,res)=>{
+export const AdminGetProduct=async(req,res,next)=>{
 
     try{
 
@@ -286,8 +314,10 @@ export const AdminGetProduct=async(req,res)=>{
 
 
     }catch(error){
-        console.log(error)
-        res.status(500).json('Internal Server error')
+       
+    
+        next(new CustomError(err.message, 500));
+      
     }
 }
 
@@ -369,9 +399,10 @@ export const AdminModifyProduct=async(req,res,next)=>{
 
     }
 
-    catch(error){
-      next(error)
-        console.log(error)
+    catch(err){
+    
+        next(new CustomError(err.message, 500));
+      
         
     }
 }
@@ -429,10 +460,11 @@ export const AdminCreateProduct=async(req,res,next)=>{
 
 
     }catch(error){
-      console.log(error)
      
-        res.status(500).json('Internal Server Error')
-        next(error)
+     
+    
+        next(new CustomError(err.message, 500));
+      
     }
 }
 
@@ -441,7 +473,7 @@ export const AdminCreateProduct=async(req,res,next)=>{
 
 
 
-export const AdminDeleteProduct=async(req,res)=>{
+export const AdminDeleteProduct=async(req,res,next)=>{
   try {
 
 
@@ -487,8 +519,10 @@ export const AdminDeleteProduct=async(req,res)=>{
 
     res.status(200).json({ message: 'Address deleted successfully' });
   } catch (error) {
-    console.error('Error deleting address:', error);
-    res.status(500).json({ error: 'Internal server error' });
+   
+   
+      next(new CustomError(err.message, 500));
+    
   }
 
 

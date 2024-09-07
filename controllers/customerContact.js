@@ -1,9 +1,9 @@
 import ContactModel from "../models/ContactModel.js";
 import { ThankYouMail } from "../middlewares/nodemailer.js";
+import CustomError from "../utils/ErrorClass.js";
 
 
-
-export const CustomerContact=async(req,res)=>{
+export const CustomerContact=async(req,res,next)=>{
 
     try{
 
@@ -31,7 +31,7 @@ export const CustomerContact=async(req,res)=>{
 
      }
     catch(err){
-        res.status(501).json('Internal Server Error')
+      next(new CustomError(err.message, 500));
     }
 }
 
@@ -45,33 +45,62 @@ export const CustomerContact=async(req,res)=>{
 
 
 
-export const  AdminGetUserContacts=async(req,res)=>{
+export const  AdminGetUserContacts=async(req,res,next)=>{
 
 
     try{
   
-      const contacts=await ContactModel.find();
-     
-      const modifiedContacts = contacts.map(contact => {
-        const contactObject = contact.toObject(); // Convert Mongoose document to plain JavaScript object
-        contactObject.id = contactObject._id;
-        delete contactObject._id;
-        return contactObject;
+      const filter = JSON.parse(req.query.filter || '{}');
+      const range = JSON.parse(req.query.range || '[0, 10]');
+      const sort = JSON.parse(req.query.sort || '["createdAt", "ASC"]');
+      
+      // Convert the sort array to an object for MongoDB
+      const sortObject = {};
+      sortObject[sort[0]] = sort[1] === 'DESC' ? -1 : 1;
+  
+      // Extract pagination parameters
+      const skip = range[0];
+      const limit = range[1] - range[0] + 1;
+  
+      // Build the query based on filter
+      const query = {};
+      if (filter) {
+        for (const key in filter) {
+          if (filter.hasOwnProperty(key)) {
+            // Check if the value is a number or a string
+            if (!isNaN(filter[key])) {
+              query[key] = filter[key]; // Direct match for numeric fields
+            } else {
+              query[key] = { $regex: new RegExp(filter[key], 'i') }; // Case-insensitive search for string fields
+            }
+          }
+        }
+      }
+  
+      
+      // Find orders based on the filter, sort, skip, and limit
+      const customerContacts = await ContactModel.find(query).sort(sortObject).skip(skip).limit(limit);
+      const totalContacts = await ContactModel.countDocuments(query);
+  
+      
+      const modifiedCustomerContacts = customerContacts.map(customerContact => {
+        const customerContactObject = customerContact.toObject(); // Convert Mongoose document to plain JavaScript object
+        customerContactObject.id = customerContactObject._id;
+        delete customerContactObject._id;
+        return customerContactObject;
       });
+  
       res.set({
-        'X-Content-Header': 'application/json',
-        'X-Total-Count': modifiedContacts.length,
+        'Content-Range': `news ${range[0]}-${range[1]}/${totalContacts}`,
+        'X-Total-Count': totalContacts,
       });
-     
   
-      res.status(200).json(modifiedContacts);
-  
+      res.status(200).json(modifiedCustomerContacts);
   
   
-    }catch(error){
-      console.log(error)
-      res.status(500).json('Internal Server Error')
   
+    }catch(err){
+      next(new CustomError(err.message, 500));
     }
   
   
@@ -83,7 +112,7 @@ export const  AdminGetUserContacts=async(req,res)=>{
 
 
 
-  export const AdminGetContact=async(req,res)=>{
+  export const AdminGetContact=async(req,res,next)=>{
 
     try{
 
@@ -101,9 +130,8 @@ export const  AdminGetUserContacts=async(req,res)=>{
 
 
 
-    }catch(error){
-        console.log(error)
-        res.status(500).json('Internal Server error')
+    }catch(err){
+      next(new CustomError(err.message, 500));
     }
 }
 
@@ -117,7 +145,7 @@ export const  AdminGetUserContacts=async(req,res)=>{
 
 
 
-export const AdminDeleteContact=async(req,res)=>{
+export const AdminDeleteContact=async(req,res,next)=>{
   try {
     // Assuming req.user is populated with user data by authMiddleware
     const {contactId } = req.params;
@@ -134,9 +162,9 @@ export const AdminDeleteContact=async(req,res)=>{
     }
 
     res.status(200).json({ message: 'Contact deleted successfully' });
-  } catch (error) {
-    console.error('Error deleting address:', error);
-    res.status(500).json({ error: 'Internal server error' });
+  } catch (err) {
+  
+    next(new CustomError(err.message, 500));
   }
 
 

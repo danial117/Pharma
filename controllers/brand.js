@@ -1,5 +1,6 @@
 import Brand from "../models/BrandModel.js"
 import Product from "../models/ProductModel.js";
+import  CustomError from '../utils/ErrorClass.js'
 
 
 
@@ -7,8 +8,7 @@ import Product from "../models/ProductModel.js";
 
 
 
-
-export const GetAdminBrands = async (req, res) => {
+export const GetAdminBrands = async (req, res,next) => {
   try {
     // Extract filter, range, and sort parameters from the query
     const filter = JSON.parse(req.query.filter || '{}');
@@ -38,7 +38,7 @@ export const GetAdminBrands = async (req, res) => {
       }
     }
 
-    console.log(query)
+   
     // Find orders based on the filter, sort, skip, and limit
     const brands = await Brand.find(query).sort(sortObject).skip(skip).limit(limit);
     const totalBrands = await Brand.countDocuments(query);
@@ -57,9 +57,9 @@ export const GetAdminBrands = async (req, res) => {
     });
 
     res.status(200).json(modifiedBrands);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json('Internal Server Error');
+  } catch (err) {
+  
+    next(new CustomError(err.message, 500));
   }
 };
 
@@ -100,15 +100,14 @@ export const AdminCreateBrand=async(req,res,next)=>{
     }
     catch(err){
 
-        console.log(err)
-        next(err)
-        res.status(501).json('Internal Server Error')
+       
+      next(new CustomError(err.message, 500));
     }
 }
 
 
 
-export const GetBrands=async(req,res)=>{
+export const GetBrands=async(req,res,next)=>{
 
 
     try{
@@ -125,7 +124,8 @@ export const GetBrands=async(req,res)=>{
 
     }
     catch(err){
-        console.log(err)
+      next(new CustomError(err.message, 500));
+       
     }
 }
 
@@ -142,12 +142,12 @@ export const GetBrands=async(req,res)=>{
 
 
 
-export const GetBrandProducts=async(req,res)=>{
+export const GetBrandProducts=async(req,res,next)=>{
 
     try{
 
         const {brandName}=req.params;
-        console.log(brandName);
+      
         const page = parseInt(req.query.page) || 1; // Default to page 1 if not provided
           const limit = parseInt(req.query.limit) || 10; // Default to 10 items per page if not provided
           const formattedBrandName = brandName?.replaceAll('-','/');
@@ -171,7 +171,7 @@ export const GetBrandProducts=async(req,res)=>{
         const products=await Product.find({brand:brand.name,$nor: [
           { productImage: { $type: "string" } },
           { productImage: "" }
-        ]}).skip(skip).limit(limit);
+        ]}).select('name brand productImage options').skip(skip).limit(limit);
        
         res.status(200).json(products)
 }else{
@@ -182,8 +182,8 @@ export const GetBrandProducts=async(req,res)=>{
 
 
     }catch(err){
-        res.status(500).json('Internal Server Error')
-        console.log(err)
+      next(new CustomError(err.message, 500));
+      
     }
 }
 
@@ -200,7 +200,7 @@ export const AdminModifyBrand=async(req,res,next)=>{
         const data=req.body;
         const {brandId} =req.params;
 
-        console.log(data)
+      
 
         if(req.file){
           const file=req.file
@@ -224,7 +224,7 @@ export const AdminModifyBrand=async(req,res,next)=>{
     
         // Save the updated product
         const updatedBrand = await brand.save();
- console.log(updatedBrand)
+
         if(updatedBrand){
           const updateProducts=await Product.updateMany({
             $or: [
@@ -251,10 +251,9 @@ export const AdminModifyBrand=async(req,res,next)=>{
 
     }
 
-    catch(error){
-        console.log(error)
-        next(error)
-        res.status(500).json('Internal Server Error')
+    catch(err){
+       
+      next(new CustomError(err.message, 500));
     }
 }
 
@@ -266,7 +265,7 @@ export const AdminModifyBrand=async(req,res,next)=>{
 
 
 
-export const AdminGetBrand=async(req,res)=>{
+export const AdminGetBrand=async(req,res,next)=>{
 
     try{
   
@@ -278,16 +277,16 @@ export const AdminGetBrand=async(req,res)=>{
           modifiedBrand.name=modifiedBrand.name
           delete modifiedBrand._id;
   
-            console.log(modifiedBrand)
+          
           res.status(200).json(modifiedBrand)
   
   
   
   
   
-    }catch(error){
-        console.log(error)
-        res.status(500).json('Internal Server error')
+    }catch(err){
+       
+      next(new CustomError(err.message, 500));
     }
   }
   
@@ -295,11 +294,12 @@ export const AdminGetBrand=async(req,res)=>{
   
   
   
-export const AdminDeleteBrand=async(req,res)=>{
+export const AdminDeleteBrand=async(req,res,next)=>{
     try {
       // Assuming req.user is populated with user data by authMiddleware
-      const { brandId } = req.params;
      
+      const { brandId } = req.params;
+      
   
       // Check if the user is trying to delete their own address
       
@@ -312,9 +312,9 @@ export const AdminDeleteBrand=async(req,res)=>{
       }
   
       res.status(200).json({ message: 'Brand deleted successfully' });
-    } catch (error) {
-      console.error('Error deleting News:', error);
-      res.status(500).json({ error: 'Internal server error' });
+    } catch (err) {
+    
+      next(new CustomError(err.message, 500));
     }
   
   
