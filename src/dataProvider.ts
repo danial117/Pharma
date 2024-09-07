@@ -205,6 +205,7 @@ const customDataProvider = {
             range: JSON.stringify([(page - 1) * perPage, page * perPage - 1]),
             filter: JSON.stringify(params.filter),
         };
+        console.log(resource)
         const url = `${apiUrl}/${resource}/show?${stringify(query)}`;
         
         return httpClient(url)
@@ -215,6 +216,7 @@ const customDataProvider = {
             }));
     },
     getOne: (resource, params) => {
+        console.log(resource)
         const url = `${apiUrl}/${resource}/show/${params.id}`;
         return httpClient(url)
             .then(handleHttpError)
@@ -279,6 +281,9 @@ const customDataProvider = {
            
             data= JSON.stringify(params.data)
             headers={'Content-Type':'application/json'}
+         }else{
+            data= params.data
+
          }
 
         
@@ -335,11 +340,12 @@ const customDataProvider = {
                     resolve({ data: params.data });
                 });
             }
-            console.log(params.data)
+           
     
             createRequestInProgress = true;
             let formData;
             let headers={};
+           
             if (resource === 'products') { 
                 formData = params.data
             } else if (resource === 'brands') {
@@ -347,6 +353,9 @@ const customDataProvider = {
             } else if(resource === 'news') {
                 formData = createNewsFormData(params);
                 
+            }
+            if (resource ==='admin/CMS'){
+                formData = params.data
             }
     
               

@@ -1,12 +1,15 @@
 import  { useState } from 'react';
 import { Menu, MenuItem, Button } from '@mui/material';
 import SpinnerRotating from '../skeletons/spinner';
+import { useResourceContext } from 'react-admin';
+
 
 const FolderUploadMenu = ({ anchorE2, handleClose }) => {
     const apiUrl = process.env.VITE_API_URL;
     const [files, setFiles] = useState([]);
     const token = localStorage.getItem('token');
     const [loading,setLoading]=useState(false);
+    const resource=useResourceContext()
 
     const handleFolderChange = (event) => {
         const selectedFiles = Array.from(event.target.files);
@@ -20,8 +23,24 @@ const FolderUploadMenu = ({ anchorE2, handleClose }) => {
             formData.append(`file_${index}`, file);
         });
         setLoading(true)
+        let endpoint;
+        alert(resource)
+        switch(resource) {
+            
+            case 'products':
+                endpoint = 'products/uploadFolder';
+                break;
+            case 'brands':
+                endpoint = 'brands/uploadFolder';
+                break;
+            case 'news':
+                endpoint = 'news/uploadFolder';
+                break;
+            default:
+                endpoint = 'default/uploadFolder'; // Fallback to a default endpoint
+        }
 
-        fetch(`${apiUrl}/admin/uploadFolder`, {
+        fetch(`${apiUrl}/admin/${endpoint}`, {
             method: 'POST',
             headers: { 'Authorization': `Bearer ${token}` },
             body: formData
