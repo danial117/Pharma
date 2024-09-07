@@ -5,7 +5,7 @@ import ProductsList from "./Data Lists/Products/ProductsList";
 import ProductEdit  from "./Data Lists/Products/ProductsEdit";
 import './main.css'
 import AddressList from "./Data Lists/Addresses/AddressList";
-import CustomRecordList from "./Data Lists/Users/UsersList";
+import UsersList from "./Data Lists/Users/UsersList";
 import ProductCreate from "./Data Lists/Products/ProductsCreate";
 import OrdersList from "./Data Lists/orders/OrdersList";
 import CartsList from "./Data Lists/Carts/CartsList";
@@ -30,8 +30,8 @@ import OtpPage from "./componenets/OTP_Validation";
 import ContactList from "./Data Lists/contact/ContactList";
 import { ContactShow } from "./Data Lists/contact/ContactShow";
 import ProtectedLayout from "./componenets/ProtectedLayout";
-
-
+import CMS_Create from "./Data Lists/DOM/DOM_Edit";
+import { UserShow } from "./Data Lists/Users/OrdersShow";
 
 const AppContent = () => {
   const location = useLocation();
@@ -43,14 +43,14 @@ const AppContent = () => {
     <>
       {showSearchData && <SearchData />}
      {!isFetching &&<div className={`${showSearchData && 'mt-28'} `}>  <Admin  dataProvider={customDataProvider} loginPage={<MyLoginPage />} authProvider={authProvider}>
-        <Resource name="users" list={<CustomRecordList resource="user" />} />
+        <Resource name="user" show={<UserShow/>} list={<UsersList  />} />
         <Resource name="news" list={<NewsList/>} show={NewsShow} create={NewsCreate} edit={NewsEdit} hasCreate hasEdit hasShow/>
         <Resource name="address" list={<AddressList />} />
         <Resource name="order" show={OrderShow} list={<OrdersList />} edit={OrderEdit} hasShow />
         <Resource name="cart" list={<CartsList />} />
         <Resource name="products" list={ProductsList} edit={ProductEdit} create={ProductCreate} hasCreate />
         <Resource name="brands" show={BrandShow} edit={BrandEdit} list={BrandsList} create={BrandsCreate} hasShow hasCreate />
-        {/* <Resource name="content" list={DomList} show={DOM_Show} edit={DomEdit} hasEdit hasShow /> */}
+        <Resource name="Cms"    list={DomList}  edit={CMS_Create} hasShow hasEdit hasCreate/>
         <Resource name="contact"  list={ContactList} show={ContactShow} hasEdit hasShow />
         
       </Admin>

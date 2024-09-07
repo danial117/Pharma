@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Menu, MenuItem, Button } from '@mui/material';
 import { CSVLink } from 'react-csv';
 import SpinnerRotating from '../skeletons/spinner';
-
+import { useResourceContext } from 'react-admin';
 
 
 
@@ -11,24 +11,37 @@ const CsvMenu = ({ anchorEl, handleClose }) => {
     const [csvData, setCsvData] = useState([]);
     const [file, setFile] = useState(null);
     const token = localStorage.getItem('token');
+    const resource=useResourceContext();
    const [loading,setLoading]=useState(false);
     const handleGenerateCsv = () => {
-        const data = [
-            [
-                'name',
-                'brand',
-                'productImage',
-                'category',
-                'option',
-                'price',
-                'Description',
-                'Warnings',
-                'More',
-                'DietaryRestrictions',
-                'Certifications'
+        const columnsByResource = {
+            products: [
+              'name',
+              'brand',
+              'productImage',
+              'category',
+              'option',
+              'price',
+              'Description',
+              'Warnings',
+              'More',
+              'DietaryRestrictions',
+              'Certifications',
             ],
-        ];
-        setCsvData(data);
+            brands: [
+              'name',
+              'productImage'
+             
+            ],
+            news:[
+                'title',
+                'content',
+                'topic',
+                'imageUrl'
+            ]
+          
+          };
+        setCsvData([columnsByResource[resource]]);
     };
 
     const handleFileChange = (event) => {
@@ -43,31 +56,43 @@ const CsvMenu = ({ anchorEl, handleClose }) => {
     const handleUpload = (fileToUpload) => {
         const formData = new FormData();
         formData.append('file', fileToUpload);
-        setLoading(true)
-        fetch(`${apiUrl}/admin/CsvFile`, {
+        setLoading(true);
+
+        let endpoint;
+        switch(resource) {
+            case 'products':
+                endpoint = 'products/CsvFile';
+                break;
+            case 'brands':
+                endpoint = 'brands/CsvFile';
+                break;
+            case 'news':
+                endpoint = 'news/CsvFile';
+                break;
+            default:
+                endpoint = 'default/CsvFile'; // Fallback to a default endpoint
+        }
+
+        fetch(`${apiUrl}/admin/${endpoint}`, {
             method: 'POST',
             headers: { 'Authorization': `Bearer ${token}` },
             body: formData
         })
-        .then(response => response)
-        .then((response) => {
-           
-            if(response.status===200)
-        {
-
-            setLoading(false)
-        }else{
-            alert('An error occured while uploading the file')
-        }
+        .then(response => {
+            if(response.status === 200) {
+                setLoading(false);
+            } else {
+                alert('An error occurred while uploading the file');
+            }
         })
-        .catch((error) => {setLoading(false);
-            alert('An error occured while uploading')
+        .catch((error) => {
+            setLoading(false);
+            alert('An error occurred while uploading');
         })
-        .finally(()=>{
-            setLoading(false)
-        })
+        .finally(() => {
+            setLoading(false);
+        });
     };
-
     return (
         <Menu
             anchorEl={anchorEl}
@@ -98,7 +123,7 @@ const CsvMenu = ({ anchorEl, handleClose }) => {
             <MenuItem>
                 <CSVLink
                     data={csvData}
-                    filename={"products.csv"}
+                    filename={`${resource}.csv`}
                     className="btn btn-primary"
                     onClick={handleGenerateCsv}
                 >

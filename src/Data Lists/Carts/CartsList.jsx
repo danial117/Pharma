@@ -9,9 +9,7 @@ import { List, Datagrid, TextField, useRecordContext, useResourceContext,CreateB
 
     const ListActions = () => (
         <TopToolbar>
-            <SelectColumnsButton />
-            
-            <CreateButton/>
+           
             <ExportButton/>
         </TopToolbar>
     );
@@ -23,7 +21,8 @@ const CartsList = () =>{
     <List actions={<ListActions/>}>
         <Datagrid >
             <TextField  source="id" />
-            <TextField source="user" />
+            <TextField source="user.name" />
+            <TextField source="user.email" />
             <TextField label='items' source="items.length" />
             
         </Datagrid>

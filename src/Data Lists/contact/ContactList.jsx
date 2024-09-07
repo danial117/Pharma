@@ -6,13 +6,27 @@ import { List, Datagrid, TextField, useRecordContext, useResourceContext,CreateB
     SelectColumnsButton,
     TopToolbar,
     SearchInput,
-    ShowButton, } from 'react-admin';
+    ShowButton,FilterForm,TextInput } from 'react-admin';
+
+
+    const postFilters = [
+   
+        <TextInput label="User name" source="name" defaultValue="" />,
+        <TextInput label="User Email" source="email" defaultValue="" />,
+        
+       
+  
+    ];
 
     const ListActions = () => (
+        
         <TopToolbar>
-            <SelectColumnsButton />
+             <FilterForm filters={postFilters} />
             
-            <CreateButton/>
+                <FilterButton filters={postFilters} />
+           
+            
+            
             <ExportButton/>
         </TopToolbar>
     );

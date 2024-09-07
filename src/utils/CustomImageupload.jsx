@@ -7,7 +7,7 @@ const CustomImageUpload = ({ source, onChange }) => {
     const [image, setImage] = useState(null);
     const [src, setSrc] = useState(null);
     const [showImage, setShowImage] = useState(record[source]);
-    
+    console.log(record)
  
     useEffect(() => {
         if (record && record[source]) {

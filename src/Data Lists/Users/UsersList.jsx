@@ -1,53 +1,70 @@
-import React, { useEffect, useState } from 'react';
-import { useDataProvider } from 'react-admin';
-import { Card, CardContent, Typography, CircularProgress } from '@mui/material';
-import CustomButton from './customButton';
 
-const CustomRecordList = ({ resource }) => {
-    const dataProvider = useDataProvider();
-    const [records, setRecords] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+import { List, Datagrid, TextField, useRecordContext, useResourceContext,CreateButton,
+    DatagridConfigurable,
+    ExportButton,
+    FilterButton,
+    SelectColumnsButton,
+    TopToolbar,
+    SearchInput,
+    ShowButton,FilterForm,TextInput } from 'react-admin';
+  
+     import { Stack } from '@mui/material';
+  
 
-    useEffect(() => {
-        dataProvider.getList(resource, {
-            pagination: { page: 1, perPage: 10 },
-            sort: { field: 'id', order: 'ASC' },
-            filter: {}
-        })
-        .then(({ data }) => {
-            setRecords(data);
-            setLoading(false);
-        })
-        .catch(error => {
-            setError(error);
-            setLoading(false);
-        });
-    }, [dataProvider, resource]);
 
-    if (loading) {
-        return <CircularProgress />;
-    }
 
-    if (error) {
-        return <Typography color="error">Error: {error.message}</Typography>;
-    }
 
-    return (
-        <div>
-            {records.map(record => (
-                <Card key={record.id} style={{ margin: '1em' }}>
-                    <CardContent>
-                        <Typography variant="h5">ID: {record.id}</Typography>
-                        <Typography variant="h6">Name: {record.name}</Typography>
-                        <Typography variant="body1">Email: {record.email}</Typography>
-                        <Typography variant="body2">Auth Method: {record.authenticationMethod}</Typography>
-                        <CustomButton />
-                    </CardContent>
-                </Card>
-            ))}
-        </div>
-    );
-};
+    const postFilters = [
+   
+        <TextInput label="User Name" source="name" defaultValue="" />,
+        <TextInput label="Authentication Method" source="authenticationMethod" defaultValue="" />,
+        <TextInput label="User Email" source="email" defaultValue="" />,
+       
+  
+    ];
 
-export default CustomRecordList;
+
+    
+    
+    const ListToolbar = () => {
+ 
+     
+    
+    
+       return( <Stack direction="column"  >
+            <FilterForm filters={postFilters} />
+            <div >
+                <FilterButton filters={postFilters} />
+                <ExportButton/>
+               
+              
+               
+              
+              
+            </div>
+        </Stack>
+    )
+}
+
+  
+
+const UsersList = (props) =>{ 
+  
+    
+    return(
+    <List actions={<ListToolbar/>}>
+        <Datagrid rowClick='show'>
+            <TextField  source="name" />
+            <TextField source="email" />
+            <TextField source="authenticationMethod" />
+          
+            <ShowButton />
+
+            
+           
+            
+        </Datagrid>
+    </List>
+);
+}
+export default UsersList;

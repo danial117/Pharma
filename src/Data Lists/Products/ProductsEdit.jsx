@@ -10,7 +10,6 @@ const ProductEdit = (props) => {
     const [options, setOptions] = useState([]);
     const [imageFile, setImageFile] = useState(null);
 
-
     const handleDietaryRestrictionsChange = (updatedArray) => {
         console.log(dietaryRestrictions)
         setDietaryRestrictions(updatedArray);
