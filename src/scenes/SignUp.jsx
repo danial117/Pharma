@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setUser, setAccessToken, addItemToCartAsync,addItemToCart } from '../state';
+import { setUser, setAccessToken, addItemToCartAsync,setItemCart } from '../state';
 import { removeItemFromCart } from '../state';
 import NavBar from './NavBar';
 import Footer from './Footer';
@@ -303,57 +303,79 @@ const SignUp = () => {
 
           });
       } else {
-     const response= await  fetch(`${process.env.REACT_APP_API_URL}/user/login`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify(formData),
-        })
-          .then((response) =>  { 
-            if(response.status===401){
-             alert('Incorrect email or password')
-            }else{
-             response.json()
-            }
-             
-           })
-          .then((data) => {
-            UserSignedInEvent()
+        
+          const response = await fetch(`${process.env.REACT_APP_API_URL}/user/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify(formData),
+          });
+        
+          if (response.status === 401) {
+            alert('Incorrect email or password');
+            return;
+          }
+        
+          const data = await response.json(); // Parse the response JSON
+        
+          // Dispatch your actions
+         
+        
+         
+        
+       
+          if(data){
+            UserSignedInEvent();
             dispatch(setUser({ user: data.modifiedUser }));
             dispatch(setAccessToken({ accessToken: data.accessToken }));
-           
-         return data
-          });
-
-          if(response){
+            
             api.get('/cart/').then((response)=>
-              { if(response.status===200 && response.data) {
-        
-                response.data.items.map((item)=>{
+              { if (response.status === 200 && response.data) {
+                
+                // Create promises for adding items from the response to the cart
+                const addToCartPromises = response.data.items.map((item) => {
+                  const product = item.product;
                   
-                   dispatch( addItemToCart({product:item.product,quantity:item.quantity}))
-                })
-                
-               
-                const dispatchPromises = [];
-
-                cartItems.forEach((product) => {
-                    // Check if the product's ID exists in response.data.items
-                    const found = response.data.items.some((item) => item._id === product._id);
+                  // Find the selected option based on the `option` id
+                  const selectedOption = product.options.find(option => option.id === item.option);
+                  
+                  if (selectedOption) {
+                    // Create the product structure to dispatch
+                    const productToDispatch = {
+                      name: product.name,
+                      option: selectedOption, // Add the selected option
+                      productImage: product.productImage,
+                      _id: product._id,
+                    };
                     
-                    if (!found) {
-                        // Dispatch addItemToCartAsync action for products not found in response
-                        dispatchPromises.push(dispatch(addItemToCartAsync({ product:product,quantity:product.quantity })));
-                    }
-                });
-                
-                // Wait for all dispatch operations to complete
-                Promise.all(dispatchPromises)
-                    .then(() => {
-                        // After all dispatches are performed, change location
-                        window.location.href = '/';
-                     })
-                  }
+                    // Dispatch the action to add the item to the cart
+                    return dispatch(setItemCart({ product: productToDispatch, quantity: item.quantity }));
+                  }})
+              
+                // Once all items from the response are added, process the cartItems
+                Promise.all(addToCartPromises)
+                  .then(() => {
+                    // Find products in cartItems that are NOT in response.data.items
+                    const missingProducts = cartItems.filter((product) => {
+                      return !response.data.items.some((item) => item._id === product._id);
+                    });
+              
+                    // Dispatch actions for the missing products
+                    const addItemToCartAsyncPromises = missingProducts.map((product) => {
+                      return dispatch(addItemToCartAsync({ product: product, quantity: product.quantity }));
+                    });
+              
+                    // Return the promise to chain with the previous one
+                    return Promise.all(addItemToCartAsyncPromises);
+                  })
+                  .then(() => {
+                    // After all dispatch operations are complete, redirect to another page
+                    // window.location.href = '/';
+                  })
+                  .catch((error) => {
+                    console.error('Error in dispatching actions:', error);
+                  });
+              }
               }
              )
           }
@@ -363,7 +385,7 @@ const SignUp = () => {
       setLoading(false)
       // Handle error if needed
   } finally {
-    window.location.href='/'
+   
       setLoading(false);
      
   }
