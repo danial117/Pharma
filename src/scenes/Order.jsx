@@ -77,10 +77,19 @@ const Order=()=>{
             
             if (response.status === 201) {
               
-              cartItemIds.forEach((data) => {
-                console.log(data)
-                dispatch(removeItemFromCart({ itemId: data }));
+              const removePromises = cartItemIds.map((itemId) => {
+                console.log(itemId);
+                return dispatch(removeItemFromCart({ itemId }));
               });
+              
+              Promise.all(removePromises)
+                .then(() => {
+                  console.log('All items removed from cart successfully.');
+                  // You can add any additional logic here if needed, e.g., redirect, UI update
+                })
+                .catch((error) => {
+                  console.error('Error removing items from cart:', error);
+                });
             }
           } catch (error) {
             console.error('Error creating order:', error);

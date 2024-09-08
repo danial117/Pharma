@@ -72,7 +72,7 @@ const NavBar=()=>{
         <nav style={{userSelect:'none'}} className="w-[100%] border-b-2 border-gray-300 ">
         <div className="flex w-[100%] border-b-2 border-gray-700 mx-auto xs:max-md:justify-between flex-row">
             <div className="Logo  basis-[10%]  ">
-                 <p onClick={()=>{window.location.href='/'}}   className="text-[2rem] ml-4 cursor-pointer md:max-lg:text-center md:max-lg:my-2 md:max-lg:text-[1.6rem]">Info<span>vit</span></p>
+                 <img className="h-[70px] w-[80px] ml-2" src={require('../assets/logo.png')} />
 
             </div>
         {

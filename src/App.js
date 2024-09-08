@@ -45,14 +45,7 @@ const App=()=>{
   }, []);
 
 
-  useEffect(()=>{
-    fetch(`${process.env.REACT_APP_API_URL}/content/`,{
-     method:'GET'
-    }).then((response)=>response.json()).then((data)=>{
-    
-     dispatch(setContent({data:data}))
-    })
-},[])
+ 
 
   
   

@@ -19,8 +19,7 @@ const initialState = {
        api.get(`/cart/create/${product._id}/${quantity?quantity:1}?option=${product.option.id}`)
       .then((response)=>{
         if (response.status === 201) {
-       
-          dispatch(addItemToCart({product:product,quantity:quantity?quantity:1}))
+          dispatch(setItemCart({product:product,quantity:quantity?quantity:1}))
         }
       })
      

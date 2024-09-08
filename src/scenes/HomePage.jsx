@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useMediaQuery } from "@mui/material";
 import NavBar from "./NavBar"
 import {useNavigate} from 'react-router-dom'
-import { addItemToCart, removeItemFromCart, setAccessToken,setItemCart } from "../state";
+import { addItemToCartAsync, removeItemFromCart, setAccessToken,setItemCart } from "../state";
 import { CartContext } from "../cartContext/cartContext";
 import SearchComponent from "../components/SearchComponent";
 import Slider from "react-slick";
@@ -72,45 +72,108 @@ const HomePage=()=>{
      
 
       
-
       useEffect(() => {
         const fetchUserData = async () => {
           try {
+            // First fetch: Get user data
             const response = await fetch(`${process.env.REACT_APP_API_URL}/user/`, {
               method: 'GET',
-              credentials: 'include' // Include cookies in request
+              credentials: 'include', // Include cookies in request
             });
-            
+      
             if (response.ok) {
               const data = await response.json();
               const { accessToken, ...rest } = data;
-              
+      
+              // Dispatch user data and access token
               dispatch(setUser({ user: rest }));
               dispatch(setAccessToken({ accessToken }));
-    
-              if (user.email && (user.email.toString() !== data.email.toString())) {
-                cartItemIds.forEach((id) => {
-                  dispatch(removeItemFromCart({ itemId: id }));
-                });
+              fetchCartData();
+              // Check if user email has changed, remove items from the cart if needed
+              if (user.email && user.email.toString() !== data.email.toString()) {
+                const removePromises = cartItemIds.map((id) =>
+                  dispatch(removeItemFromCart({ itemId: id }))
+                );
+      
+                // Wait for all remove actions to complete before proceeding
+                await Promise.all(removePromises);
+                console.log('All items removed from cart successfully.');
               }
-    
-              if (accessToken) {
-                const cartResponse = await api.get('/cart/');
-                if (cartResponse.status === 200 && cartResponse.data) {
-                  cartResponse.data.items.forEach((item) => {
-                    dispatch(setItemCart({ product: item.product, quantity: item.quantity }));
-                  });
-                }
-              }
+      
+              // Second fetch: Fetch cart data (mandatory)
+             
+                 // Perform cart fetch after the first fetch
+              
+            } else {
+              throw new Error('Failed to fetch user data');
             }
           } catch (error) {
             console.error('Error fetching user data:', error);
           }
         };
-    
+      
+       async  function  fetchCartData() {
+          try {
+            // Fetch cart data
+            const cartResponse = await api.get('/cart/');
+      
+            if (cartResponse.status === 200 && cartResponse.data) {
+              const addToCartPromises = cartResponse.data.items.map((item) => {
+                const product = item.product;
+      
+                // Find the selected option based on the `option` id
+                const selectedOption = product.options.find(
+                  (option) => option.id === item.option
+                );
+      
+                if (selectedOption) {
+                  // Create the product structure to dispatch
+                  const productToDispatch = {
+                    name: product.name,
+                    option: selectedOption, // Add the selected option
+                    productImage: product.productImage,
+                    _id: product._id,
+                  };
+      
+                  // Dispatch the action to add the item to the cart
+                  return dispatch(
+                    setItemCart({ product: productToDispatch, quantity: item.quantity })
+                  );
+                }
+              });
+      
+              // Wait for all cart item additions to complete
+              await Promise.all(addToCartPromises)
+              .then(() => {
+               
+                // Find products in cartItems that are NOT in response.data.items
+                const missingProducts = cartItems.filter((product) => {
+                  return !cartResponse.data.items.some((item) => item._id === product._id);
+                });
+                console.log(missingProducts)
+                // Dispatch actions for the missing products
+                const addItemToCartAsyncPromises = missingProducts.map((product) => {
+                  return dispatch(addItemToCartAsync({ product: product, quantity: product.quantity }));
+                });
+          
+                // Return the promise to chain with the previous one
+                return Promise.all(addItemToCartAsyncPromises);
+              })
+              .then(() => {
+                // After all dispatch operations are complete, redirect to another page
+                // window.location.href = '/';
+              })
+              ;
+              console.log('All cart items set successfully.');
+            }
+          } catch (error) {
+            console.error('Error fetching or setting cart items:', error);
+          }
+        };
+      
+        // Call the function to fetch user data and handle cart actions
         fetchUserData();
       }, []);
-
 
 
 
