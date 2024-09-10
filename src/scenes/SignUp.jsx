@@ -189,27 +189,27 @@ const SignUp = () => {
             window.location.href = '/';
           });
       } else {
-      const response=await  fetch(`${process.env.REACT_APP_API_URL}/user/signup`, {
+      const response=await fetch(`${process.env.REACT_APP_API_URL}/user/signup`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
           body: JSON.stringify(formData),
         })
-          .then((response) => response.json())
-          .then((data) => {
-            dispatch(setUser({ user: data.userData }));
-            dispatch(setAccessToken({ accessToken: data.accessToken }));
-            
-          });
+         
 
           if(response){
-             if(response.status===201 && response.data) {
+           
+             if(response.status===201) {
+            
+              const data=await response.json()
+             
+              dispatch(setUser({ user: data.userData }));
+              dispatch(setAccessToken({ accessToken: data.accessToken }));
               UserRegisterationEvent()
-                response.data.items.map((item)=>{
-                   dispatch( addItemToCart({product:item.product,quantity:item.quantity}))
-                })
+                
                 const dispatchPromises = [];
-                cartItems.forEach((product) => {
+                cartItems.forEach((product) => {  
+                            
                         dispatchPromises.push(dispatch(addItemToCartAsync({ product:product,quantity:product.quantity })));  
                 });
 
@@ -238,7 +238,7 @@ const SignUp = () => {
   }catch (error) {
     alert('An error occured during signup')
     setLoading(false)
-    // Handle error if needed
+    
 } finally {
     setLoading(false);
     window.location.href = '/';

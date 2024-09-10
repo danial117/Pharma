@@ -1,5 +1,5 @@
 
-import { KeyboardArrowDownRounded,ShoppingCartRounded,MenuRounded,CloseRounded,AccountCircle } from "@mui/icons-material";
+import { KeyboardArrowDownRounded,ShoppingCartRounded,MenuRounded,CloseRounded,AccountCircle, DisplaySettings } from "@mui/icons-material";
 import { useEffect, useState,useContext } from "react";
 import Cart from "../widget/Cart";
 import { useMediaQuery } from "@mui/material";
@@ -28,6 +28,8 @@ const NavBar=()=>{
     const navigate=useNavigate()
     const isMobileCategories = useMediaQuery('(min-width:1024px)');
     const { cart, toggleCart } = useContext(CartContext);
+    const cartItems=useSelector((state)=>state.cartItems);
+    const [totalCartItems,setTotalCartItems]=useState(false)
     const dispatch=useDispatch()
     const [categories,setCategories]=useState(false)
     const location = useLocation();
@@ -40,6 +42,16 @@ const NavBar=()=>{
   const [anchorEl, setAnchorEl] = useState(null);
   
 
+  useEffect(()=>{
+          
+    if(cartItems.length !==0 ){
+        setTotalCartItems(cartItems.length)
+    }else{
+      setTotalCartItems(false)
+    }
+    
+
+  },[cartItems,dispatch])
 
 
 
@@ -88,7 +100,19 @@ const NavBar=()=>{
         }
 
           {isMobile &&  <div className="basis-[20%] md:max-lg:basis-[30%] md:max-lg:justify-end justify-end md:max-lg:gap-x-6  w-full gap-x-8 flex flex-row py-2 ml-auto mr-[4px]">
-                <ShoppingCartRounded onClick={toggleCart} style={{cursor:'pointer',fontSize:30,margin:'auto 0'}}/>
+             
+             <div onClick={toggleCart} className="relative cursor-pointer my-auto">
+              <div className='absolute -top-[2px] right-0'>
+              {totalCartItems  && <p className="text-top   bg-black py-[1px] px-[6px] rounded-full font-bold mb-4 text-red-500 text-xs font-Lexend">{totalCartItems}</p> }
+
+                </div>
+                
+
+                <ShoppingCartRounded  style={{cursor:'pointer',fontSize:30,margin:'auto 0'}}/>
+
+             </div>
+
+
                {!accessToken && <button onClick={()=>{window.location.href='/createAccount'}}  className="px-4  md:max-lg:text-[12px] md:max-lg:px-2   text-emerald-600 border-2 border-emerald-300  rounded-md text-sm  font-Poppins">
                     Sign Up
                 </button>}
@@ -132,7 +156,16 @@ const NavBar=()=>{
             <div className="my-auto">
               <div className="flex mr-2 flex-row gap-x-4">
            
-                 <ShoppingCartRounded onClick={toggleCart} style={{cursor:'pointer'}}/>
+              <div onClick={toggleCart} className="relative cursor-pointer my-auto">
+              <div className='absolute -top-[2px] right-0'>
+              {totalCartItems  && <p className="text-top   bg-black py-[1px] px-[6px] rounded-full font-bold mb-4 text-red-500 text-xs font-Lexend">{totalCartItems}</p> }
+
+                </div>
+                
+
+                <ShoppingCartRounded  style={{cursor:'pointer',fontSize:30,margin:'auto 0'}}/>
+
+             </div>
               {!accessToken &&
                  <button onClick={()=>{window.location.href='/createAccount'}}  className="px-4  md:max-lg:text-[12px] md:max-lg:px-2   text-emerald-600 border-2 border-emerald-300 py-[4px]  rounded-md text-sm  font-Poppins">
                     Sign Up
