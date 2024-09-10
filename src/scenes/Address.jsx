@@ -9,6 +9,7 @@ import { useSelector,useDispatch } from "react-redux";
 import { EditRounded } from "@mui/icons-material";
 import { removeItemFromCart } from "../state";
 import SpinnerRotating from "../skeleton/spinner";
+import { useNavigate } from "react-router-dom";
 
 
 const states = [
@@ -98,7 +99,24 @@ const states = [
     NH: ['Manchester', 'Nashua', 'Concord', 'Derry', 'Rochester', 'Salem', 'Dover', 'Merrimack', 'Hudson', 'Londonderry'],
     NJ: ['Newark', 'Jersey City', 'Paterson', 'Elizabeth', 'Edison', 'Woodbridge', 'Lakewood', 'Toms River', 'Hamilton', 'Trenton'],
     NM: ['Albuquerque', 'Las Cruces', 'Rio Rancho', 'Santa Fe', 'Roswell', 'Farmington', 'Clovis', 'Hobbs', 'Alamogordo', 'Carlsbad'],
-    NY: ['New York City', 'Buffalo', 'Rochester', 'Yonkers', 'Syracuse', 'Albany', 'New Rochelle', 'Mount Vernon', 'Schenectady', 'Utica'],
+    NY: [
+      "New York City", "Albany", "Buffalo", "Rochester", "Syracuse", "Yonkers", "Schenectady",
+      "Mount Vernon", "Troy", "Niagara Falls", "Binghamton", "Utica", "White Plains", 
+      "New Rochelle", "Ithaca", "Poughkeepsie", "Jamestown", "Rome", "Peekskill", 
+      "Lockport", "Kingston", "Batavia", "Plattsburgh", "Glens Falls", "Auburn", "Elmira",
+      
+      // Smaller towns and villages
+      "Amherst", "Huntington", "Hempstead", "Clarkstown", "Greenburgh", "Cheektowaga",
+      "Ramapo", "Irondequoit", "Tonawanda", "North Hempstead", "Greece", "Perinton",
+      "Babylon", "Union", "Smithtown", "Orangetown", "Hamburg", "Colonie", "Henrietta",
+      
+      // Even smaller locations and hamlets
+      "Cortland", "Oneonta", "Ogdensburg", "Massena", "Fulton", "Gloversville", "Oswego",
+      "Geneva", "Watertown", "Canandaigua", "Beacon", "Tarrytown", "Medina", "Endicott",
+      "West Seneca", "Lackawanna", "Corning", "Malone", "Canton", "Fredonia",
+      "Jamesville", // Adding Jamesville
+      "Cazenovia", "Dansville", "Skaneateles", "Delhi", "Wappingers Falls"
+    ],
     NC: ['Charlotte', 'Raleigh', 'Greensboro', 'Durham', 'Winston-Salem', 'Fayetteville', 'Cary', 'Wilmington', 'High Point', 'Asheville'],
     ND: ['Fargo', 'Bismarck', 'Grand Forks', 'Minot', 'West Fargo', 'Mandan', 'Dickinson', 'Jamestown', 'Williston', 'Wahpeton'],
     OH: ['Columbus', 'Cleveland', 'Cincinnati', 'Toledo', 'Akron', 'Dayton', 'Parma', 'Canton', 'Youngstown', 'Lorain'],
@@ -151,7 +169,8 @@ const Address=()=>{
     const [showDropdown, setShowDropdown] = useState(false);
     const [cities, setCities] = useState([]);
     const [edit,setEdit]=useState(false);
-    const [loading,setLoading]=useState(false)
+    const [loading,setLoading]=useState(false);
+    const navigate=useNavigate()
 
     useEffect(()=>{
       try{
@@ -327,7 +346,8 @@ const Address=()=>{
           api.get('/order/tax').then((response)=>{
             if(response.status === 200 || response.status=== 404 ){
                
-              window.location.href='/order'
+              navigate('/order',{replace:true})
+              window.location.reload()
             }
           }) }else{
               window.location.href='/createAccount'

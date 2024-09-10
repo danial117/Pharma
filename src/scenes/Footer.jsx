@@ -33,21 +33,21 @@ const Footer=()=>{
 
 
         <div className="flex flex-col gap-y-2">
-            <p className="font-bold text-white text-lg font-Lexend">Quick links</p>
-            <p className="text-white font-Poppins text-xs">HomePage</p>
-            <p className="text-white font-Poppins text-xs">Pro</p>
-            <p className="text-white font-Poppins text-xs">Contacts</p>
-            <p className="text-white font-Poppins text-xs">Info</p>
+            <p className="font-bold  text-white text-lg font-Lexend">Quick links</p>
+            <p onClick={()=>{window.location.href='/'}} className="text-white cursor-pointer font-Poppins text-xs">HomePage</p>
+            <p onClick={()=>{window.location.href='/createAccount'}} className="text-white cursor-pointer font-Poppins text-xs">Account</p>
+            <p onClick={()=>{window.location.href='/contact'}} className="text-white cursor-pointer font-Poppins text-xs">Contacts</p>
+            <p onClick={()=>{window.location.href='/about'}} className="text-white cursor-pointer font-Poppins text-xs">Info</p>
 
         </div>
 
 
         <div className="flex flex-col gap-y-2">
-            <p className="font-bold text-white text-lg font-Lexend">About us</p>
-            <p className="text-white font-Poppins text-xs">Order</p>
-            <p className="text-white font-Poppins text-xs">Purchase</p>
-            <p className="text-white font-Poppins text-xs">Privacy Policy</p>
-            <p className="text-white font-Poppins text-xs">Terms of Sales</p>
+            <p onClick={()=>{window.location.href='/about'}} className="font-bold  cursor-pointer text-white text-lg font-Lexend">About us</p>
+            <p onClick={()=>{window.location.href='/order'}} className="text-white  cursor-pointer font-Poppins text-xs">Order</p>
+            <p onClick={()=>{window.location.href='/userOrders'}} className="text-white  cursor-pointer font-Poppins text-xs">Purchase</p>
+            <p onClick={()=>{window.location.href='/'}} className="text-white  cursor-pointer font-Poppins text-xs">Privacy Policy</p>
+            <p onClick={()=>{window.location.href='/'}} className="text-white cursor-pointer  font-Poppins text-xs">Terms of Sales</p>
 
         </div>
 

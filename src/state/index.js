@@ -12,7 +12,7 @@ const initialState = {
  export const addItemToCartAsync = createAsyncThunk(
   'auth/addItemToCartAsync',
   async ({ product, quantity }, { getState,dispatch }) => {
-   
+    
     const state = getState();
 
     if (state.accessToken) {
