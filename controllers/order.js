@@ -46,7 +46,6 @@ import CustomError from "../utils/ErrorClass.js";
    if(order){ 
     const Tax=Number(order.itemsAmount)*Number(taxRate.total_rate);
     const totalAmount=Number(order.itemsAmount)+Tax;
-    console.log('t',Tax,totalAmount)
       order.totalAmount = totalAmount;
       order.tax= Tax;
       order.updatedAt = new Date(); 
