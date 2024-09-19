@@ -30,7 +30,7 @@ const CsvMenu = ({ anchorEl, handleClose }) => {
             ],
             brands: [
               'name',
-              'productImage'
+              'brandImage'
              
             ],
             news:[

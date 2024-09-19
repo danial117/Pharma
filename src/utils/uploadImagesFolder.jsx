@@ -1,32 +1,39 @@
 import  { useState } from 'react';
-import { Menu, MenuItem, Button } from '@mui/material';
+import { Menu, MenuItem, Button, LinearProgress, Box, Typography } from '@mui/material';
 import SpinnerRotating from '../skeletons/spinner';
 import { useResourceContext } from 'react-admin';
-
 
 const FolderUploadMenu = ({ anchorE2, handleClose }) => {
     const apiUrl = process.env.VITE_API_URL;
     const [files, setFiles] = useState([]);
     const token = localStorage.getItem('token');
-    const [loading,setLoading]=useState(false);
-    const resource=useResourceContext()
+    const [loading, setLoading] = useState(false);
+    const [progress, setProgress] = useState(0); // State for progress tracking
+    const resource = useResourceContext();
+
+    // Function to split files into chunks
+    const chunkFiles = (filesArray, chunkSize) => {
+        const chunks = [];
+        for (let i = 0; i < filesArray.length; i += chunkSize) {
+            chunks.push(filesArray.slice(i, i + chunkSize));
+        }
+        return chunks;
+    };
 
     const handleFolderChange = (event) => {
         const selectedFiles = Array.from(event.target.files);
         setFiles(selectedFiles);
-        uploadFiles(selectedFiles);
+        uploadFilesInChunks(selectedFiles);
     };
 
-    const uploadFiles = (files) => {
-        const formData = new FormData();
-        files.forEach((file, index) => {
-            formData.append(`file_${index}`, file);
-        });
-        setLoading(true)
+    const uploadFilesInChunks = async (files) => {
+        const chunkSize = 30; // Number of files per chunk
+        const fileChunks = chunkFiles(files, chunkSize); // Split files into chunks
+        setLoading(true);
+        setProgress(0); // Reset progress when starting a new upload
+
         let endpoint;
-        alert(resource)
-        switch(resource) {
-            
+        switch (resource) {
             case 'products':
                 endpoint = 'products/uploadFolder';
                 break;
@@ -40,35 +47,45 @@ const FolderUploadMenu = ({ anchorE2, handleClose }) => {
                 endpoint = 'default/uploadFolder'; // Fallback to a default endpoint
         }
 
-        fetch(`${apiUrl}/admin/${endpoint}`, {
-            method: 'POST',
-            headers: { 'Authorization': `Bearer ${token}` },
-            body: formData
-        })
-        .then(response => response)
-        .then((response) => {
-            if(response.status === 200){
-                setLoading(false)
+        try {
+            let totalFilesUploaded = 0;
+            for (let chunkIndex = 0; chunkIndex < fileChunks.length; chunkIndex++) {
+                const formData = new FormData();
+                fileChunks[chunkIndex].forEach((file, index) => {
+                    formData.append(`file_${chunkIndex}_${index}`, file); // Use unique keys for files
+                });
+
+                await fetch(`${apiUrl}/admin/${endpoint}`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: formData,
+                }).then((response) => {
+                    if (response.ok) {
+                        totalFilesUploaded += fileChunks[chunkIndex].length;
+                        // Calculate progress based on the number of files uploaded
+                        const progressPercentage = Math.round((totalFilesUploaded / files.length) * 100);
+                        setProgress(progressPercentage);
+                    } else {
+                        console.error(`Error uploading chunk ${chunkIndex + 1}`);
+                    }
+                });
             }
-
-        })
-        .catch((error) => {
-            setLoading(false)
-        }).finally(()=>{
-            setLoading(false)
-
-        })
+        } catch (error) {
+            console.error('Error uploading files:', error);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
-        <Menu
-            anchorEl={anchorE2}
-            open={Boolean(anchorE2)}
-            onClose={handleClose}
-        >
-        {
-        loading && <SpinnerRotating/>
-        }
+        <Menu anchorEl={anchorE2} open={Boolean(anchorE2)} onClose={handleClose}>
+            {loading && (
+                <Box sx={{ width: '100%', padding: '1rem' }}>
+                    <Typography>Uploading folder...</Typography>
+                    <LinearProgress variant="determinate" value={progress} />
+                    <Typography>{progress}%</Typography>
+                </Box>
+            )}
             <MenuItem>
                 <input
                     type="file"
@@ -80,11 +97,7 @@ const FolderUploadMenu = ({ anchorE2, handleClose }) => {
                     id="upload-folder"
                 />
                 <label htmlFor="upload-folder">
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        component="span"
-                    >
+                    <Button variant="contained" color="primary" component="span">
                         Upload Images Folder
                     </Button>
                 </label>
