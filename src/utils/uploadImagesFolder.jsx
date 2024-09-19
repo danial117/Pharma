@@ -27,7 +27,7 @@ const FolderUploadMenu = ({ anchorE2, handleClose }) => {
     };
 
     const uploadFilesInChunks = async (files) => {
-        const chunkSize = 30; // Number of files per chunk
+        const chunkSize = 1; // Number of files per chunk
         const fileChunks = chunkFiles(files, chunkSize); // Split files into chunks
         setLoading(true);
         setProgress(0); // Reset progress when starting a new upload
@@ -52,7 +52,7 @@ const FolderUploadMenu = ({ anchorE2, handleClose }) => {
             for (let chunkIndex = 0; chunkIndex < fileChunks.length; chunkIndex++) {
                 const formData = new FormData();
                 fileChunks[chunkIndex].forEach((file, index) => {
-                    formData.append(`file_${chunkIndex}_${index}`, file); // Use unique keys for files
+                    formData.append(`file_${index}`, file); // Use unique keys for files
                 });
 
                 await fetch(`${apiUrl}/admin/${endpoint}`, {
