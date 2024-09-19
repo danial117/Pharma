@@ -352,6 +352,7 @@ export const AdminBrandsCsvFileHandling = (req, res,next) => {
       // Preprocess the row to remove quotes and trim whitespace
       const cleanedRow = {};
       for (let key in row) {
+        
         // Remove any leading/trailing whitespace and extraneous quotes
         cleanedRow[key.trim()] = row[key].trim().replace(/^"|"$/g, '');
       }
@@ -363,7 +364,7 @@ export const AdminBrandsCsvFileHandling = (req, res,next) => {
         for (const data of results) {
             try {
              
-            
+            console.log(data)
                 // Create a new product based on the CSV data
                 const brand = new Brand({
                     name: data.name,
@@ -385,7 +386,7 @@ export const AdminBrandsCsvFileHandling = (req, res,next) => {
                
             } catch (err) { 
              
-            
+             console.log(err)
                
             }
         }
@@ -412,6 +413,7 @@ export const AdminUploadProductImagesFolder=async (req,res,next)=>{
 
   try {
     const files = req.files;
+    console.log(req.files)
     const matchedFiles = [];
     const productsDir = path.join(__dirname, '../public/products/large');
  
@@ -461,7 +463,7 @@ export const AdminUploadProductImagesFolder=async (req,res,next)=>{
 
     // If no files matched, send a response indicating no files were saved
     if (matchedFiles.length === 0) {
-        return res.status(400).json({ message: 'No files matched with any product images.' });
+        return res.status(200).json({ message: 'No files matched with any product images.' });
     }else{
       for (let file of matchedFiles){
        
@@ -521,7 +523,7 @@ export const AdminUploadBrandImagesFolder=async (req,res)=>{
           const newFilename = `${Date.now()}-${file.originalname.replace(/ /g, '_')}`;
 
                 const newPath = path.join(brandsDir, newFilename);
-                  console.log(newPath)
+                  
 
 
                 // Move the file to the new location with the new name
@@ -553,10 +555,10 @@ export const AdminUploadBrandImagesFolder=async (req,res)=>{
 
     // If no files matched, send a response indicating no files were saved
     if (matchedFiles.length === 0) {
-        return res.status(400).json({ message: 'No files matched with any product images.' });
+        return res.status(200).json({ message: 'No files matched with any product images.' });
     }else{
       for (let file of matchedFiles){
-        console.log(matchedFiles)
+       
         fs.unlinkSync(file.path);
       }
        
@@ -699,7 +701,7 @@ export const AdminUploadNewsImagesFolder=async (req,res)=>{
 
     // If no files matched, send a response indicating no files were saved
     if (matchedFiles.length === 0) {
-        return res.status(400).json({ message: 'No files matched with any News images.' });
+        return res.status(200).json({ message: 'No files matched with any News images.' });
     }else{
       for (let file of matchedFiles){
         console.log(matchedFiles)

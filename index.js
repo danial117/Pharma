@@ -165,7 +165,7 @@ app.use((err, req, res, next) => {
      new CustomError(err.message,500)
 
     }catch(err){
-      console.log(err)
+      
     }
    
   }
