@@ -9,6 +9,7 @@ const FolderUploadMenu = ({ anchorE2, handleClose }) => {
     const token = localStorage.getItem('token');
     const [loading, setLoading] = useState(false);
     const [progress, setProgress] = useState(0); // State for progress tracking
+    const [uploadedCount, setUploadedCount] = useState(0); // State for tracking uploaded files
     const resource = useResourceContext();
 
     // Function to split files into chunks
@@ -31,6 +32,7 @@ const FolderUploadMenu = ({ anchorE2, handleClose }) => {
         const fileChunks = chunkFiles(files, chunkSize); // Split files into chunks
         setLoading(true);
         setProgress(0); // Reset progress when starting a new upload
+        setUploadedCount(0);
 
         let endpoint;
         switch (resource) {
@@ -52,7 +54,11 @@ const FolderUploadMenu = ({ anchorE2, handleClose }) => {
             for (let chunkIndex = 0; chunkIndex < fileChunks.length; chunkIndex++) {
                 const formData = new FormData();
                 fileChunks[chunkIndex].forEach((file, index) => {
-                    formData.append(`file_${index}`, file); // Use unique keys for files
+                   
+                    const encodedFileName = encodeURIComponent(file.name);
+                   
+                    const newFile = new File([file], encodedFileName, { type: file.type });
+                    formData.append(`file_${index}`, newFile);
                 });
 
                 await fetch(`${apiUrl}/admin/${endpoint}`, {
@@ -63,6 +69,7 @@ const FolderUploadMenu = ({ anchorE2, handleClose }) => {
                     if (response.ok) {
                         totalFilesUploaded += fileChunks[chunkIndex].length;
                         // Calculate progress based on the number of files uploaded
+                        setUploadedCount((prev) => prev + fileChunks[chunkIndex].length); // Increment uploaded count
                         const progressPercentage = Math.round((totalFilesUploaded / files.length) * 100);
                         setProgress(progressPercentage);
                     } else {
@@ -72,19 +79,22 @@ const FolderUploadMenu = ({ anchorE2, handleClose }) => {
             }
         } catch (error) {
             console.error('Error uploading files:', error);
+            handleClose();
         } finally {
             setLoading(false);
+            handleClose();
         }
     };
 
     return (
         <Menu anchorEl={anchorE2} open={Boolean(anchorE2)} onClose={handleClose}>
             {loading && (
-                <Box sx={{ width: '100%', padding: '1rem' }}>
-                    <Typography>Uploading folder...</Typography>
-                    <LinearProgress variant="determinate" value={progress} />
-                    <Typography>{progress}%</Typography>
-                </Box>
+                  <Box sx={{ width: '100%', padding: '1rem' }}>
+                  <Typography>Uploading folder...</Typography>
+                  <LinearProgress variant="determinate" value={progress} />
+                  <Typography>{uploadedCount}/{files.length} files uploaded</Typography> 
+                 
+              </Box>
             )}
             <MenuItem>
                 <input
