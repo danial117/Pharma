@@ -14,7 +14,7 @@ const SchemaTypes = mongoose.Schema.Types;
 function getCosts(value) {
   if (value && typeof value.toString === 'function') {
     // Convert Decimal128 to string and return it
-    console.log(value.toString())
+   
     return value.toString();
   }
   return value; // Return value as-is if it's undefined or null

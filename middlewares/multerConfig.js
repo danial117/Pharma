@@ -85,7 +85,7 @@ const fileFilter = (req, file, cb) => {
 
     
     else {
-      cb(new CustomError('Extension unallowed', 500));
+      cb(new CustomError('Extension unallowed', 415));
     }
   } catch (err) {
     
