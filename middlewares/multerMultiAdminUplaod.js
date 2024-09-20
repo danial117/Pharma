@@ -21,7 +21,9 @@ const storage = multer.diskStorage({
         }
     },
     filename: function (req, file, cb) {
-        cb(null, `${Date.now()}-${file.originalname.replace(/ /g, '_')}`);
+        const decodedFilename = decodeURIComponent(file.originalname);
+         file.originalname=decodedFilename
+        cb(null, `${Date.now()}-${decodedFilename.replace(/ /g, '_')}`);
     }
 });
 
@@ -37,7 +39,7 @@ export const multiUpload = multer({
 // Check File Type
 function checkFileType(file, cb) {
     // Allowed ext
-    const filetypes = /|png|/;
+    const filetypes = /png/;
     // Check ext
     const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
     // Check mime
@@ -46,6 +48,6 @@ function checkFileType(file, cb) {
     if (mimetype && extname) {
         return cb(null, true);
     } else {
-        cb(new CustomError('Png allowed only', 500));
+        cb(new CustomError('Png allowed only', 415));
     }
 }

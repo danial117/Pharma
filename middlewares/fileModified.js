@@ -62,7 +62,7 @@ export const modifiedProductFile = async (req, res,next) => {
         
 
        
-    } catch (error) {
+    } catch (err) {
        
         next(new CustomError(err.message, 500));
     }

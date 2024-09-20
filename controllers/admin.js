@@ -413,49 +413,58 @@ export const AdminUploadProductImagesFolder=async (req,res,next)=>{
 
   try {
     const files = req.files;
-    console.log(req.files)
+    
     const matchedFiles = [];
     const productsDir = path.join(__dirname, '../public/products/large');
  
     // Iterate over the uploaded files
     for (let file of files) {
-      
+       
         const product = await Product.findOne({ productImage: file.originalname });
-
+        // console.log(product)
+        
         if (product) {
           const newFilename = `${Date.now()}-${file.originalname.replace(/ /g, '_').replace('.png', '_large.png')}`;
 
                 const newPath = path.join(productsDir, newFilename);
                  
+                if (!fs.existsSync(productsDir)) {
+                  fs.mkdirSync(productsDir, { recursive: true });
+              }
+              
 
 
                 // Move the file to the new location with the new name
-                fs.rename(file.path, newPath, async(err) => {
-                  if (err) {
-                    console.error(`Failed to rename and move file: ${err.message}`);
-                } else {
-                    console.log('fix')
-                    const {outputMediumFileName,outputSmallFileName}=await compressAndSaveProductImage(newFilename)
-                  product.productImage={
-                    large:newFilename,
-                    medium:outputMediumFileName,
-                    small:outputSmallFileName
-                  }
+                try {
+                  // Synchronously rename (move) the file
+                  fs.renameSync(file.path, newPath);
                   
-                 await product.save()
-                   
+                  
+              
+                  // Call the async function to compress and save the product image
+                  const { outputMediumFileName, outputSmallFileName } = await compressAndSaveProductImage(newFilename);
+              
+                  // Update the product object with the new image paths
+                  product.productImage = {
+                      large: newFilename,
+                      medium: outputMediumFileName,
+                      small: outputSmallFileName
+                  };
+                  
+                  // Save the product document
+                  await product.save();
+              
+                 
+              
+              } catch (err) {
+                 
+              }
 
-
-
-
-
-                }
-                });
-
-
+              
                 matchedFiles.push({ ...file, newFilename });
             
         } else {
+           console.log('delete')
             // If no match, delete the file
             fs.unlinkSync(file.path);
         }
@@ -463,11 +472,12 @@ export const AdminUploadProductImagesFolder=async (req,res,next)=>{
 
     // If no files matched, send a response indicating no files were saved
     if (matchedFiles.length === 0) {
-        return res.status(200).json({ message: 'No files matched with any product images.' });
+         res.status(200).json({ message: 'Product does not exist.' });
     }else{
       for (let file of matchedFiles){
-       
+          // console.log(matchedFiles)
         fs.unlinkSync(file.path);
+         res.status(200).json({ message: 'Product does not exist.' });
       }
        
     }
@@ -477,7 +487,7 @@ export const AdminUploadProductImagesFolder=async (req,res,next)=>{
 
 } catch (err) {
  
-  next(new CustomError(err.message, 500));
+  next(new CustomError(err.message, 200));
 }
 }
 

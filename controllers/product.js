@@ -247,7 +247,7 @@ export const GetProduct=async(req,res)=>{
         }
       }
   
-      console.log(query)
+    
       // Find orders based on the filter, sort, skip, and limit
       const products = await Product.find(query).sort(sortObject).skip(skip).limit(limit);
       const totalProducts = await Product.countDocuments(query);
