@@ -147,7 +147,7 @@ export const GetBrandProducts=async(req,res,next)=>{
     try{
 
         const {brandName}=req.params;
-      
+        console.log(brandName)
         const page = parseInt(req.query.page) || 1; // Default to page 1 if not provided
           const limit = parseInt(req.query.limit) || 10; // Default to 10 items per page if not provided
           const formattedBrandName = brandName?.replaceAll('-','/');
@@ -164,7 +164,7 @@ export const GetBrandProducts=async(req,res,next)=>{
 
         })
        
-      
+      console.log(brand)
 
 
        if(brand){

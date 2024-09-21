@@ -6,6 +6,7 @@ import path from 'path'
 import { fileURLToPath } from 'url';
 import fs from 'fs'
 import CustomError from '../utils/ErrorClass.js';
+
 // Get current file directory
 const __filename = fileURLToPath(import.meta.url); 
 const __dirname = path.dirname(__filename);
@@ -21,9 +22,12 @@ export const GetProducts=async(req,res,next)=>{
 
 
 try{
-    const page = parseInt(req.query.page) || 1; // Default to page 1 if not provided
-    const limit = parseInt(req.query.limit) || 10; // Default to 10 items per page if not provided
-    const type = req.query.type;
+    const page = parseInt(req.query?.page) || 1; // Default to page 1 if not provided
+    let limit = parseInt(req.query?.limit)<40?parseInt(req.query.limit) : 40; // Default to 10 items per page if not provided
+    const type = req.query?.type;
+    const name =req.query?.name
+    const brand =req.query?.brand
+    const category =req.query?.category
     
     const skip = (page - 1) * limit;
     
@@ -34,13 +38,96 @@ try{
         { productImage: { $type: "string" } },
         { productImage: "" }
       ]}; // 'i' option for case-insensitive search
+      const count = await Product.countDocuments(query);  // Get total count of matching documents
+      const randomSkip = Math.floor(Math.random() * count);  // Generate a random skip value
+      
       const products = await Product.find(query)
-      .select('productImage name brand options ')
-      .skip(skip).limit(limit);
+        .select('productImage name brand options')
+        .skip(randomSkip)   // Skip a random number of documents
+        .limit(limit);      // Limit the number of returned documents
     
      
       res.status(200).json(products);
      
+  
+}
+
+else if(name){
+
+ function breakString(productName) {
+  // Split on capital letters, spaces, and hyphens
+  const substrings = productName.split(/(?=[A-Z])|\s+|-+/);
+  return substrings;
+}
+
+  async function findSimilarProducts(productName) {
+    let data=[]
+    // Break the product name into substrings
+    const substrings = breakString(productName);
+   
+    // Create the regex query using the substrings
+    const regexQueries = substrings.map(substring => ({
+      name: { $regex: substring, $options: 'i',$ne:productName }
+    }));
+   
+    // Combine the regex queries with an $or operator
+    const query = {
+      $or: regexQueries,
+      $nor: [
+        { productImage: { $type: "string" } },
+        { productImage: "" }
+      ]
+    };
+  
+    // Fetch the similar products from the database, limiting the result to 6 products
+    const products = await Product.find(query)
+      .select('productImage name brand options') // Select specific fields
+      .limit(limit); // Limit to 6 products
+
+      data.push(...products)
+
+     if(data.length !==6){
+      limit =data.length -6;
+      const categoryProducts = await Product.find({category:category,
+        name: { $ne: productName },
+        $nor: [
+        { productImage: { $type: "string" } },
+        { productImage: "" }
+      ]})
+      .select('productImage name brand options') // Select specific fields
+      .limit(limit);
+
+      data.push (...categoryProducts)
+
+
+     }
+
+     if(data.length !==6){
+      limit =data.length-6;
+      const brandProducts = await Product.find({brand:brand,
+        name: { $ne: productName },
+        $nor: [
+        { productImage: { $type: "string" } },
+        { productImage: "" }
+      ]})
+      .select('productImage name brand options') // Select specific fields
+      .limit(limit);
+
+      data.push (...brandProducts)
+
+
+     }
+  
+
+
+
+    return data;
+  }
+
+  const similarProducts=await findSimilarProducts(name)
+  
+  res.status(200).json(similarProducts)
+  
   
 }
     
@@ -49,12 +136,24 @@ try{
     // Calculate the number of documents to skip
     
 
-    const products=await Product.find({ $nor: [
-      { productImage: { $type: "string" } },
-      { productImage: "" }
-    ] })
-    .select('productImage name brand options ')
-    .skip(skip).limit(limit);
+    const count = await Product.countDocuments({
+      $nor: [
+        { productImage: { $type: "string" } },  // Exclude documents with productImage as a string
+        { productImage: "" }                    // Exclude documents with an empty productImage
+      ]
+    });
+    
+    const randomSkip = Math.floor(Math.random() * count);  // Generate a random skip value
+    
+    const products = await Product.find({
+      $nor: [
+        { productImage: { $type: "string" } },
+        { productImage: "" }
+      ]
+    })
+      .select('productImage name brand options')
+      .skip(randomSkip)   // Skip a random number of documents
+      .limit(limit); 
   
    
 
@@ -70,7 +169,6 @@ catch(err){
     next(new CustomError(err.message, 500));
   
 
-    
 
 }
 
@@ -87,7 +185,7 @@ export const SearchProductCategory = async (req, res,next) => {
     const { search } = req.params;
     const words = search.trim().toLowerCase().split(/\s+/);
     const page = parseInt(req.query.page) || 1; // Default to page 1 if not provided
-    const limit = parseInt(req.query.limit) || 10; // Default to 10 items per page if not provided
+    const limit = parseInt(req.query.limit)<20?parseInt(req.query.limit)  :10; // Default to 10 items per page if not provided
   
     const skip = (page - 1) * limit;
 
@@ -133,7 +231,10 @@ export const SearchProductCategory = async (req, res,next) => {
 export const SearchProduct=async(req,res,next)=>{
         try {
           // Parse query parameters
-          const { product,  page = 1, limit = 10 } = req.query;
+          const { product } = req.query;
+          const page = parseInt(req.query.page) || 1; // Default to page 1 if not provided
+          const limit = parseInt(req.query.limit)<20?parseInt(req.query.limit) : 20; // Default to 10 items per page if not provided
+         
       
           // Initialize query object
           const query = {};
