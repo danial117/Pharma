@@ -6,15 +6,15 @@ import { useNavigate } from 'react-router-dom';
 import { TruncateText } from '../utility functions/TranctuateText';
 
 
-const SimiliarProducts=()=>{
-
+const SimiliarProducts=({productName,category,brand})=>{
+ 
     const [products,setProducts]=useState([]);
     const navigate=useNavigate()
 
     useEffect(()=>{
 
         
-        fetch(`${process.env.REACT_APP_API_URL}/products?page=1&limit=3`,{
+        fetch(`${process.env.REACT_APP_API_URL}/products?name=${productName}&category=${category}&brand=${brand}&limit=6`,{
          method:'GET'
         }).then((response)=>response.json()).then((result)=>{setProducts(result)})
      

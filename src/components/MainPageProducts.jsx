@@ -56,7 +56,7 @@ const MainPageProducts=()=>{
      const RequestProducts=async()=>{
 
       
-           await fetch(`${process.env.REACT_APP_API_URL}/products?page=${page}&limit=6`,{
+           await fetch(`${process.env.REACT_APP_API_URL}/products?page=${page}&limit=28`,{
         method:'GET'
          }).then((response)=>response.json()).then((result)=>{products.push(...result);setPage(page+1); })
     
@@ -72,7 +72,7 @@ const MainPageProducts=()=>{
     
         const FetchProduct=async()=>{
 
-         await  fetch(`${process.env.REACT_APP_API_URL}/products?page=${page}&limit=6`,{
+         await  fetch(`${process.env.REACT_APP_API_URL}/products?page=${page}&limit=40`,{
              method:'GET'
             }).then((response)=>response.json()).then((result)=>{setProducts(result);  setPage(page+1)})
           
@@ -121,7 +121,7 @@ const MainPageProducts=()=>{
           { 
             
             
-             fetch(`${process.env.REACT_APP_API_URL}/products?type=${search}&page=${searchPage}&limit=6`,{
+             fetch(`${process.env.REACT_APP_API_URL}/products?type=${search}&page=${searchPage}&limit=16`,{
                 method:'GET'
                  }).then((response)=>response.json()).then((result)=>{setProducts(result);    })
                 }
