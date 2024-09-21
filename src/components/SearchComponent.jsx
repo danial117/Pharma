@@ -41,7 +41,7 @@ const SearchComponent = ({ isMobile }) => {
          
           
 
-      await  fetch(`${process.env.REACT_APP_API_URL}/products/search?product=${search.product}`, {
+      await  fetch(`${process.env.REACT_APP_API_URL}/products/search?product=${search.product}&limit=20`, {
             method: 'GET',
           })
             .then((response) => response.json())

@@ -140,7 +140,7 @@ if (foundItem) {
                
                 <TruncateText 
                          text={product.name}
-                         maxLength={50}
+                         maxLength={60}
                          className="font-Abel text-[2rem] xs:max-md:text-[1.4rem] font-bold"
                    />
 
@@ -453,12 +453,11 @@ if (foundItem) {
 
 
         </div>
-        
-   
+    
+{ product &&
 
-
-        <SimiliarProducts />
-
+        <SimiliarProducts productName={product.name} category={product.category} brand={product.brand} />
+}
         <Footer />
 
         {cart && <Cart/>}

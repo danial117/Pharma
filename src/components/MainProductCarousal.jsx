@@ -44,7 +44,7 @@ const MainProductCarousal=()=>{
      const FetchCarousalProduct=async()=>{
 
         
-       await fetch(`${process.env.REACT_APP_API_URL}/products?page=1&limit=4`,{
+       await fetch(`${process.env.REACT_APP_API_URL}/products?page=1&limit=16`,{
          method:'GET'
         }).then((response)=>response.json()).then((result)=>{setProducts(result)})
      

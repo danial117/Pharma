@@ -84,9 +84,8 @@ const BrandPage = () => {
         <div className="container w-full flex flex-col mx-auto p-4 pb-24">
             <p className="font-Abel py-6 text-[1.7rem]">Results:</p>
           <div className="grid w-full grid-cols-1 md:grid-cols-3 gap-6">
-          {isLoading ? (
-  <RenderSkeletons /> // Capitalized to make it a valid React component
-) : (
+         {
+
   typeof products === 'object' && products.map((data, index) => {
     const carted = cartItemIds.includes(data._id);
 
@@ -136,7 +135,11 @@ const BrandPage = () => {
       </div>
     );
   })
-)}
+}
+
+{isLoading && 
+  <RenderSkeletons /> // Capitalized to make it a valid React component
+}
 
           </div>
           <div onClick={refetch} className="border-2 mx-auto cursor-pointer  xs:max-sm:w-[80%]  sm:max-md:w-[30%] py-4   w-[20%] mt-24 border-emerald-500  rounded-md">
