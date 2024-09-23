@@ -1,5 +1,5 @@
 
-import { KeyboardArrowDownRounded,ShoppingCartRounded,MenuRounded,CloseRounded,AccountCircle, DisplaySettings } from "@mui/icons-material";
+import { HomeRounded,ArticleRounded,InfoRounded,ContactsRounded,CategoryRounded,KeyboardArrowDownRounded,ShoppingCartRounded,MenuRounded,CloseRounded,AccountCircle, DisplaySettings } from "@mui/icons-material";
 import { useEffect, useState,useContext } from "react";
 import Cart from "../widget/Cart";
 import { useMediaQuery } from "@mui/material";
@@ -24,8 +24,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 const NavBar=()=>{
 
-    const isMobile = useMediaQuery('(min-width:768px)');
-    const navigate=useNavigate()
+    const isDesktop = useMediaQuery('(min-width:768px)');
     const isMobileCategories = useMediaQuery('(min-width:1024px)');
     const { cart, toggleCart } = useContext(CartContext);
     const cartItems=useSelector((state)=>state.cartItems);
@@ -68,13 +67,52 @@ const NavBar=()=>{
     setAnchorEl(null);
   };
 
+  const ToggleMenuSizeCheck = () => window.matchMedia('(min-width: 769px)').matches;
 
   
-  
+  useEffect(() => {
+    const root = document.getElementById('root');
+    const overlay = document.createElement('div');
+    overlay.id = 'overlay';
+    overlay.style.position = 'fixed';
+    overlay.style.top = 0;
+    overlay.style.left = 0;
+    overlay.style.width = '100%';
+    overlay.style.height = '100%';
+    overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+    overlay.style.zIndex = 999;
+    overlay.style.display = 'none'; // Initially hidden
 
-  useEffect(()=>{
-   
-  },[user])
+
+    // Append overlay to root
+    root.appendChild(overlay);
+
+    const updateOverlay = () => {
+      if (toggleMenu) {
+        overlay.style.display = 'block'; // Show overlay when menu is toggled
+      } else {
+        overlay.style.display = 'none'; // Hide overlay when menu is closed
+      }
+
+      // Close the menu if the window size is greater than 769px
+      if (ToggleMenuSizeCheck() && toggleMenu) {
+        setToggleMenu(false);
+      }
+    };
+
+    updateOverlay(); // Initial call
+
+    // Listen for resize events
+    window.addEventListener('resize', updateOverlay);
+
+    // Cleanup effect
+    return () => {
+      root.removeChild(overlay);
+      window.removeEventListener('resize', updateOverlay);
+    };
+  }, [toggleMenu]);
+
+
 
 
 
@@ -89,7 +127,7 @@ const NavBar=()=>{
             </div>
         {
 
-          isMobile && <div className="flex text-center my-auto justify-center   className='font-Abel text-lg' mx-auto gap-x-16 md:max-lg:gap-x-4 basis-[70%] md:max-lg:basis-[80%] mx-auto flex-row">
+          isDesktop && <div className="flex text-center my-auto justify-center   className='font-Abel text-lg' mx-auto gap-x-16 md:max-lg:gap-x-4 basis-[70%] md:max-lg:basis-[80%] mx-auto flex-row">
                 <p onClick={()=>{window.location.href='/'}} className='font-Lexend cursor-pointer md:max-lg:text-[14px] text-lg'>Home <span><KeyboardArrowDownRounded/></span></p>
                 <p onClick={()=>{window.location.href='/about'}} className='font-Lexend cursor-pointer md:max-lg:text-[14px] text-lg'>About <span><KeyboardArrowDownRounded/></span></p>
                 <p onClick={()=>{window.location.href='/news'}} className='font-Lexend cursor-pointer md:max-lg:text-[14px] text-lg'>News <span><KeyboardArrowDownRounded/></span></p>
@@ -99,7 +137,7 @@ const NavBar=()=>{
 
         }
 
-          {isMobile &&  <div className="basis-[20%] md:max-lg:basis-[30%] md:max-lg:justify-end justify-end md:max-lg:gap-x-6  w-full gap-x-8 flex flex-row py-2 ml-auto mr-[4px]">
+          {isDesktop &&  <div className="basis-[20%] md:max-lg:basis-[30%] md:max-lg:justify-end justify-end md:max-lg:gap-x-6  w-full gap-x-8 flex flex-row py-2 ml-auto mr-[4px]">
              
              <div onClick={toggleCart} className="relative cursor-pointer my-auto">
               <div className='absolute -top-[2px] right-0'>
@@ -152,7 +190,7 @@ const NavBar=()=>{
             }
             
 
-            { !isMobile &&
+            { !isDesktop &&
             <div className="my-auto">
               <div className="flex mr-2 flex-row gap-x-4">
            
@@ -216,17 +254,19 @@ const NavBar=()=>{
            
               { toggleMenu &&
               
-              <div className="w-[30%] h-[100vh] right-0 z-[1000] fixed bg-gray-200"> 
-                <div className="absolute text-emerald-500 right-[3%] top-[3%]">
+              <div className="w-[50%] h-[100vh] right-0 z-[1000] fixed bg-white"> 
+                <div className="absolute text-black right-[3%] top-[3%]">
                   <CloseRounded onClick={()=>{setToggleMenu(!toggleMenu)}} style={{fontSize:'40px',cursor:'pointer'}}/>
                 </div>
-                   <div className="flex w-[80%] text-white mx-auto gap-y-6 mt-24 text-black flex-col ">
-                    <p onClick={()=>{window.location.href='/'}} className="font-Abel border-2 bg-emerald-500 cursor-pointer  text-center p-2 border-emerald-500">Home</p>
-                    <p onClick={()=>{window.location.href='/about'}}  className="font-Abel border-2 bg-emerald-500 cursor-pointer text-center p-2 border-emerald-500">About</p>
-                    <p onClick={()=>{window.location.href='/createAccount'}} className="font-Abel border-2 bg-emerald-500 cursor-pointer  text-center p-2 border-emerald-500">Sign Up</p>
-                    <p onClick={()=>{window.location.href='/news'}}  className="font-Abel border-2 bg-emerald-500 cursor-pointer text-center p-2 border-emerald-500">News</p>
-                    <p onClick={()=>{window.location.href='/contact'}}  className="font-Abel border-2 bg-emerald-500 cursor-pointer text-center p-2 border-emerald-500">Contact</p>
-                   {!isMobileCategories && <p onClick={()=>{window.location.href='/categories'}}  className="font-Abel border-2 bg-emerald-500 cursor-pointer text-center p-2 border-emerald-500">Categories</p>}
+                   <div className="flex w-[80%] text-white mx-auto gap-y-8 mt-24 text-black flex-col ">
+                 <div onClick={()=>{window.location.href='/'}} className="flex cursor-pointer flex-row gap-x-4"> <HomeRounded style={{color:'black',fontSize:32}} />   <p  className="font-Abel text-[1.4rem] font-bold text-black  text-center  ">Home</p>  </div>
+                 <div onClick={()=>{window.location.href='/about'}} className="flex cursor-pointer flex-row gap-x-4"> <InfoRounded style={{color:'black',fontSize:32}} />   <p  className="font-Abel text-[1.4rem] font-bold text-black text-center  ">About</p>  </div>
+                 <div onClick={()=>{window.location.href='/createAccount'}} className="flex cursor-pointer flex-row gap-x-4"> <HomeRounded style={{color:'black',fontSize:32}} />   <p  className="font-Abel text-[1.4rem] font-bold text-black  text-center  ">Sign Up</p>  </div>
+                 <div onClick={()=>{window.location.href='/news'}} className="flex cursor-pointer flex-row gap-x-4"> <ArticleRounded style={{color:'black',fontSize:32}} />   <p  className="font-Abel text-[1.4rem] font-bold text-black  text-center  ">News</p>  </div>
+                 <div onClick={()=>{window.location.href='/contact'}} className="flex cursor-pointer flex-row gap-x-4"> <ContactsRounded style={{color:'black',fontSize:32}} />   <p  className="font-Abel text-[1.4rem] font-bold text-black  text-center  ">Contact</p>  </div>
+                 {!isMobileCategories &&    <div onClick={()=>{window.location.href='/categories'}} className="flex flex-row cursor-pointer gap-x-4"> <CategoryRounded style={{color:'black',fontSize:32}} />   <p  className="font-Abel text-[1.4rem] font-bold text-black  text-center  ">Categories</p>  </div> }
+                  
+         
 
                    </div>
 

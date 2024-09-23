@@ -143,7 +143,7 @@ const SearchComponent = ({ isMobile }) => {
             <div onClick={() => navigate(`/productPage/${data._id}`)} key={index} className="w-full cursor-pointer border-b-2 border-gray-400">
               <div className="flex py-2 justify-between items-center w-[90%] gap-x-2 mx-auto">
                 <div className='flex gap-x-2 items-center'>
-                  <img className="w-[40px] h-auto" src={`${process.env.REACT_APP_API_URL}/assets/products/sm/${data.productImage.small}`} alt="Product" />
+                  <img className="w-[40px] h-[50px]" src={`${process.env.REACT_APP_API_URL}/assets/products/sm/${data.productImage.small}`} alt="Product" />
                   <TruncateText
                     text={data.name}
                     maxLength={40}
