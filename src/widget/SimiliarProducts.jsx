@@ -17,11 +17,11 @@ const SimiliarProducts=({productName,category,brand})=>{
         fetch(`${process.env.REACT_APP_API_URL}/products?name=${productName}&category=${category}&brand=${brand}&limit=6`,{
          method:'GET'
         }).then((response)=>response.json()).then((result)=>{setProducts(result)})
+       
      
-     
-         },[])
+         },[productName])
 
-
+  
     return(
        
 
@@ -50,12 +50,14 @@ const SimiliarProducts=({productName,category,brand})=>{
 
                                 <div key={index} onClick={()=>navigate(`/productPage/${data._id}`)}  className="flex cursor-pointer justify-between gap-y-2 border-2 bg-white rounded-md border-emerald-500 flex-col">
                                 <div className=" w-[90%]  mt-6 h-[150px] border-b-2 pb-2 border-gray-200  mx-auto">
-                                    <img className="w-[50%] h-[100%] mx-auto my-auto" src={`${process.env.REACT_APP_API_URL}/assets/products/md/${data.productImage.medium}`}/>
+                                    <img className="w-[100px] h-[140px] mx-auto my-auto" src={`${process.env.REACT_APP_API_URL}/assets/products/md/${data.productImage.medium}`}/>
         
                                 </div>
                                 <div className="m-2">
                                 <p className="font-Abel text-[12px] font-bold text-emerald-400 my-[2px]">{data.brand}</p>
                                
+
+
                                 <TruncateText 
                                            text={data.name}
                                            maxLength={30}

@@ -316,7 +316,7 @@ const HomePage=()=>{
 
     <div className="w-[5%] mx-auto bg-emerald-500 my-4 h-[3px]"></div>
 
-    <p className="text-center w-[50%] xs:max-md:w-[80%] mx-auto font-Livvic text-xs">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Quae deserunt adipisci aliquid? Totam minima officia, molestias magnam facere iure laborum.</p>
+    <p className="text-center w-[60%] xs:max-md:w-[80%] mx-auto font-Livvic text-sm">Start by searching for the item you want in the online store's search bar. Once you've found it, add it to your cart and follow the simple checkout process to finalize your purchase.</p>
 
     <div className="grid grid-cols-3 xs:max-md:grid-cols-1 xs:max-md:gap-y-2 xs:max-lg:w-[90%] my-6 gap-x-6 w-[80%] mx-auto">
 
