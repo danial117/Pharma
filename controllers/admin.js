@@ -543,6 +543,7 @@ export const AdminUploadBrandImagesFolder=async (req,res)=>{
                 } else {
                     
                  brand.brandLogoPath=newFilename;
+                 brand.imageAvailable=true
                   
                  await brand.save()
                    

@@ -107,19 +107,32 @@ export const AdminCreateBrand=async(req,res,next)=>{
 
 
 
+
+
+
 export const GetBrands=async(req,res,next)=>{
 
 
     try{
 
         const page = parseInt(req.query.page) || 1; // Default to page 1 if not provided
-        const limit = parseInt(req.query.limit) || 10; // Default to 10 items per page if not provided
+        const limit = parseInt(req.query.limit)<=4 ? parseInt(req.query.limit) : 4; // Default to 10 items per page if not provided
     
         // Calculate the number of documents to skip
         const skip = (page - 1) * limit;
     
-        const brands=await Brand.find().skip(skip).limit(limit);
-        res.status(200).json(brands)
+        const brands=await Brand.find({ imageAvailable:{$ne:false}}).skip(skip).limit(limit).select('name brandLogoPath');
+        // Get the total count of brands that match the query
+        const totalBrands = await Brand.countDocuments({ imageAvailable: { $ne: false } });
+
+        // Calculate total pages
+        const totalPages = Math.ceil(totalBrands / limit);
+
+        const data={
+          brands:brands,
+          totalPages:totalPages
+        }
+        res.status(200).json(data)
 
 
     }
@@ -206,6 +219,7 @@ export const AdminModifyBrand=async(req,res,next)=>{
           const file=req.file
          
           data['brandLogoPath']=file.filename
+          data['imageAvailable']=true
    
         }
         data['name']=data.name
