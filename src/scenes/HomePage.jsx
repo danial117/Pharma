@@ -21,7 +21,7 @@ import api from "../utils/api";
 import UAParser from 'ua-parser-js';
 import AD_1 from '../assets/AD.png'
 import { useCMS } from '../cartContext/CmsContext'
-
+import BrandComponent from "../components/BrandsComponent";
 
 
 
@@ -246,7 +246,8 @@ const HomePage=()=>{
 
     </section>
 
-
+ 
+   <BrandComponent/>
 
 
     <MainProductCarousal />

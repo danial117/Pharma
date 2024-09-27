@@ -213,8 +213,8 @@ const Address=()=>{
             newErrors.zip = 'zip code is required.';
         }
 
-        if (formData.zip && formData.zip.length !== 6) {
-            newErrors.zip = 'zip code should be at least 6 characters long.';
+        if (formData.zip && formData.zip.length !== 5) {
+            newErrors.zip = 'zip code should be at least 5 characters long.';
           }
     
 

@@ -110,36 +110,7 @@ const Contact=()=>{
                     
                     </div>
 
-                    <div className="flex xs:max-md:w-[90%] xs:max-md:mx-auto flex-col xs:max-md:grid xs:max-md: grid-cols-2 gap-y-8">
-
-                        <div>
-                          
-                            <p className="font-Abel xs:max-md:text-[1.4rem] text-[1.8rem]">Connect with us:</p>
-                            <p className="font-Abel xs:max-md:text-sm text-lg">For any support or any questions:</p>
-                            <p className="font-Abel xs:max-md:text-sm text-lg">Email us at <span className="text-blue-700">infovit@gmail.com</span></p>
-                            
-
-
-                        </div>
-
-
-                        <div>
-                          
-                            <p className="font-Abel xs:max-md:text-[1.4rem] text-[1.8rem]">Pixpa USA</p>
-                            <p className="font-Abel xs:max-md:text-sm text-lg">501 Silverside Road, Suite 105,</p>
-                            <p className="font-Abel xs:max-md:text-sm text-lg">Wilmington, Delaware 19809</p>
-                            <p className="font-Abel xs:max-md:text-sm text-lg">USA</p>
-                            
-
-
-                        </div>
-
-
-
-
-
-
-                    </div>
+                  
 
 
                 </div>

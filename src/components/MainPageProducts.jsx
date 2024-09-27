@@ -76,12 +76,7 @@ const MainPageProducts=()=>{
              method:'GET'
             }).then((response)=>response.json()).then((result)=>{setProducts(result);  setPage(page+1)})
           
-         
-        
-        
-        
-        
-        }
+    }
 
 
 
