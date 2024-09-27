@@ -126,7 +126,11 @@ else if(name){
 
   const similarProducts=await findSimilarProducts(name)
   
-  res.status(200).json(similarProducts)
+
+  
+    res.status(200).json(similarProducts)
+  
+  
   
   
 }
