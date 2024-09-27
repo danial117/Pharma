@@ -411,7 +411,7 @@ const SignUp = () => {
         <div className="w-[80%] xs:max-md:grid-cols-1 xs:max-md:w-[90%] md:max-lg:w-[90%] pt-4 pb-12 mx-auto grid grid-cols-2">
           <div className="bg-white">
             <div className="w-[70%] xs:max-sm:w-[100%] sm:max-lg:w-[90%] xs:max-sm:p-4 p-12 mx-auto">
-              <p className="font-Lexend text-center text-[2rem]">Info.vit</p>
+              <p className="font-Lexend text-center text-[2rem]">Infovit</p>
               <p className="font-Abel text-center">Create an account</p>
 
               <div className="container w-full my-4">

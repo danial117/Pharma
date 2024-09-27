@@ -12,7 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { removeItemFromCart } from "../state";
 import ReactGA from 'react-ga4';
 import SpinnerRotating from "../skeleton/spinner";
-
+import FullscriptLogo from "../assets/svg/fullscript";
 
 
 
@@ -82,7 +82,7 @@ const Order=()=>{
                 return dispatch(removeItemFromCart({ itemId }));
               });
               
-              Promise.all(removePromises)
+             await Promise.all(removePromises)
                 .then(() => {
                   console.log('All items removed from cart successfully.');
                   // You can add any additional logic here if needed, e.g., redirect, UI update
@@ -187,26 +187,7 @@ const Order=()=>{
 
 
 
-  
 
-
-
-
-
-
-
-
-      const Checkout=async()=>{
-
-        await fetch(`${process.env.REACT_APP_API_URL}/user/address/`,{
-            method:'GET',
-            
-        }).then((response)=>response.json()).then(()=>{
-
-        })
-      }
-    
-    
 
       
 
@@ -238,7 +219,15 @@ const Order=()=>{
     
    {loading && <SpinnerRotating />}
 
-    <div className=" w-[100%] p-8">
+    <div className=" w-[100%] ">
+
+   <div className="mt-2 xs:max-md:mt-4 flex  mb-6">
+      <div className="flex  mx-auto  justify-center flex-row">
+        <FullscriptLogo />
+        <p className="font-Lexend text-gray-500 text-[1.4rem] xs:max-sm:text-lg  my-6">Powered By Fullscript</p>
+      </div>
+    </div>
+    
 
 
 
