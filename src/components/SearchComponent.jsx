@@ -41,7 +41,7 @@ const SearchComponent = ({ isMobile }) => {
          
           
 
-      await  fetch(`${process.env.REACT_APP_API_URL}/products/search?product=${search.product}&limit=20`, {
+      await  fetch(`${process.env.REACT_APP_API_URL}/products/search?product=${search.product}&limit=15`, {
             method: 'GET',
           })
             .then((response) => response.json())
@@ -144,11 +144,22 @@ const SearchComponent = ({ isMobile }) => {
               <div className="flex py-2 justify-between items-center w-[90%] gap-x-2 mx-auto">
                 <div className='flex gap-x-2 items-center'>
                   <img className="w-[40px] h-[50px]" src={`${process.env.REACT_APP_API_URL}/assets/products/sm/${data.productImage.small}`} alt="Product" />
+                  <div className='flex flex-col'>
                   <TruncateText
                     text={data.name}
                     maxLength={40}
                     className="my-auto font-Abel cursor-pointer"
                   />
+
+                  <TruncateText
+                    text={data.brand}
+                    maxLength={40}
+                    className="cursor-pointer font-Abel text-[14px] xs:max-sm:text-[12px] font-bold text-emerald-400 my-[2px]"
+                  />
+                  </div>
+
+
+
                 </div>
                 <p className="my-auto font-bold font-Abel">${data.options[0].price}</p>
               </div>

@@ -66,8 +66,7 @@ const Footer=()=>{
                 <p className="text-white font-Abel">{cmsData.FooterContent?.email}</p>
 
             </div>
-
-            <p className="my-2 text-white -mb-2 text-lg font-Lexend">Follow Us</p>
+vcfcvvc            <p className="my-2 text-white -mb-2 text-lg font-Lexend">Follow Us</p>
             <div className="flex flex-row gap-x-2">
                 <a className="cursor-pointer" href={cmsData?.FooterContent?.facebookLink} target="_blank" rel="noopener noreferrer">
         <Facebook />

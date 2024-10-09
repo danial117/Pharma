@@ -162,7 +162,7 @@ const MainProductCarousal=()=>{
                                     <p className="font-Poppins text-gray-600">{data.options[0]?.option}</p>
                                     <div  className="grid py-2 grid-cols-2 gap-x-2 ">
                                         <div className="bg-gray-200 font-Abel py-2 text-[20px] rounded-md text-center">${data.options[0]?.price}</div>
-                                        {carted ?   <div style={{userSelect:'none'}} onClick={toggleCart}  className="text-md border-2 cursor-pointer rounded-md py-2 sm:max-md:text-xs xs:max-sm:text-xs font-Abel text-center border-gray-300">View in cart</div>      : <div onClick={()=>dispatch(addItemToCartAsync({ product: { ...data, option:{id: data.options[0].id,price:data.options[0].price}}}))}  className="text-md border-2 cursor-pointer rounded-md py-2 sm:max-md:text-xs xs:max-sm:text-xs font-Abel text-center border-gray-300">Add to cart</div>}
+                                        {carted ?   <div style={{userSelect:'none'}} onClick={toggleCart}  className="text-md border-2 cursor-pointer rounded-md py-2 sm:max-md:text-md xs:max-sm:text-md font-Abel text-center border-gray-300">View in cart</div>      : <div onClick={()=>dispatch(addItemToCartAsync({ product: { ...data, option:{id: data.options[0].id,price:data.options[0].price}}}))}  className="text-md border-2 cursor-pointer rounded-md py-2 sm:max-md:text-md xs:max-sm:text-md font-Abel text-center border-gray-300">Add to cart</div>}
                                     </div>
                                     </div>
             
