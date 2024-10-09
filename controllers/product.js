@@ -186,40 +186,67 @@ catch(err){
 
 export const SearchProductCategory = async (req, res,next) => {
   try {
-    const { search } = req.params;
-    const words = search.trim().toLowerCase().split(/\s+/);
+    // Parse query parameters
+    const { product } = req.query;
     const page = parseInt(req.query.page) || 1; // Default to page 1 if not provided
-    const limit = parseInt(req.query.limit)<20?parseInt(req.query.limit)  :10; // Default to 10 items per page if not provided
-  
+    const limit = Math.min(parseInt(req.query.limit) || 10, 20); // Limit to 20 items per page
+
+    // Initialize query object
+    const query = {};
+
+    if (product) {
+        const parts = product.split(' ');
+        let brand = '';
+        let productName = '';
+
+        // Determine brand and product name based on position
+        if (parts.length > 1) {
+            brand = parts.pop(); // Last part as brand
+            productName = parts.join(' '); // Remaining parts as product name
+        } else {
+            productName = parts[0]; // If only one part, treat as product name
+        }
+
+        const brandRegex = new RegExp(brand, 'i'); // Regex for brand
+        const productRegex = new RegExp(productName, 'i'); // Regex for product name
+
+        // Build the query
+        query.$or = [
+            { name: productRegex }, // Search for products matching the product name
+            { brand: brandRegex }    // Search for all products of the brand
+        ];
+    }
+
+    // Calculate the number of documents to skip
     const skip = (page - 1) * limit;
 
-    // Escape special characters for regex safety
-    const escapedWords = words.map(word => word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
-
-    // Create a regex pattern to match the exact phrases or words
-    const pattern = new RegExp(`\\b${escapedWords.join('\\b.*?\\b')}\\b`, 'i'); // 'i' for case-insensitive
-    
-    const results = await Product.find({
-      $nor: [
-        { productImage: { $type: "string" } },
-        { productImage: "" }
-      ],
-      category: {
-        $elemMatch: {
-          $regex: pattern
-        }
-      }
+    // Retrieve products from the database with pagination and search
+    const products = await Product.find({
+        ...query,
+        $nor: [
+            { productImage: { $type: "string" } },
+            { productImage: "" }
+        ]
     })
-    .select('productImage name brand options ')
-    .skip(skip).limit(limit);
-   
-    res.status(200).json(results);
-  } catch (err) {
-   
-   
-      next(new CustomError(err.message, 500));
-    
-  }
+    .select('productImage name brand options')
+    .sort({
+        // Sort to prioritize products by name matches first
+        name: { $regex: product ? productRegex : '', $options: 'i' },
+        brand: 1 // Sort by brand name as secondary
+    })
+    .skip(skip)
+    .limit(limit);
+
+    // Get the total number of matching products to calculate total pages
+    const totalProducts = await Product.countDocuments(query);
+    const totalPages = Math.ceil(totalProducts / limit);
+
+    // Send the paginated results along with additional information
+    res.status(200).json({ products, totalPages, currentPage: page });
+
+} catch (err) {
+    next(new CustomError(err.message, 500));
+}
 };
 
 
@@ -233,49 +260,53 @@ export const SearchProductCategory = async (req, res,next) => {
 
 
 export const SearchProduct=async(req,res,next)=>{
-        try {
-          // Parse query parameters
-          const { product } = req.query;
-          const page = parseInt(req.query.page) || 1; // Default to page 1 if not provided
-          const limit = parseInt(req.query.limit)<20?parseInt(req.query.limit) : 20; // Default to 10 items per page if not provided
-         
-      
-          // Initialize query object
-          const query = {};
-      
-          // Add search conditions to query object
-          if (product) {
-            query.name = { $regex: product, $options: 'i' }; // Case-insensitive regex search
-          }
-         
-      
-          // Calculate the number of documents to skip
-          const skip = (parseInt(page) - 1) * parseInt(limit);
-      
-          // Retrieve products from the database with pagination and search
-          const products = await Product.find({...query,$nor: [
+  try {
+    // Parse query parameters
+    const { product } = req.query;
+    const page = parseInt(req.query.page) || 1; // Default to page 1 if not provided
+    const limit = Math.min(parseInt(req.query.limit) || 10, 20); // Limit to 20 items per page
+
+    // Initialize query object
+    const query = {};
+
+    // Add search conditions to query object
+    if (product) {
+        // Split the input into parts for separate search
+        const searchParts = product.split(' ');
+        const regex = new RegExp(searchParts.join('|'), 'i'); // Create a case-insensitive regex
+        
+        // Use $or to search in both fields
+        query.$or = [
+            { name: regex },    // Search by product name
+            { brand: regex }    // Search by brand name
+        ];
+    }
+
+    // Calculate the number of documents to skip
+    const skip = (page - 1) * limit;
+
+    // Retrieve products from the database with pagination and search
+    const products = await Product.find({
+        ...query,
+        $nor: [
             { productImage: { $type: "string" } },
             { productImage: "" }
-          ]})
-          .select('productImage name brand options ')
-          .skip(skip).limit(parseInt(limit));
-      
-          // Get the total number of matching products to calculate total pages
-          const totalProducts = await Product.countDocuments(query);
-          const totalPages = Math.ceil(totalProducts / parseInt(limit));
-      
-          // Send the paginated results along with additional information
-         
+        ]
+    })
+    .select('productImage name brand options')
+    .skip(skip)
+    .limit(limit);
 
-            res.status(200).json({products:products});
+    // Get the total number of matching products to calculate total pages
+    const totalProducts = await Product.countDocuments(query);
+    const totalPages = Math.ceil(totalProducts / limit);
 
-          
-          
-        } catch (err) {
-         
-            next(new CustomError(err.message, 500));
-          
-        }
+    // Send the paginated results along with additional information
+    res.status(200).json({ products, totalPages, currentPage: page });
+
+} catch (err) {
+    next(new CustomError(err.message, 500));
+}
       };
 
 
