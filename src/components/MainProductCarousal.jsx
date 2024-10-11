@@ -157,7 +157,7 @@ const MainProductCarousal=()=>{
                                            text={data.name}
                                            maxLength={30}
                                            onClick={()=>{window.location.href=`/productPage/${data._id}`}}
-                                           className="font-Lexend cursor-pointer text-gray-800"
+                                           className="font-Lexend cursor-pointer xs:max-sm:text-sm text-gray-800"
                                      />
                                     <p className="font-Poppins text-gray-600">{data.options[0]?.option}</p>
                                     <div  className="grid py-2 grid-cols-2 gap-x-2 ">
