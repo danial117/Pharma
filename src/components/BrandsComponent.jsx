@@ -70,7 +70,28 @@ const Pagination = ({totalPages , currentPage, onPageChange}) => {
 
 
 
-
+  const brands = [
+    {
+        name: 'Pure Encapsulations',
+        image: require('../assets/brands/Pure_Encapsulations.jfif'), // Adjust the path as needed
+        // Add any additional properties here
+    },
+    {
+        name: 'Designs for Health',
+        image: require('../assets/brands/designs-for-health.png'), // Replace with an actual image path
+        // Add any additional properties here
+    },
+    {
+        name: 'Apex Energetics, Inc',
+        image: require('../assets/brands/apex_energetics.png'), // Replace with an actual image path
+        // Add any additional properties here
+    },
+    {
+        name: 'Microbiome Labs',
+        image: require('../assets/brands/microbiome-labs.webp'), // Replace with an actual image path
+        // Add any additional properties here
+    }
+];
 
 
 
@@ -79,29 +100,13 @@ const Pagination = ({totalPages , currentPage, onPageChange}) => {
 
 const BrandComponent=()=>{
  
-    const [brands, setBrands] = useState([]);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
+ 
+  
       
 
 
 
-    const fetchBrands = (page = 1) => {
-      fetch(`${process.env.REACT_APP_API_URL}/brands?page=${page}`)
-        .then((response) => response.json())
-        .then((data) => {
-          setBrands(data.brands); // Assuming the API response contains a 'brands' array
-          setTotalPages(data.totalPages); // Assuming the API response contains a 'totalPages' property
-        });
-    };
   
-    useEffect(() => {
-      fetchBrands(currentPage);
-    }, [currentPage]); // Fetch brands whenever the current page changes
-  
-    const handlePageChange = (pageNumber) => {
-      setCurrentPage(pageNumber);
-    };
 
 
 
@@ -116,8 +121,10 @@ const BrandComponent=()=>{
             return(
                 
                 <div onClick={()=>{window.location.href=`/brand/${data.name}`}} className='border-2 cursor-pointer border-gray-500' key={index}>
-                <img className="w-[500px] h-[175px] mx-auto my-auto" src={`${process.env.REACT_APP_API_URL}/assets/brands/${data.brandLogoPath}`} alt={data.name} />
+                <img className="w-[500px] xs:max-sm:h-[145px] h-[175px] mx-auto my-auto" src={data.image} alt={data.name} />
                 </div>
+              
+              
              )
               })}
 
@@ -128,14 +135,14 @@ const BrandComponent=()=>{
 
 
 
-            <div className='my-24 w-full'>
+            {/* <div className='my-24 w-full'>
                 <Pagination 
                  totalPages={totalPages}
                  currentPage={currentPage}
                  onPageChange={handlePageChange}
                  />
 
-            </div>
+            </div> */}
 
 
         </div>

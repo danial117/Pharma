@@ -69,7 +69,7 @@ const SearchComponent = ({ isMobile }) => {
            })
 
   
-   console.log(isLoadingSearchProducts)
+
 
 
 
