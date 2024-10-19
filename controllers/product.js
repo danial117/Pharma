@@ -27,6 +27,7 @@ try{
     const type = req.query?.type;
     const name =req.query?.name
     const brand =req.query?.brand
+    const productName =req.query?.productName
     const category =req.query?.category
     
     const skip = (page - 1) * limit;
@@ -134,6 +135,20 @@ else if(name){
   
   
 }
+else if(productName && brand){
+  const productsByBrand=await Product.find({name:new RegExp(productName, 'i'),brand:brand})
+  .select('productImage name brand options') 
+  .limit(limit);
+
+  setTimeout(()=>
+    {
+      res.status(200).json(productsByBrand)
+    
+    },1000
+  )
+ 
+
+}
     
     else
 {
@@ -160,11 +175,12 @@ else if(name){
       .limit(limit); 
   
    
-
+  
       res.status(200).json(products)
       
     
 }
+
 
 }
 catch(err){
