@@ -444,33 +444,7 @@ const Address=()=>{
 
 
 
-                <div>
-                <div className="p-4 border-2 w-full relative border-gray-300 rounded-md">
-                <input type="text" 
-                value={formData.state}
-                onChange={handleChange}
-                name="state"
-                
-                
-                onFocus={() => setShowDropdown(true)}
-                onBlur={() => setTimeout(() => setShowDropdown(false), 100)}
-                placeholder="State" className="focus:outline-none"/>
-                {showDropdown && (
-        <div className="border border-gray-300 rounded-md mt-1 left-0 bg-white absolute z-10 w-full max-h-60 overflow-y-auto">
-          {filteredStates.map((state,index) => (
-            <div
-              key={index}
-              className="p-2 font-Lexend cursor-pointer hover:bg-gray-200"
-              onClick={() => handleSelect( state.name,state.code)}
-            >
-              {state.name}
-            </div>
-          ))}
-        </div>
-      )}
-                </div>
-                {errors.state && <p className="text-red-500 font-Lexend ml-2">{errors.state}</p>}
-                </div>
+               
 
 
 
@@ -496,6 +470,47 @@ const Address=()=>{
 
 
 
+
+
+                <div>
+                <div className="p-4 border-2 w-full relative border-gray-300 rounded-md">
+                <select 
+                value={formData.state}
+                
+                name="state"
+                onChange={(e) => handleSelect(e.target.value, e.target.selectedOptions[0].getAttribute('data-code'))}
+                 className="focus:outline-none  w-full"
+                // onFocus={() => setShowDropdown(true)}
+                // onBlur={() => setTimeout(() => setShowDropdown(false), 100)}
+                placeholder="State" >
+                
+                <option className="font-Lexend" value={formData.state?formData.state:''}>{formData.state  ?formData.state:'Select State'}</option>
+                {states.map((state,index) => (
+                  <option className="cursor-pointer"  key={index}  data-code={state.code} value={state.name}>{state.name}</option>
+                ))}
+                {/* {showDropdown && (
+        <div className="border border-gray-300 rounded-md mt-1 left-0 bg-white absolute z-10 w-full max-h-60 overflow-y-auto">
+          {filteredStates.map((state,index) => (
+            <div
+              key={index}
+              className="p-2 font-Lexend cursor-pointer hover:bg-gray-200"
+              onClick={() => handleSelect( state.name,state.code)}
+            >
+              {state.name}
+            </div>
+          ))}
+        </div>
+      )} */}
+      </select >
+                </div>
+                {errors.state && <p className="text-red-500 font-Lexend ml-2">{errors.state}</p>}
+                </div>
+
+
+
+
+
+
             
          
                 <div className="grid grid-cols-2 xs:max-md:grid-cols-1 xs:max-md:gap-y-4 gap-x-6">
@@ -504,21 +519,47 @@ const Address=()=>{
 
                 <div>
                 <div className="p-4 border-2 border-gray-300 rounded-md">
-              <select
+              <input
                 name="city"
                 value={formData.city}
-                
+                placeholder="Enter a city"
                 onChange={handleChange}
                 className="focus:outline-none  w-full"
-              >
-                <option className="font-Lexend" value={formData.city?formData.city:''}>{formData.city  ?formData.city:'Select City'}</option>
+              />
+                {/* <option className="font-Lexend" value={formData.city?formData.city:''}>{formData.city  ?formData.city:'Select City'}</option>
                 {cities.map((city,index) => (
                   <option key={index} value={city}>{city}</option>
-                ))}
-              </select>
+                ))} */}
+
+
+{/* {showDropdown && (
+        <div className="border border-gray-300 rounded-md mt-1 left-0 bg-white absolute z-10 w-full max-h-60 overflow-y-auto">
+          {cities.map((citu,index) => (
+            <div
+              key={index}
+              className="p-2 font-Lexend cursor-pointer hover:bg-gray-200"
+              onClick={() => handleSelect( city.name)}
+            >
+              {city.name}
+            </div>
+          ))}
+        </div>
+      )}  */}
+
+              
               </div>
               {errors.city && <p className="text-red-500 font-Lexend ml-2">{errors.city}</p>}
             </div>
+
+
+
+
+
+
+
+
+
+            
 
                 <div>
                 <div className="p-4 border-2 border-gray-300 rounded-md">
