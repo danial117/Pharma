@@ -121,8 +121,8 @@ const NavBar=()=>{
     return(
         <nav style={{userSelect:'none'}} className="w-[100%] border-b-2 border-gray-300 ">
         <div className="flex w-[100%] border-b-2 border-gray-700 mx-auto xs:max-md:justify-between flex-row">
-            <div className="Logo  basis-[10%]  ">
-                 <img className="h-[70px] w-[200px] ml-2" src={require('../assets/logo_1.png')} />
+            <div className="Logo my-auto xs:max-md:basis-[20%]   basis-[15%]  ">
+                 <img className="h-[50px] w-[150px] xs:max-sm:w-[500px] sm:max-md:w-[400px] " src={require('../assets/logo_1.png')} />
 
             </div>
         {
